@@ -1,0 +1,7 @@
+index,year,ortg,drtg,AtRimFGM,AtRimFGA,AtRimAssists,Turnovers,FTA,OffPoss,DefPoss,TwoPtAssists,Steals,BadPassSteals,ThreePtAssists,FG3A,OpponentPoints,Points,SecondChancePoints,FG2A,LiveBallTurnovers,TsPct,Fg3Pct,AtRimFG3AFrequency,Pace,AtRimFrequency,SecondsPerPossOff,SecondsPerPossDef,Minutes,DefAtRimReboundPct,DefFGReboundPct,AtRimAccuracy,player_on,OffFGReboundPct,nba_id
+0,1997,117.1,103.0,,,,,,,,,,,,,,,,,,,,,,,,,191.0,,,,True,0.327,364
+1,1997,108.3,86.5,,,,,,,,,,,,,,,,,,,,,,,,,53.0,,,,False,0.275,364
+2,1998,116.8,104.6,,,,,,,,,,,,,,,,,,,,,,,,,58.0,,,,True,0.3329999999999999,364
+3,1998,105.7,97.7,,,,,,,,,,,,,,,,,,,,,,,,,133.0,,,,False,0.241,364
+4,1999,123.7,98.3,,,,,,,,,,,,,,,,,,,,,,,,,58.0,,,,True,0.289,364
+5,1999,105.0,97.5,,,,,,,,,,,,,,,,,,,,,,,,,85.0,,,,False,0.226,364
