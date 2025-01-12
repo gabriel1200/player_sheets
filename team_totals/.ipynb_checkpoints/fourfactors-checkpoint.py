@@ -87,8 +87,6 @@ def four_factors_data(df,frame2,year,ps=False,vs=False):
     df['oreb_factor']=((1-df['avg_orb%'])*df['OREB']-df['avg_orb%']*df['opp_DREB'])*df['avg_ortg']
     df['ft_factor']=df['FTM']-.4*df['FTA']*df['avg_ortg'] + .06*(df['FTA']-df['FTM'])*df['avg_ortg']
 
-    columns = ['ft_factor', 'oreb_factor', 'turnover_factor', '2shooting_factor', '3shooting_factor']
-    df['spread']=df['ft_factor']+df['oreb_factor']+df['turnover_factor']+df['2shooting_factor']+df['3shooting_factor']
     df.drop(columns=['opp_DREB'],inplace=True)
 
 
