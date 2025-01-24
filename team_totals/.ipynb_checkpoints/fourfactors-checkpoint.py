@@ -71,8 +71,8 @@ def four_factors_data(df,frame2,year,ps=False,vs=False):
     
     #df['avg_ortg']/=100
     #df['avg_orb%']/=100
-    df['FGA']=df['FG2A']-df['FG3A']
-    df['FGM']= df['FG2M']-df['FG3M']
+    df['FGA']=df['FG2A']+df['FG3A']
+    df['FGM']= df['FG2M']+df['FG3M']
     df['FG2_miss']=df['FG2A']-df['FG2M']
     
     df['FG3_miss']=df['FG3A']-df['FG3M']
