@@ -1,0 +1,285 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+import pandas as pd
+import pandas as pd
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import glob
+import os
+
+
+ps=False
+def collect_yeardata(ps=False):
+    frames = []
+    trail=''
+    if ps ==True:
+        trail='_ps'
+    end_year = 2024 if ps else 2025
+    for year in range(1997,end_year+1):
+        file= str(year)+trail+'_avg.csv'
+        
+        df = pd.read_csv(file)
+        df['PLAYER_ID']=df['PLAYER_ID'].astype(str)
+
+        if year >2000:
+            df2=pd.read_csv(str(year)+trail+'_pbp'+'.csv')
+ 
+            df2.rename(columns={'EntityId':'PLAYER_ID'},inplace=True)
+
+            curcol =[col.lower() for col in df.columns]
+            keepcol =[col for col in df2.columns if col.lower() not in curcol]
+            keepcol.append('PLAYER_ID')
+            keepcol.append('year')
+            df2=df2[keepcol]
+            df2['PLAYER_ID']=df2['PLAYER_ID'].astype(str)
+            if ps:
+                df2['year']=df2['year'].str.split('_').str[0].astype(int)
+
+            df=df.merge(df2,on=['PLAYER_ID','year'],how='left')
+        df['year']=year
+        frames.append(df)
+
+    return pd.concat(frames)
+sum_metrics = [
+    "MIN", "FGM", "FGA", "FG3M", "FG3A", "FTM", "FTA", "OREB", "DREB", "REB",
+    "AST", "TOV", "STL", "BLK", "BLKA", "PF", "PFD", "PTS", "PLUS_MINUS", 
+    "DD2", "TD3", "FGM_PG", "sp_work_PACE", "sp_work_DEF_RATING", "DEF_RATING", 
+    "sp_work_NET_RATING", "E_DEF_RATING", "OFF_RATING", "PACE_PER40", 
+    "AST_RATIO", "sp_work_OFF_RATING", "E_PACE", "NET_RATING", "E_NET_RATING", 
+    "PACE", "E_OFF_RATING", "FGA_PG", "AST_TO", "ITP_FGM", 
+    "ABOVE_BREAK_3_FGA", "MID_FGM", "RIGHT_CORNER_3_FGM", "MID_FGA", 
+    "RA_FGA", "LEFT_CORNER_3_FGM", "ITP_FGA", "LEFT_CORNER_3_FGA", 
+    "BACKCOURT_FGA", "RA_FGM", "CORNER_3_FGM", "RIGHT_CORNER_3_FGA", 
+    "BACKCOURT_FGM", "CORNER_3_FGA", "ABOVE_BREAK_3_FGM", "FGM_10_14", 
+    "FGP_5_9", "FGP_35_39", "FGP_LT_5", "FGP_10_14", "FGA_15_19", 
+    "FGP_15_19", "FGA_25_29", "FGM_40_PLUS", "FGM_LT_5", "FGM_15_19", 
+    "FGA_40_PLUS", "FGM_20_24", "FGA_30_34", "FGM_5_9", "FGM_30_34", 
+    "FGA_10_14", "FGP_30_34", "FGA_5_9", "FGP_25_29", "FGP_40_PLUS", 
+    "FGM_25_29", "FGA_20_24", "FGP_20_24", "FGA_35_39", 
+    "FGM_35_39", "FGA_LT_5", "POTENTIAL_AST", "AST_ADJ", "FT_AST", 
+    "PASSES_RECEIVED", "PASSES_MADE", "SECONDARY_AST", "AST_PTS_CREATED", 
+    "DRIVE_FTM", "DRIVE_TOV", "DRIVE_FGM", "DRIVE_PASSES", "DRIVES", 
+    "DRIVE_PTS", "DRIVE_PF", "DRIVE_AST", "DRIVE_FTA", "DRIVE_FGA", 
+    "TOUCHES", "AVG_SEC_PER_TOUCH", "POINTS", "TIME_OF_POSS", 
+    "AVG_DRIB_PER_TOUCH", "PAINT_TOUCHES", "FRONT_CT_TOUCHES", 
+    "ELBOW_TOUCHES", "POST_TOUCHES", "PTS_PER_ELBOW_TOUCH", 
+    "PTS_PER_PAINT_TOUCH", "PTS_PER_TOUCH", "PTS_PER_POST_TOUCH", 
+    "DREB_CHANCE_DEFER", "AVG_DREB_DIST", "REB_UNCONTEST", 
+    "OREB_CHANCE_DEFER", "OREB_CHANCES", "AVG_OREB_DIST", "DREB_CONTEST", 
+    "OREB_UNCONTEST", "AVG_REB_DIST", "REB_CONTEST", "REB_CHANCES", 
+    "REB_CHANCE_DEFER", "DREB_UNCONTEST", "DREB_CHANCES", "OREB_CONTEST", 
+    "very_tight_FG3M",  "very_tight_FGA_FREQUENCY", 
+    "very_tight_FG3A", "very_tight_FG2M",
+    "very_tight_FGM", "very_tight_FG2A_FREQUENCY", "very_tight_FGA", 
+    "very_tight_FG2A", "very_tight_FG3A_FREQUENCY", "tight_FGM", 
+    "tight_FGA_FREQUENCY", "tight_FG3A", "tight_FGA", "tight_FG2A_FREQUENCY", 
+    "tight_FG2M", "tight_FG2A", "tight_FG3A_FREQUENCY", "tight_FG3M", 
+    "open_FG3A_FREQUENCY", "open_FG3A", "open_FG2A", "open_FG3M", 
+    "open_FG2A_FREQUENCY", "open_FG2M", "open_FGM", "open_FGA_FREQUENCY", 
+    "open_FGA", "wide_open_FG2A", "wide_open_FG2M", "wide_open_FGM", 
+    "wide_open_FG3M", "wide_open_FGA_FREQUENCY", "wide_open_FGA", 
+    "wide_open_FG2A_FREQUENCY", "wide_open_FG3A", "wide_open_FG3A_FREQUENCY", 
+    "PULL_UP_PTS", "PULL_UP_FG3A", "PULL_UP_FGA", "PULL_UP_FGM", 
+    "PULL_UP_FG3M", "PAINT_TOUCH_PTS", "ELBOW_TOUCH_PTS", "POST_TOUCH_PTS", 
+    "CATCH_SHOOT_PTS", "FGM_LT_06", "FGA_LT_06", "PLUSMINUS", "CATCH_SHOOT_FG3M", "CATCH_SHOOT_FG3A", 
+    "CATCH_SHOOT_FGA", "CATCH_SHOOT_FGM"
+]
+pct_metrics = [
+    "W_PCT",                "FG_PCT",             "FG3_PCT",            "FT_PCT",
+    "TM_TOV_PCT",          "REB_PCT",           "AST_PCT",           "DREB_PCT",
+    "E_TOV_PCT",           "TS_PCT",            "EFG_PCT",           "E_USG_PCT",
+    "OREB_PCT",            "USG_PCT",           "MID_FG_PCT",       "BACKCOURT_FG_PCT",
+    "ABOVE_BREAK_3_FG_PCT", "CORNER_3_FG_PCT", "RA_FG_PCT",         "LEFT_CORNER_3_FG_PCT",
+    "RIGHT_CORNER_3_FG_PCT", "ITP_FG_PCT",      "AST_TO_PASS_PCT_ADJ", "AST_TO_PASS_PCT",
+    "DRIVE_PTS_PCT",       "DRIVE_FT_PCT",      "DRIVE_PASSES_PCT",  "DRIVE_TOV_PCT",
+    "DRIVE_PF_PCT",        "DRIVE_FG_PCT",      "DRIVE_AST_PCT",     "REB_CHANCE_PCT",
+    "OREB_CONTEST_PCT",    "OREB_CHANCE_PCT",   "DREB_CHANCE_PCT",   "DREB_CONTEST_PCT",
+    "DREB_CHANCE_PCT_ADJ", "REB_CHANCE_PCT_ADJ", "OREB_CHANCE_PCT_ADJ", "REB_CONTEST_PCT",
+    "very_tight_EFG_PCT",  "very_tight_FG2_PCT", "very_tight_FG3_PCT", "very_tight_FG_PCT",
+    "tight_FG_PCT",        "tight_EFG_PCT",     "tight_FG2_PCT",     "tight_FG3_PCT",
+    "open_FG2_PCT",        "open_EFG_PCT",      "open_FG3_PCT",      "open_FG_PCT",
+    "wide_open_FG2_PCT",   "wide_open_FG_PCT",  "wide_open_FG3_PCT",  "wide_open_EFG_PCT",
+    "PULL_UP_EFG_PCT",     "PULL_UP_FG3_PCT",   "PULL_UP_FG_PCT",    "ELBOW_TOUCH_FG_PCT",
+    "CATCH_SHOOT_FG_PCT",  "PAINT_TOUCH_FG_PCT", "POST_TOUCH_FG_PCT",  "EFF_FG_PCT",
+    "LT_06_PCT",           "NS_LT_06_PCT",      "CATCH_SHOOT_FG3_PCT","CATCH_SHOOT_EFG_PCT"
+]
+pbp_columns = [
+    "TeamId", "Name", "ShortName", "RowId",  "SecondsPlayed",
+    "GamesPlayed", "Minutes", "PlusMinus", "OffPoss", "DefPoss", "PenaltyOffPoss", "PenaltyDefPoss",
+    "SecondChanceOffPoss", "TotalPoss", "AtRimFGM", "AtRimFGA", "SecondChanceAtRimFGM",
+    "SecondChanceAtRimFGA", "PenaltyAtRimFGM", "PenaltyAtRimFGA", "ShortMidRangeFGM",
+    "ShortMidRangeFGA", "LongMidRangeFGM", "LongMidRangeFGA", "Corner3FGM", "Corner3FGA",
+    "SecondChanceCorner3FGM", "SecondChanceCorner3FGA", "PenaltyCorner3FGM", "PenaltyCorner3FGA",
+    "Arc3FGM", "Arc3FGA", "SecondChanceArc3FGM", "SecondChanceArc3FGA", "PenaltyArc3FGM",
+    "PenaltyArc3FGA", "FG2M", "FG2A", "FG3M", "FG3A", "FtPoints", "Points", "OpponentPoints",
+    "SecondChanceFG2M", "SecondChanceFG2A", "SecondChanceFG3M", "SecondChanceFG3A", "SecondChanceFtPoints",
+    "SecondChancePoints", "PenaltyFG2M", "PenaltyFG2A", "PenaltyFG3M", "PenaltyFG3A", "PenaltyFtPoints",
+    "PenaltyPoints", "PtsAssisted2s", "PtsUnassisted2s", "PtsAssisted3s", "PtsUnassisted3s",
+    "PtsPutbacks", "NonHeaveArc3FGA", "NonHeaveArc3FGM", "Fg2aBlocked", "Fg3aBlocked", "TwoPtAssists",
+    "ThreePtAssists", "Assists", "Arc3Assists", "Corner3Assists", "AtRimAssists", "ShortMidRangeAssists",
+    "LongMidRangeAssists", "AssistPoints", "OffThreePtRebounds", "OffTwoPtRebounds", "FTOffRebounds",
+    "DefThreePtRebounds", "DefTwoPtRebounds", "FTDefRebounds", "DefRebounds", "OffRebounds", "Rebounds",
+    "SelfOReb", "Steals", "BadPassSteals", "LostBallSteals", "LiveBallTurnovers",
+    "BadPassOutOfBoundsTurnovers", "BadPassTurnovers", "DeadBallTurnovers", "LostBallOutOfBoundsTurnovers",
+    "LostBallTurnovers", "StepOutOfBoundsTurnovers", "Travels", "Turnovers", "SecondChanceTurnovers",
+    "PenaltyTurnovers", "ShootingFouls", "Fouls", "Charge Fouls", "Loose Ball Fouls",
+    "Offensive Fouls", "FoulsDrawn", "Charge Fouls Drawn", "Loose Ball Fouls Drawn",
+    "Offensive Fouls Drawn", "FTA", "2pt And 1 Free Throw Trips", "TwoPtShootingFoulsDrawn",
+    "NonShootingFoulsDrawn", "Blocked2s", "Blocked3s", "BlockedArc3", "BlockedAtRim",
+    "BlockedCorner3", "BlockedLongMidRange", "BlockedShortMidRange", "Blocks", "RecoveredBlocks",
+    "FirstChancePoints", "PenaltyPointsExcludingTakeFouls", "PenaltyOffPossExcludingTakeFouls",
+    "NonShootingPenaltyNonTakeFouls", "NonShootingPenaltyNonTakeFoulsDrawn", "Period1Fouls2Minutes",
+    "Period2Fouls2Minutes", "Period3Fouls3Minutes", "Period4Fouls4Minutes", "OnOffRtg", "OnDefRtg",
+    "Assisted2sPct", "NonPutbacksAssisted2sPct", "Assisted3sPct", "Fg3Pct", "SecondChanceFg3Pct",
+    "PenaltyFg3Pct", "NonHeaveFg3Pct", "Fg2Pct", "SecondChanceFg2Pct", "PenaltyFg2Pct", "EfgPct",
+    "SecondChanceEfgPct", "PenaltyEfgPct", "TsPct", "SecondChanceTsPct", "PenaltyTsPct", "FG3APct",
+    "FG3APctBlocked", "FG2APctBlocked", "AtRimPctBlocked", "ShortMidRangePctBlocked", "LongMidRangePctBlocked",
+    "Corner3PctBlocked", "Arc3PctBlocked", "Usage", "LiveBallTurnoverPct", "DefFTReboundPct",
+    "OffFTReboundPct", "DefTwoPtReboundPct", "OffTwoPtReboundPct", "DefThreePtReboundPct",
+    "OffThreePtReboundPct", "DefFGReboundPct", "OffFGReboundPct", "OffAtRimReboundPct",
+    "OffShortMidRangeReboundPct", "OffLongMidRangeReboundPct", "OffArc3ReboundPct", "OffCorner3ReboundPct",
+    "DefAtRimReboundPct", "DefShortMidRangeReboundPct", "DefLongMidRangeReboundPct", "DefArc3ReboundPct",
+    "DefCorner3ReboundPct", "SelfORebPct", "BlocksRecoveredPct", "AtRimFrequency", "AtRimAccuracy",
+    "UnblockedAtRimAccuracy", "AtRimPctAssisted", "ShortMidRangeFrequency", "ShortMidRangeAccuracy",
+    "UnblockedShortMidRangeAccuracy", "ShortMidRangePctAssisted", "LongMidRangeFrequency",
+    "LongMidRangeAccuracy", "UnblockedLongMidRangeAccuracy", "LongMidRangePctAssisted",
+    "Corner3Frequency", "Corner3Accuracy", "UnblockedCorner3Accuracy", "Corner3PctAssisted",
+    "Arc3Frequency", "Arc3Accuracy", "UnblockedArc3Accuracy", "Arc3PctAssisted", "SecondChanceAtRimFrequency",
+    "SecondChanceAtRimAccuracy", "SecondChanceAtRimPctAssisted", "SecondChanceCorner3Frequency",
+    "SecondChanceCorner3Accuracy", "SecondChanceCorner3PctAssisted", "SecondChanceArc3Frequency",
+    "SecondChanceArc3Accuracy", "SecondChanceArc3PctAssisted", "PenaltyAtRimFrequency",
+    "PenaltyAtRimAccuracy", "PenaltyCorner3Frequency", "PenaltyCorner3Accuracy", "PenaltyArc3Frequency",
+    "PenaltyArc3Accuracy", "AtRimFG3AFrequency", "NonHeaveArc3Accuracy", "ShotQualityAvg",
+    "SecondChanceShotQualityAvg", "PenaltyShotQualityAvg", "ShootingFoulsDrawnPct", "TwoPtShootingFoulsDrawnPct",
+    "SecondChancePointsPct", "PenaltyPointsPct", "Avg2ptShotDistance", "Avg3ptShotDistance",
+    "AtRimOffReboundedPct", "ShortMidRangeOffReboundedPct", "LongMidRangeOffReboundedPct",
+    "ThreePtOffReboundedPct", "PenaltyOffPossPct", "HeaveAttempts", "Technical Free Throw Trips",
+    "DefensiveGoaltends", "OffensiveGoaltends", "Defensive 3 Seconds Violations", "Period2Fouls3Minutes",
+    "Period3Fouls4Minutes", "Period4Fouls5Minutes", "PeriodOTFouls4Minutes", "PeriodOTFouls5Minutes",
+    "3pt And 1 Free Throw Trips", "ThreePtShootingFoulsDrawn", "ThreePtShootingFoulsDrawnPct",
+    "Clear Path Fouls", "HeaveMakes", "3SecondViolations", "Period1Fouls3Minutes", "Period3Fouls5Minutes",
+    "Period2Fouls4Minutes"
+]
+
+index_col=["PLAYER_ID","PLAYER_NAME","W","GP","year","POSS","TEAM_ABBREVIATION","TEAM_ID","AGE"]
+other_col = index_col+sum_metrics+pct_metrics
+pbp_col =[ col for col in pbp_columns if col not in other_col]
+data=collect_yeardata(ps=ps)
+total_columns = index_col+sum_metrics+pct_metrics+pbp_columns
+
+total_columns=list(set(total_columns))
+data=data[total_columns]
+
+
+columns_to_front = ["PLAYER_ID", "PLAYER_NAME", "W", "GP", "year", "POSS", "TEAM_ABBREVIATION", "TEAM_ID", "AGE"]
+
+# Reorder the DataFrame
+data = data[columns_to_front + [col for col in data.columns if col not in columns_to_front]]
+
+total_path = 'all_totals.csv' if ps else 'all_totals_ps.csv'
+data.to_csv(total_path,index=False)
+modern = data[data.year>=2014]
+
+modern_path='modern_totals.csv' if ps else 'modern_totals_ps.csv'
+data.to_csv(modern_path,index=False)
+
+def perc_save(df,ps=True):
+    trail ='_ps' if ps else ''
+    player_ids=df['PLAYER_ID'].unique().tolist()
+    
+    frame=df[index_col+sum_metrics+pct_metrics].reset_index()
+    frame=frame.fillna(0)
+    for col in sum_metrics:
+        frame[col] =100* frame[col].astype(int)/frame['POSS']
+    all_metrics = sum_metrics+pct_metrics
+    for col in all_metrics:
+        rank_col=frame.groupby('year')[col].rank(pct=True)
+        frame[col+'_rank'] = rank_col
+    for id in player_ids:
+    
+        player_frame=frame[frame.PLAYER_ID==id]
+    
+        player_frame.to_csv('../perc/'+str(id)+trail+'.csv',index=False)
+
+def total_save(df,ps=False):
+    trail ='_ps' if ps else ''
+    player_ids=df['PLAYER_ID'].unique().tolist()
+    
+    frame=df[index_col+sum_metrics+pct_metrics].reset_index()
+    frame=frame.fillna(0)
+
+
+    for id in player_ids:
+    
+        player_frame=frame[frame.PLAYER_ID==id]
+    
+        player_frame.to_csv('../totals/'+str(id)+trail+'.csv',index=False)
+perc_save(data,ps=ps)
+
+total_save(data,ps=ps)
+
+
+# In[2]:
+
+
+data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
+
+
+# In[ ]:
+
+
+
+
+
+# In[3]:
+
+
+directory = "../totals"
+
+
+totals=pd.read_csv(total_path)
+totals.columns = totals.columns.str.replace(' ', '_')
+totals.rename(columns={'3SecondViolations':'ThreeSecondViolations'},inplace=True)
+
+
+lebron=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/lebron.csv')
+start_year=1997
+end_year=2024 if ps else 2025
+trail = '_ps' if ps else ''
+for year in range(start_year,end_year+1):
+
+    yearframe=totals[totals.year==year].reset_index(drop=True)
+    if trail =='' and year>=2010:
+        lebronyear=lebron[lebron.year==year].reset_index(drop=True)
+        lebronyear=lebronyear[['WAR','LEBRON','O-LEBRON','D-LEBRON','year','NBA ID']]
+        
+        lebronyear.rename(columns={'WAR':'LEBRON_WAR','NBA ID':'PLAYER_ID','O-LEBRON':'O_LEBRON','D-LEBRON':'D_LEBRON',},inplace=True)
+        print(len(yearframe))
+
+        yearframe=yearframe.merge(lebronyear,on=['PLAYER_ID','year'],how='left')
+        print(len(yearframe))
+        print(lebronyear)
+    if year>=2014:
+        
+        yearframe['on-ball-time%'] = 100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
+        yearframe['ON_BALL_TIME_PCT'] =  100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
+    yearframe.sort_values(by=['Points','Minutes'],inplace=True)
+    yearframe.to_csv('../year_totals/'+str(year)+trail+'.csv',index=False)
+
+
+# In[4]:
+
+
+yearframe.sort_values('TIME_OF_POSS',inplace=True)
+yearframe[['TIME_OF_POSS','Minutes']]
+
+
+# In[ ]:
+
+
+
+
