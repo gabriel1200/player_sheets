@@ -67,6 +67,43 @@ class PBPStatsAPI:
                     
         return pd.concat(all_games) if all_games else pd.DataFrame()
 
+def get_team_abbreviations():
+    """
+    Returns a dictionary mapping team IDs to team abbreviations.
+    """
+    return {
+        '1610612755': 'PHI', 
+        '1610612744': 'GSW', 
+        '1610612752': 'NYK', 
+        '1610612737': 'ATL', 
+        '1610612758': 'SAC', 
+        '1610612738': 'BOS', 
+        '1610612765': 'DET', 
+        '1610612747': 'LAL', 
+        '1610612741': 'CHI', 
+        '1610612764': 'WAS', 
+        '1610612745': 'HOU', 
+        '1610612760': 'OKC', 
+        '1610612749': 'MIL', 
+        '1610612756': 'PHX', 
+        '1610612757': 'POR', 
+        '1610612739': 'CLE', 
+        '1610612761': 'TOR', 
+        '1610612762': 'UTA', 
+        '1610612754': 'IND', 
+        '1610612751': 'BRK', 
+        '1610612743': 'DEN', 
+        '1610612759': 'SAS', 
+        '1610612746': 'LAC', 
+        '1610612742': 'DAL', 
+        '1610612766': 'CHO', 
+        '1610612748': 'MIA', 
+        '1610612753': 'ORL', 
+        '1610612750': 'MIN', 
+        '1610612763': 'MEM', 
+        '1610612740': 'NOP'
+    }
+
 def fetch_all_teams_game_logs(team_ids: List[str], start_year: int, end_year: int,entity_type:str ="Team") -> Dict[str, pd.DataFrame]:
     """
     Fetch game logs for multiple teams within the specified year range.
@@ -113,26 +150,40 @@ if __name__ == "__main__":
     #frames=[]
     frames=[]
     # Example: Save to CSV files
-    
+    team_dict = get_team_abbreviations()
+   
     for team_id, games_df in team_game_logs.items():
         if not games_df.empty:
+            team_all=[]
             for year in range(start_year, end_year + 1):
-                team_df = games_df[games_df.year == year]
                 
+                team_df = games_df[games_df.year == year]
+                team_df['team_id']=team_id
+                team_df['team_id']=team_id
+                team_df['team']=team_dict[str(team_id)]
                 if len(team_df)!=0:
                     team_df.to_csv(f"team/{year}/{team_id}.csv", index=False)
-                    #frames.append(team_df)
+
+                    team_all.append(team_df)
+                all_teams=pd.concat(team_all)
+                all_teams.to_csv((str(year)+'_all_team_logs.csv'),index=False)
+            
             logging.info(f"Saved game logs for {team_id}")
-    
+          
     entity_type="Opponent"
     team_game_logs = fetch_all_teams_game_logs(team_ids, start_year, end_year,entity_type)
     for team_id, games_df in team_game_logs.items():
         if not games_df.empty:
+            team_all_vs=[]
             for year in range(start_year, end_year + 1):
                 team_df = games_df[games_df.year == year]
-                
+                team_df['team_id']=team_id
+                team_df['team']=team_dict[str(team_id)]
                 if len(team_df)!=0:
                     team_df.to_csv(f"team/{year}/{team_id}vs.csv", index=False)
+                    team_all_vs.append(team_df)
+                all_teams_vs=pd.concat(team_all_vs)
+                all_teams_vs.to_csv(str(year)+'_all_team_logs_vs.csv',index=False)
                     #frames.append(team_df)
             logging.info(f"Saved game logs for {team_id}")
     
