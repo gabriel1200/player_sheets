@@ -159,14 +159,11 @@ if __name__ == "__main__":
                 
                 team_df = games_df[games_df.year == year]
                 team_df['team_id']=team_id
-                team_df['team_id']=team_id
-                team_df['team']=team_dict[str(team_id)]
+                
                 if len(team_df)!=0:
                     team_df.to_csv(f"team/{year}/{team_id}.csv", index=False)
 
-                    team_all.append(team_df)
-                all_teams=pd.concat(team_all)
-                all_teams.to_csv((str(year)+'_all_team_logs.csv'),index=False)
+
             
             logging.info(f"Saved game logs for {team_id}")
           
@@ -178,24 +175,21 @@ if __name__ == "__main__":
             for year in range(start_year, end_year + 1):
                 team_df = games_df[games_df.year == year]
                 team_df['team_id']=team_id
-                team_df['team']=team_dict[str(team_id)]
+                team_df['team']=team_dict[str(team_id]
                 if len(team_df)!=0:
                     team_df.to_csv(f"team/{year}/{team_id}vs.csv", index=False)
-                    team_all_vs.append(team_df)
-                all_teams_vs=pd.concat(team_all_vs)
-                all_teams_vs.to_csv(str(year)+'_all_team_logs_vs.csv',index=False)
+
                     #frames.append(team_df)
             logging.info(f"Saved game logs for {team_id}")
     
     
 
 
-# In[2]:
+# In[4]:
 
 
 import os
 
-'''
 for year in range(2014,2026):
     directory = "team/"+str(year)
     files = os.listdir(directory)
@@ -240,17 +234,56 @@ for year in range(2014,2026):
             'UTA': '1610612762',
             'POR': '1610612757',
             'NOP': '1610612740'}
-    master.dropna(subset='Opponent',inplace=True)
-    for opp in master.Opponent.unique():
-        teamframe=master[master.Opponent==opp].reset_index()
-
- 
-        teamframe.to_csv(directory+'/'+team_id+'vs.csv',index=False)
-        print(len(teamframe))
-        
+    master.to_csv(directory+'all_logs.csv')
     
     print(year)
-'''
+for year in range(2014,2026):
+    directory = "team/"+str(year)
+    files = os.listdir(directory)
+    files =[file for file in files if 'game_logs' not in file and '.csv' in file and 'vs' in file]
+    
+    totals=[]
+    for file in files:
+        df=pd.read_csv(directory+'/'+file)
+        totals.append(df)
+    master= pd.concat(totals)
+
+    team_dict={'OKC': '1610612760',
+            'MIL': '1610612749',
+            'SAC': '1610612758',
+            'LAL': '1610612747',
+            'BOS': '1610612738',
+            'DEN': '1610612743',
+            'MIN': '1610612750',
+            'NYK': '1610612752',
+            'PHO': '1610612756',
+            'PHX': '1610612756',
+            'ORL': '1610612753',
+            'CHA': '1610612766',
+            'CHO': '1610612766',
+            'CLE': '1610612739',
+            'LAC': '1610612746',
+            'ATL': '1610612737',
+            'MIA': '1610612748',
+            'DAL': '1610612742',
+            'DET': '1610612765',
+            'MEM': '1610612763',
+            'TOR': '1610612761',
+            'CHI': '1610612741',
+            'IND': '1610612754',
+            'SAS': '1610612759',
+            'HOU': '1610612745',
+            'BRK': '1610612751',
+            'BKN': '1610612751',
+            'WAS': '1610612764',
+            'GSW': '1610612744',
+            'PHI': '1610612755',
+            'UTA': '1610612762',
+            'POR': '1610612757',
+            'NOP': '1610612740'}
+    master.to_csv(directory+'vs_all_logs.csv')
+    
+    print(year)
 
 
 # In[ ]:
