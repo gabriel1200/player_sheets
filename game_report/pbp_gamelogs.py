@@ -175,7 +175,7 @@ if __name__ == "__main__":
             for year in range(start_year, end_year + 1):
                 team_df = games_df[games_df.year == year]
                 team_df['team_id']=team_id
-                team_df['team']=team_dict[str(team_id]
+                team_df['team']=team_dict[str(team_id)]
                 if len(team_df)!=0:
                     team_df.to_csv(f"team/{year}/{team_id}vs.csv", index=False)
 
