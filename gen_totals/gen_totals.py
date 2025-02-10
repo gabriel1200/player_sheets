@@ -235,7 +235,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[3]:
+# In[7]:
 
 
 directory = "../totals"
@@ -250,19 +250,20 @@ lebron=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs
 start_year=1997
 end_year=2024 if ps else 2025
 trail = '_ps' if ps else ''
+modern_years=[]
 for year in range(start_year,end_year+1):
 
     yearframe=totals[totals.year==year].reset_index(drop=True)
     if trail =='' and year>=2010:
         lebronyear=lebron[lebron.year==year].reset_index(drop=True)
-        lebronyear=lebronyear[['WAR','LEBRON','O-LEBRON','D-LEBRON','year','NBA ID']]
+        print(lebronyear.columns)
+        lebronyear=lebronyear[['WAR','LEBRON','O-LEBRON','D-LEBRON','year','NBA ID','Pos', 'Offensive Archetype','Defensive Role']]
         
         lebronyear.rename(columns={'WAR':'LEBRON_WAR','NBA ID':'PLAYER_ID','O-LEBRON':'O_LEBRON','D-LEBRON':'D_LEBRON',},inplace=True)
-        print(len(yearframe))
+
 
         yearframe=yearframe.merge(lebronyear,on=['PLAYER_ID','year'],how='left')
-        print(len(yearframe))
-        print(lebronyear)
+
     if year>=2014:
         
         yearframe['on-ball-time%'] = 100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
@@ -270,12 +271,29 @@ for year in range(start_year,end_year+1):
     yearframe.sort_values(by=['Points','Minutes'],inplace=True)
     yearframe.to_csv('../year_totals/'+str(year)+trail+'.csv',index=False)
 
+    if year>=2014:
+        modern_years.append(yearframe)
+modern = pd.concat(modern_years)
+modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
+
 
 # In[4]:
 
 
 yearframe.sort_values('TIME_OF_POSS',inplace=True)
 yearframe[['TIME_OF_POSS','Minutes']]
+
+
+# In[5]:
+
+
+yearframe['Pos'].unique()
+
+
+# In[6]:
+
+
+yearframe[yearframe.Pos.isna()]
 
 
 # In[ ]:
