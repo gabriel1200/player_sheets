@@ -737,6 +737,11 @@ for year in range(2001,2026):
 
 
     pbp=pbp.merge(vsframe,on='TeamId')
+    pbp['OffMinutes'] = (pbp['SecondsPerPossOff'] * pbp['OffPoss']) / 60
+    pbp['DefMinutes'] = (pbp['SecondsPerPossDef'] * pbp['DefPoss']) / 60
+    pbp['OPace'] = 48 * ((pbp['OffPoss']) / (2 * (pbp['OffMinutes'])))
+    pbp['DPace'] = 48 * ((pbp['DefPoss']) / (2 * (pbp['DefMinutes'])))
+
     pbp['o_rating']=100* pbp['Points']/pbp['OffPoss']
     pbp['d_rating']=100* pbp['OpponentPoints']/pbp['DefPoss']
     pbp['3p_rate']=100* pbp['FG3A']/pbp['FGA']
