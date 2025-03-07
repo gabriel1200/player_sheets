@@ -28,17 +28,20 @@ python game_report_scrape.py
 python pbp_gamelogs.py
 cd ..
 
-cd teamgame_report
-python teamgame_report_scrape.py
-cd ..
 
 cd team_totals
 python team_average_scrape.py
+cp team_averages.csv ../teamgame_report/team_averages.csv
+cp team_averages_ps.csv ../teamgame_report/team_averages_ps.csv
 cd ..
 
 cd gen_totals
 python averages_scrape.py
 python gen_totals.py
+cd ..
+
+cd teamgame_report
+python teamgame_report_scrape.py
 cd ..
 
 cd lineups
