@@ -5,6 +5,9 @@ cd game_report
 jupyter nbconvert --to script game_report_scrape.ipynb
 jupyter nbconvert --to script pbp_gamelogs.ipynb
 cd ..
+cd teamgame_report
+jupyter nbconvert --to script teamgame_report_scrape.ipynb
+cd ..
 
 cd team_totals
 jupyter nbconvert --to script team_average_scrape.ipynb
@@ -23,6 +26,10 @@ cd ..
 cd game_report
 python game_report_scrape.py
 python pbp_gamelogs.py
+cd ..
+
+cd teamgame_report
+python teamgame_report_scrape.py
 cd ..
 
 cd team_totals
