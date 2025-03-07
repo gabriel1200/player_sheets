@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 from nba_api.stats.static import players,teams
@@ -323,7 +323,7 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
             
             url14=f"https://stats.nba.com/stats/leaguedashptteamdefend?College=&Conference=&Country=&DateFrom{date}=&DateTo={date}&DefenseCategory=Less%20Than%206Ft&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
             df14=pull_data(url14)
-            #print(df14)
+         
             #print('frame14')
             
             url15=f"https://stats.nba.com/stats/leaguedashteamshotlocations?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DistanceRange=5ft%20Range&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&Location=&MeasureType=Base&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
@@ -366,14 +366,20 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
             df['team_poss']=df['TEAM_ID'].map(poss_map)
            
             frames = [df2, df3, df4, df5, df6, df7, df8, df9, df10,df11,df12,df13,df14,df15,df16,df18,df19,df20,df21,df22]
+            i=1
             for frame in frames:
                 
                 joined_columns = set(frame.columns) - set(df.columns)
                 joined_columns = list(joined_columns)
+                print(joined_columns)
                 joined_columns.append('TEAM_ID')
                 frame = frame[joined_columns]
 
                 df = df.merge(frame, on='TEAM_ID',how='left').reset_index(drop=True)
+                i+=1
+                if i ==17:
+                    i+=1
+                print(i)
 
             df['year'] = year
             print(year)
