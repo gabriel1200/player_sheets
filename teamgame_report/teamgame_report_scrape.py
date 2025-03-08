@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[75]:
+# In[4]:
 
 
 from nba_api.stats.static import players,teams
@@ -324,7 +324,7 @@ inverted_team_dict = {
 }
 
 
-# In[76]:
+# In[5]:
 
 
 for year in range(2026,2026):    
@@ -518,6 +518,7 @@ for year in range(2014, 2026):
         "wide_open_FG3A_FREQUENCY": "opp_wide_open_FG3A_FREQUENCY"
     }
     copied_data.rename(columns=opp_dict,inplace=True)
+    
     col_list = [
         'opp_very_tight_FG3A_FREQUENCY',
         'opp_very_tight_FG3A',
@@ -544,8 +545,13 @@ for year in range(2014, 2026):
 
 
     merged_data=merged_data.merge(copied_data,how='inner',on=['TEAM_ABBREVIATION','GameId'])
-    
+    ranked=[col for col in merged_data.columns if 'rank' in col.lower()]
+    print(len(merged_data.columns))
+    merged_data.drop(columns=ranked,inplace=True)
+    print(len(merged_data.columns))
     merged_data.to_csv(f"year_files/all_games_{year}{trail}.csv",index=False)
+    merged_data.to_parquet(f"year_files/all_games_{year}{trail}.parquet",index=False)
+
   
 
   
