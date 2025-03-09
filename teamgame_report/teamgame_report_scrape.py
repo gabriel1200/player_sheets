@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
+# In[24]:
 
 
 from nba_api.stats.static import players,teams
@@ -324,7 +324,7 @@ inverted_team_dict = {
 }
 
 
-# In[5]:
+# In[25]:
 
 
 for year in range(2026,2026):    
@@ -396,7 +396,11 @@ all_pbp_vs = []
 all_nba = []
 ps=False
 trail='ps' if ps else ''
-for year in range(2014, 2026):
+start_year=2014
+end_year=2026
+if ps == True:
+    end_year=2025
+for year in range(start_year, end_year):
     # Read CSV files for each year
     pbp = pd.read_csv(f"../game_report/team/{year}all_logs.csv")
     pbp_vs = pd.read_csv(f"../game_report/team/{year}vs_all_logs.csv")
@@ -484,6 +488,10 @@ for year in range(2014, 2026):
     pbp=pbp[to_keep]
     # Merge pbp and nba data
     merged_data = pd.merge(nba, pbp, on=['TEAM_ID', 'date'], how='left')
+    merged_data['AtRimFG3A']=merged_data['AtRimFGA'] +merged_data['FG3A']
+    merged_data['FGA']=merged_data['FG2A']+merged_data['FG3A']
+    merged_data['FGM']=merged_data['FG2M']+merged_data['FG3M']
+    merged_data['FG_missed']=merged_data['FGA']-merged_data['FGM']
     print(merged_data[merged_data.GameId.isna()])
     merged_data['GameId']=merged_data['GameId'].astype(int)
     merged_data['date']=merged_data['date'].astype(int)
@@ -515,7 +523,10 @@ for year in range(2014, 2026):
         "wide_open_FG3_PCT": "opp_wide_open_FG3_PCT",
         "wide_open_FG3M": "opp_wide_open_FG3M",
         "wide_open_FG3A": "opp_wide_open_FG3A",
-        "wide_open_FG3A_FREQUENCY": "opp_wide_open_FG3A_FREQUENCY"
+        "wide_open_FG3A_FREQUENCY": "opp_wide_open_FG3A_FREQUENCY",
+        "FG_missed":"opp_FG_missed",
+        "OREB":"opp_OREB",
+        "DREB":"opp_DREB"
     }
     copied_data.rename(columns=opp_dict,inplace=True)
     
@@ -536,7 +547,10 @@ for year in range(2014, 2026):
         'opp_wide_open_FG3M',
         'opp_wide_open_FG3A',
         'opp_wide_open_FG3A_FREQUENCY',
+        'opp_FG_missed',
         'TEAM_ABBREVIATION',
+        "opp_OREB",
+        "opp_DREB"
     
         'GameId'
     ]
@@ -544,7 +558,11 @@ for year in range(2014, 2026):
     copied_data=copied_data[col_list].reset_index()
 
 
+
     merged_data=merged_data.merge(copied_data,how='inner',on=['TEAM_ABBREVIATION','GameId'])
+    merged_data["team_oreb_chances"]=merged_data["OREB"]+merged_data["opp_DREB"]
+    merged_data["team_dreb_chances"]=merged_data["DREB"]+merged_data["opp_OREB"]
+
     ranked=[col for col in merged_data.columns if 'rank' in col.lower()]
     print(len(merged_data.columns))
     merged_data.drop(columns=ranked,inplace=True)
