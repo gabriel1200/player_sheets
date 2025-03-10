@@ -444,6 +444,9 @@ for year in range(2025,2026):
             count += 1
     all_games=pd.concat(games_collected)
     all_games.to_csv('all_games/all_'+str(year)+'.csv',index=False)
+    all_games.to_parquet('all_games/all_'+str(year)+'.parquet', index=False)
+    all_games.head(1).to_csv('all_games/sample.csv')
+
         
             
             # Exit early for testing if more than 8 files are saved.
