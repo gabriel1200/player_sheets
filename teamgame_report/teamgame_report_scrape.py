@@ -550,7 +550,7 @@ for year in range(start_year, end_year):
         'opp_FG_missed',
         'TEAM_ABBREVIATION',
         "opp_OREB",
-        "opp_DREB"
+        "opp_DREB",
     
         'GameId'
     ]
