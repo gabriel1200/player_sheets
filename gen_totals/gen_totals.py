@@ -235,7 +235,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[7]:
+# In[3]:
 
 
 directory = "../totals"
@@ -256,7 +256,7 @@ for year in range(start_year,end_year+1):
     yearframe=totals[totals.year==year].reset_index(drop=True)
     if trail =='' and year>=2010:
         lebronyear=lebron[lebron.year==year].reset_index(drop=True)
-        print(lebronyear.columns)
+    
         lebronyear=lebronyear[['WAR','LEBRON','O-LEBRON','D-LEBRON','year','NBA ID','Pos', 'Offensive Archetype','Defensive Role']]
         
         lebronyear.rename(columns={'WAR':'LEBRON_WAR','NBA ID':'PLAYER_ID','O-LEBRON':'O_LEBRON','D-LEBRON':'D_LEBRON',},inplace=True)
@@ -270,6 +270,8 @@ for year in range(start_year,end_year+1):
         yearframe['ON_BALL_TIME_PCT'] =  100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
     yearframe.sort_values(by=['Points','Minutes'],inplace=True)
     yearframe.to_csv('../year_totals/'+str(year)+trail+'.csv',index=False)
+    yearframe.to_parquet('../year_totals/'+str(year)+trail+'.parquet',index=False)
+
 
     if year>=2014:
         modern_years.append(yearframe)

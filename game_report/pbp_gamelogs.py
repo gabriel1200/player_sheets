@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 
 import requests
@@ -59,7 +59,7 @@ class PBPStatsAPI:
                         all_games.append(games_data)
                                 
                         # Respect API rate limits
-                        time.sleep(3)
+                        time.sleep(5)
                         
                     except requests.exceptions.RequestException as e:
                         logging.error(f"Error fetching data for {team_id} in {season} {season_type}: {str(e)}")
@@ -144,7 +144,7 @@ if __name__ == "__main__":
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
-    
+
     # Fetch game logs
     team_game_logs = fetch_all_teams_game_logs(team_ids, start_year, end_year)
     #frames=[]
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     
 
 
-# In[ ]:
+# In[1]:
 
 
 import os

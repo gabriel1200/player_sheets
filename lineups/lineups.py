@@ -19,6 +19,8 @@ import glob
 start_time = time.time()
 directory = "data/2025"
 
+'''
+
 # Use glob to find all CSV files in the directory
 csv_files = glob.glob(os.path.join(directory, "*.csv"))
 
@@ -32,6 +34,7 @@ for file in csv_files:
 
 print("All CSV files deleted.")
 time.sleep(1)
+'''
 
 
 # In[2]:

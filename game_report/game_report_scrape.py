@@ -251,15 +251,16 @@ def get_dates(start_year,end_year):
     
         for team in teams.get_teams():
             team_id=team['id']
-            path = '../../shot_data/team/'+str(year)+'/'+str(team_id)+'.csv'
-            if os.path.exists(path):
-                df=pd.read_csv(path)
-    
-                df=df[['PLAYER_ID','TEAM_ID','HTM','VTM','GAME_DATE','GAME_ID']]
-                df.sort_values(by='GAME_DATE',inplace=True)
-                df.drop_duplicates(inplace=True)
-                df['year']=year
-                dates.append(df)
+            base='https://raw.githubusercontent.com/gabriel1200/shot_data/refs/heads/master/team/'
+            path = base+str(year)+'/'+str(team_id)+'.csv'
+      
+            df=pd.read_csv(path)
+
+            df=df[['PLAYER_ID','TEAM_ID','HTM','VTM','GAME_DATE','GAME_ID']]
+            df.sort_values(by='GAME_DATE',inplace=True)
+            df.drop_duplicates(inplace=True)
+            df['year']=year
+            dates.append(df)
     return pd.concat(dates)
 dateframe=get_dates(start_year,end_year)
 
@@ -309,7 +310,7 @@ merge[merge.GAME_ID.isna()]
 '''
 
 
-# In[5]:
+# In[ ]:
 
 
 frames= []
@@ -443,6 +444,10 @@ for year in range(2025,2026):
             games_collected.append(gameid_frame)
             count += 1
     all_games=pd.concat(games_collected)
+
+
+
+
     all_games.to_csv('all_games/all_'+str(year)+'.csv',index=False)
     all_games.to_parquet('all_games/all_'+str(year)+'.parquet', index=False)
     all_games.head(1).to_csv('all_games/sample.csv')
@@ -465,7 +470,7 @@ for year in range(2025,2026):
 
 
 
-# In[6]:
+# In[14]:
 
 
 sumframe=df.groupby(['TEAM_ID','TEAM_ABBREVIATION','date']).sum(numeric_only=True)[['very_tight_FG3A','wide_open_FG3A','open_FG3A','tight_FG3A','very_tight_FG3M','wide_open_FG3M','open_FG3M','tight_FG3M',
@@ -477,13 +482,13 @@ sumframe=sumframe[sumframe.TEAM_ABBREVIATION.isin(selected_teams)]
 sumframe
 
 
-# In[7]:
+# In[15]:
 
 
 sumframe.columns
 
 
-# In[8]:
+# In[16]:
 
 
 sumframe['POTENTIAL_AST']
