@@ -19,7 +19,6 @@ import glob
 start_time = time.time()
 directory = "data/2025"
 
-'''
 
 # Use glob to find all CSV files in the directory
 csv_files = glob.glob(os.path.join(directory, "*.csv"))
@@ -34,10 +33,9 @@ for file in csv_files:
 
 print("All CSV files deleted.")
 time.sleep(1)
-'''
 
 
-# In[2]:
+# In[ ]:
 
 
 def lineuppull(team_id, season, opp=False, ps=False):
@@ -131,7 +129,7 @@ def pull_onoff(years, opp=False, ps=False):
                 
                 # Save individual team file
                 df.to_csv(filepath, index=False)
-                time.sleep(2)
+                time.sleep(4)
                 print(f"Saved data for team {team_id} in {year}")
                 
                 frames.append(df)
