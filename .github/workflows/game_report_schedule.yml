@@ -51,7 +51,7 @@ jobs:
         cd ..
         
     - name: Restore fourfactors.py from GitHub Secret
-      run: echo "${{ secrets.FOURFACTORS_PY }}" | base64 --decode > fourfactors.py
+      run: echo "${{ secrets.FOURFACTORS_PY }}" | base64 --decode > team_totals/fourfactors.py
 
     - name: Run Python scripts
       run: |
