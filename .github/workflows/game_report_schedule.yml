@@ -2,8 +2,8 @@ name: Convert and Run Notebooks
 
 on:
   schedule:
-    # Runs at 2:00 AM UTC every day
-    - cron: '0 13 * * *'
+    # Runs at 2:00 PM UTC every day
+    - cron: '0 14 * * *'
   # Allow manual triggering
   workflow_dispatch:
 
@@ -50,6 +50,9 @@ jobs:
         jupyter nbconvert --to script lineups.ipynb
         cd ..
         
+    - name: Restore fourfactors.py from GitHub Secret
+      run: echo "${{ secrets.FOURFACTORS_PY }}" | base64 --decode > fourfactors.py
+
     - name: Run Python scripts
       run: |
         cd game_report
