@@ -186,24 +186,32 @@ modern = data[data.year>=2014]
 
 modern_path='modern_totals.csv' if ps else 'modern_totals_ps.csv'
 data.to_csv(modern_path,index=False)
+def perc_save(df, ps=True):
+    trail = '_ps' if ps else ''
+    player_ids = df['PLAYER_ID'].unique().tolist()
 
-def perc_save(df,ps=True):
-    trail ='_ps' if ps else ''
-    player_ids=df['PLAYER_ID'].unique().tolist()
+    frame = df[index_col + sum_metrics + pct_metrics].reset_index().fillna(0)
     
-    frame=df[index_col+sum_metrics+pct_metrics].reset_index()
-    frame=frame.fillna(0)
+    # Calculate percentages
     for col in sum_metrics:
-        frame[col] =100* frame[col].astype(int)/frame['POSS']
-    all_metrics = sum_metrics+pct_metrics
-    for col in all_metrics:
-        rank_col=frame.groupby('year')[col].rank(pct=True)
-        frame[col+'_rank'] = rank_col
-    for id in player_ids:
+        frame[col] = 100 * frame[col].astype(int) / frame['POSS']
+
+    # Rank metrics
+    all_metrics = sum_metrics + pct_metrics
     
-        player_frame=frame[frame.PLAYER_ID==id]
+    # Create a dictionary to store new columns
+    rank_cols = {col + '_rank': frame.groupby('year')[col].rank(pct=True) for col in all_metrics}
     
-        player_frame.to_csv('../perc/'+str(id)+trail+'.csv',index=False)
+    # Use pd.concat to add all rank columns at once
+    frame = pd.concat([frame, pd.DataFrame(rank_cols)], axis=1)
+
+    # De-fragment the DataFrame
+    frame = frame.copy()
+
+    # Save individual player files
+    for player_id in player_ids:
+        player_frame = frame[frame['PLAYER_ID'] == player_id]
+        player_frame.to_csv(f'../perc/{player_id}{trail}.csv', index=False)
 
 def total_save(df,ps=False):
     trail ='_ps' if ps else ''
