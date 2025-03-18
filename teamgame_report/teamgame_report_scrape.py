@@ -492,17 +492,14 @@ for year in range(start_year, end_year):
     merged_data['FGA']=merged_data['FG2A']+merged_data['FG3A']
     merged_data['FGM']=merged_data['FG2M']+merged_data['FG3M']
     merged_data['FG_missed']=merged_data['FGA']-merged_data['FGM']
-    print(merged_data[merged_data.GameId.isna()])
     merged_data['GameId']=merged_data['GameId'].astype(int)
     merged_data['date']=merged_data['date'].astype(int)
     merged_data.sort_values(by=['date','GameId'],inplace=True)
-    print(merged_data[merged_data.OffMinutes.isna()])
 
     # Create a deep copy of merged_data
     copied_data = merged_data.copy(deep=True)
     copied_data.sort_values(by=['date','GameId'],inplace=True)
 
-    print (set(copied_data.TEAM_ABBREVIATION.unique()) -  set(copied_data['Opponent'].unique()))
 
 
 # Swap the column names

@@ -371,7 +371,7 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
                 
                 joined_columns = set(frame.columns) - set(df.columns)
                 joined_columns = list(joined_columns)
-                print(joined_columns)
+            
                 joined_columns.append('TEAM_ID')
                 frame = frame[joined_columns]
 
@@ -379,10 +379,10 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
                 i+=1
                 if i ==17:
                     i+=1
-                print(i)
+            
 
             df['year'] = year
-            print(year)
+        
             
 
             year_frames.append(df)
@@ -466,7 +466,7 @@ def scrape_teams(ps=False):
         df['year']=season+1
         year =season+1
         df.to_csv(str(year)+carry+'.csv',index=False)
-        print(season+1)
+        
         time.sleep(2.5)
         all_data.append(df)
     
@@ -526,7 +526,7 @@ def scrape_teams_vs(ps=False):
         df['season']=season
         df['year']=season+1
         year =season+1
-        print(season+1)
+      
         time.sleep(2.5)
         df.to_csv(str(year)+'vs'+carry+'.csv',index=False)
         all_data.append(df)

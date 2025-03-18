@@ -198,7 +198,6 @@ for year in range(2014,2026):
     totals=[]
     for file in files:
         df=pd.read_csv(directory+'/'+file)
-        print(file.split('.')[0])
         df['TeamId']=file.split('.')[0]
         totals.append(df)
     master= pd.concat(totals)
@@ -238,7 +237,7 @@ for year in range(2014,2026):
             'NOP': '1610612740'}
     master.to_csv(directory+'all_logs.csv')
     
-    print(year)
+   
 for year in range(2014,2026):
     directory = "team/"+str(year)
     files = os.listdir(directory)
@@ -249,7 +248,7 @@ for year in range(2014,2026):
         df=pd.read_csv(directory+'/'+file)
         split1=file.split('.')[0]
         split2=split1.split('vs')[0]
-        print(split2)
+     
         df['TeamId']=split2
         totals.append(df)
     master= pd.concat(totals)

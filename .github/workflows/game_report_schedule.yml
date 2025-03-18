@@ -55,38 +55,10 @@ jobs:
 
     - name: Run Python scripts
       run: |
-              cd game_report
-              python game_report_scrape.py
-              echo "Ran game_report_scrape.py"
-              python pbp_gamelogs.py
-              echo "Ran pbp_gamelogs.py"
-              cd ..
-              
-              cd team_totals
-              python team_average_scrape.py
-              echo "Ran team_average_scrape.py"
-              cp team_averages.csv ../teamgame_report/team_averages.csv
-              echo "Copied team_averages.csv"
-              cp team_averages_ps.csv ../teamgame_report/team_averages_ps.csv
-              echo "Copied team_averages_ps.csv"
-              cd ..
-              
-              cd gen_totals
-              python averages_scrape.py
-              echo "Ran averages_scrape.py"
-              python gen_totals.py
-              echo "Ran gen_totals.py"
-              cd ..
-              
-              cd teamgame_report
-              python teamgame_report_scrape.py
-              echo "Ran teamgame_report_scrape.py"
-              cd ..
-              
-              cd lineups
-              python lineups.py
-              echo "Ran lineups.py"
-              cd ..
+
+        chmod +x daily_scrape.sh 
+        ./daily_scrape.sh        
+
 
     - name: Commit and push changes
       run: |

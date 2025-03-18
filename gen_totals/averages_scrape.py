@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 from nba_api.stats.static import players,teams
@@ -55,7 +55,7 @@ def pull_data(url):
         #print(columns)
         df = pd.DataFrame.from_records(data, columns=columns)
 
-    time.sleep(.5)
+    time.sleep(2)
     return df
 
 
@@ -277,13 +277,13 @@ def get_dates(start_year,end_year):
     
         for team in teams.get_teams():
             team_id=team['id']
-            path = '../../shot_data/team/'+str(year)+'/'+str(team_id)+'.csv'
-            if os.path.exists(path):
-                df=pd.read_csv(path)
-    
-                df=df[['PLAYER_ID','HTM','VTM','GAME_DATE']]
-                df.drop_duplicates(inplace=True)
-                dates.append(df)
+            path ='https://raw.githubusercontent.com/gabriel1200/shot_data/refs/heads/master/team/'+str(year)+'/'+str(team_id)+'.csv'
+      
+            df=pd.read_csv(path)
+
+            df=df[['PLAYER_ID','HTM','VTM','GAME_DATE']]
+            df.drop_duplicates(inplace=True)
+            dates.append(df)
     return pd.concat(dates)
 start_year=2025
 end_year=2026
