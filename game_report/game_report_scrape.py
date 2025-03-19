@@ -201,7 +201,71 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
                 poss_map=dict(zip(df17['TEAM_ID'],df17['team_poss']  ))
     
                 df['team_poss']=df['TEAM_ID'].map(poss_map)
+
+                url18 = f'https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DefenseCategory=Overall&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+            
+                df18 = pull_data(url18)
+                df18.rename(columns={'CLOSE_DEF_PERSON_ID': 'PLAYER_ID'}, inplace=True)
+                df18.rename(columns={col: f'overall_def_{col}' for col in df8.columns if col != 'PLAYER_ID'}, inplace=True)
+
+                # Link 2: 3-pointers defense stats
+                url19 = f'https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DefenseCategory=3%20Pointers&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+                
+                df19 = pull_data(url19)
+
+                df19.rename(columns={'CLOSE_DEF_PERSON_ID': 'PLAYER_ID'}, inplace=True)
+                df19.rename(columns={col: f'three_pt_def_{col}' for col in df19.columns if col != 'PLAYER_ID'}, inplace=True)
+  
+                
+                # Link 3: 2-pointers defense stats
+                url20 = f'https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DefenseCategory=2%20Pointers&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+     
+                df20 = pull_data(url20)
+
+                df20.rename(columns={'CLOSE_DEF_PERSON_ID': 'PLAYER_ID'}, inplace=True)
+                df20.rename(columns={col: f'two_pt_def_{col}' for col in df20.columns if col != 'PLAYER_ID'}, inplace=True)
+
+                
+                # Link 4: Less than 6ft defense stats
+                url21 = f'https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DefenseCategory=Less%20Than%206Ft&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
                
+                df21 = pull_data(url21)
+                df21.rename(columns={'CLOSE_DEF_PERSON_ID': 'PLAYER_ID'}, inplace=True)
+                df21.rename(columns={col: f'less_6ft_def_{col}' for col in df21.columns if col != 'PLAYER_ID'}, inplace=True)
+    
+                # Link 5: Less than 10ft defense stats
+                url22 = f'https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DefenseCategory=Less%20Than%2010Ft&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+                
+                df22 = pull_data(url22)
+                df22.rename(columns={'CLOSE_DEF_PERSON_ID': 'PLAYER_ID'}, inplace=True)
+                df22.rename(columns={col: f'less_10ft_def_{col}' for col in df22.columns if col != 'PLAYER_ID'}, inplace=True)
+                
+                
+                # Link 6: Less than 15ft defense stats
+                url23 = f'https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DefenseCategory=Greater%20Than%2015Ft&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+            
+                df23 = pull_data(url6)
+                df23.rename(columns={'CLOSE_DEF_PERSON_ID': 'PLAYER_ID'}, inplace=True)
+                df23.rename(columns={col: f'more_15ft_def_{col}' for col in df23.columns if col != 'PLAYER_ID'}, inplace=True)
+        
+                
+
+                url24 = f'https://stats.nba.com/stats/leaguehustlestatsplayer?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=PerGame&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&TeamID=0&VsConference=&VsDivision=&Weight='
+            
+                df24 = pull_data(url24)
+                df24.rename(columns={col: f'hustle_{col}' for col in df24.columns if col != 'PLAYER_ID'}, inplace=True)
+       
+                # Link 8: Post touch stats
+                url25 = f'https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&PlayerExperience=&PlayerOrTeam=Player&PlayerPosition=&PtMeasureType=PostTouch&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+                
+                df25 = pull_data(url25)
+                df25.rename(columns={col: f'post_touch_{col}' for col in df25.columns if col != 'PLAYER_ID'}, inplace=True)
+      
+                
+                # Link 9: Speed distance stats
+                url26 = f'https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&PlayerExperience=&PlayerOrTeam=Player&PlayerPosition=&PtMeasureType=SpeedDistance&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+                
+                df26 = pull_data(url26)
                 frames = [df2, df3, df4, df5, df6, df7, df8, df9, df10,df11,df12,df13,df14,df15,df16]
                 for frame in frames:
                     
@@ -214,6 +278,25 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
     
                 df['year'] = year
                 df['date']=date_num
+                extra_columns = [
+                '_PLAYER_NAME', 
+                '_PLAYER_LAST_TEAM_ID', 
+                '_GP', 
+                '_PLAYER_POSITION', 
+                '_PLAYER_LAST_TEAM_ABBREVIATION', 
+                '_PLAYER_ID',
+                '_MIN',
+                '_TEAM_ABBREVIAITON',
+                '_G',
+                '_W',
+                '_L',
+                '_MIN',
+                '_AGE'
+            ]
+
+    
+                cols_to_drop = [col for col in df.columns if any(col.endswith(ex_col) for ex_col in extra_columns)]
+                df = df.drop(columns=cols_to_drop)
       
                 year_frame.append(df)
                 count+=1
