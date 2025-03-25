@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[3]:
 
 
 from nba_api.stats.static import players,teams
@@ -379,16 +379,16 @@ def get_dates(start_year,end_year):
             df.drop_duplicates(inplace=True)
             dates.append(df)
     return pd.concat(dates)
-start_year=2014
-end_year=2025
+start_year=2025
+end_year=2026
 #dateframe=get_dates(start_year,end_year)
 #dates=dateframe['GAME_DATE'].unique().tolist()
 dates=[]
-df= pull_avg(dates,start_year,end_year,ps=True)
+df= pull_avg(dates,start_year,end_year,ps=False)
 #data=pull_game_level(dates)
 
 
-# In[2]:
+# In[4]:
 
 
 start_year=2014
