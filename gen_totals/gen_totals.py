@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[8]:
 
 
 import pandas as pd
@@ -86,7 +86,20 @@ sum_metrics = [
     "PULL_UP_PTS", "PULL_UP_FG3A", "PULL_UP_FGA", "PULL_UP_FGM", 
     "PULL_UP_FG3M", "PAINT_TOUCH_PTS", "ELBOW_TOUCH_PTS", "POST_TOUCH_PTS", 
     "CATCH_SHOOT_PTS", "FGM_LT_06", "FGA_LT_06", "PLUSMINUS", "CATCH_SHOOT_FG3M", "CATCH_SHOOT_FG3A", 
-    "CATCH_SHOOT_FGA", "CATCH_SHOOT_FGM"
+    "CATCH_SHOOT_FGA", "CATCH_SHOOT_FGM",
+
+    'more_15ft_def_REB_CHANCE_DEFER', 'less_10ft_def_PLUSMINUS', 'two_pt_def_FG2A', 'hustle_LOOSE_BALLS_RECOVERED', 'DIST_FEET', 
+    'less_6ft_def_PLUSMINUS', 'DIST_MILES_DEF', 'post_touch_POST_TOUCH_FOULS', 'two_pt_def_FG2M', 'three_pt_def_FG3M', 'post_touch_POST_TOUCH_FGM', 
+    'hustle_BOX_OUTS', 'hustle_DEF_BOXOUTS', 'post_touch_POST_TOUCH_TOV', 'DIST_MILES', 'more_15ft_def_AVG_OREB_DIST', 'more_15ft_def_DREB_UNCONTEST', 
+    'AVG_SPEED_DEF', 'more_15ft_def_AVG_DREB_DIST', 'more_15ft_def_AVG_REB_DIST', 'post_touch_POST_TOUCH_PASSES', 'hustle_OFF_BOXOUTS', 'hustle_SCREEN_ASSISTS', 
+    'less_6ft_def_FGM_LT_06', 'more_15ft_def_OREB', 'hustle_CONTESTED_SHOTS_2PT', 'hustle_BOX_OUT_PLAYER_REBS', 'D_FGA', 'more_15ft_def_DREB', 'post_touch_POST_TOUCH_FGA', 
+    'post_touch_TOUCHES', 'hustle_OFF_LOOSE_BALLS_RECOVERED', 'less_10ft_def_FGM_LT_10', 'more_15ft_def_DREB_CHANCES', 'more_15ft_def_OREB_CONTEST', 'AVG_SPEED', 'team_poss',
+      'D_FGM', 'post_touch_POST_TOUCH_FTM', 'three_pt_def_PLUSMINUS', 'more_15ft_def_OREB_UNCONTEST', 'AVG_SPEED_OFF', 'more_15ft_def_REB', 'more_15ft_def_DREB_CONTEST', 
+      'hustle_CHARGES_DRAWN', 'less_6ft_def_FGA_LT_06',  'more_15ft_def_OREB_CHANCES', 'hustle_BOX_OUT_PLAYER_TEAM_REBS', 'hustle_CONTESTED_SHOTS_3PT',
+        'more_15ft_def_REB_CONTEST', 'post_touch_POST_TOUCHES', 'three_pt_def_FG3A',  'hustle_CONTESTED_SHOTS',
+      'hustle_DEFLECTIONS', 'more_15ft_def_DREB_CHANCE_DEFER','post_touch_POST_TOUCH_AST', 
+'hustle_SCREEN_AST_PTS', 'post_touch_POST_TOUCH_FTA', 'more_15ft_def_OREB_CHANCE_DEFER', 'less_10ft_def_FGA_LT_10',
+ 'post_touch_POST_TOUCH_PTS', 'hustle_DEF_LOOSE_BALLS_RECOVERED', 'DIST_MILES_OFF', 'more_15ft_def_REB_UNCONTEST', 'more_15ft_def_REB_CHANCES'
 ]
 pct_metrics = [
     "W_PCT",                "FG_PCT",             "FG3_PCT",            "FT_PCT",
@@ -105,7 +118,15 @@ pct_metrics = [
     "wide_open_FG2_PCT",   "wide_open_FG_PCT",  "wide_open_FG3_PCT",  "wide_open_EFG_PCT",
     "PULL_UP_EFG_PCT",     "PULL_UP_FG3_PCT",   "PULL_UP_FG_PCT",    "ELBOW_TOUCH_FG_PCT",
     "CATCH_SHOOT_FG_PCT",  "PAINT_TOUCH_FG_PCT", "POST_TOUCH_FG_PCT",  "EFF_FG_PCT",
-    "LT_06_PCT",           "NS_LT_06_PCT",      "CATCH_SHOOT_FG3_PCT","CATCH_SHOOT_EFG_PCT"
+    "LT_06_PCT",           "NS_LT_06_PCT",      "CATCH_SHOOT_FG3_PCT","CATCH_SHOOT_EFG_PCT",
+    'hustle_PCT_BOX_OUTS_TEAM_REB', 'post_touch_POST_TOUCH_AST_PCT', 'post_touch_POST_TOUCH_FG_PCT', 'D_FG_PCT',
+      'post_touch_POST_TOUCH_PTS_PCT', 'more_15ft_def_OREB_CHANCE_PCT_ADJ', 'PCT_PLUSMINUS', 'post_touch_POST_TOUCH_TOV_PCT',
+        'less_6ft_def_LT_06_PCT', 'more_15ft_def_REB_CHANCE_PCT_ADJ', 'hustle_PCT_LOOSE_BALLS_RECOVERED_OFF', 'post_touch_POST_TOUCH_FOULS_PCT', 
+        'three_pt_def_FREQ', 'more_15ft_def_DREB_CHANCE_PCT_ADJ', 'less_6ft_def_NS_LT_06_PCT', 'three_pt_def_FG3_PCT', 'more_15ft_def_REB_CHANCE_PCT', 
+        'post_touch_POST_TOUCH_PASSES_PCT', 'three_pt_def_NS_FG3_PCT', 'more_15ft_def_OREB_CONTEST_PCT', 'two_pt_def_FG2_PCT', 'less_10ft_def_FREQ',
+          'less_10ft_def_NS_LT_10_PCT', 'NORMAL_FG_PCT', 'less_6ft_def_FREQ', 'more_15ft_def_DREB_CONTEST_PCT', 'more_15ft_def_REB_CONTEST_PCT', 
+          'two_pt_def_FREQ', 'hustle_PCT_LOOSE_BALLS_RECOVERED_DEF', 'post_touch_POST_TOUCH_FT_PCT', 'hustle_PCT_BOX_OUTS_REB', 'hustle_PCT_BOX_OUTS_DEF',
+            'more_15ft_def_OREB_CHANCE_PCT', 'hustle_PCT_BOX_OUTS_OFF', 'two_pt_def_NS_FG2_PCT', 'more_15ft_def_DREB_CHANCE_PCT', 'less_10ft_def_LT_10_PCT'
 ]
 pbp_columns = [
     "TeamId", "Name", "ShortName", "RowId",  "SecondsPlayed",
@@ -231,7 +252,7 @@ perc_save(data,ps=ps)
 total_save(data,ps=ps)
 
 
-# In[2]:
+# In[9]:
 
 
 data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
@@ -243,7 +264,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[3]:
+# In[ ]:
 
 
 directory = "../totals"
@@ -294,13 +315,13 @@ yearframe.sort_values('TIME_OF_POSS',inplace=True)
 yearframe[['TIME_OF_POSS','Minutes']]
 
 
-# In[5]:
+# In[12]:
 
 
 yearframe['Pos'].unique()
 
 
-# In[6]:
+# In[13]:
 
 
 yearframe[yearframe.Pos.isna()]
