@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[8]:
+# In[14]:
 
 
 import pandas as pd
@@ -252,7 +252,7 @@ perc_save(data,ps=ps)
 total_save(data,ps=ps)
 
 
-# In[9]:
+# In[15]:
 
 
 data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
@@ -264,7 +264,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[ ]:
+# In[16]:
 
 
 directory = "../totals"
@@ -308,14 +308,14 @@ modern = pd.concat(modern_years)
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 
 
-# In[ ]:
+# In[17]:
 
 
 yearframe.sort_values('TIME_OF_POSS',inplace=True)
 yearframe[['TIME_OF_POSS','Minutes']]
 
 
-# In[12]:
+# In[18]:
 
 
 yearframe['Pos'].unique()
