@@ -47,3 +47,7 @@ cd ..
 cd lineups
 python lineups.py
 cd ..
+
+
+cp team_totals/team_averages.csv ../web_app/data/team_averages.csv
+
