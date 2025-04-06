@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[14]:
+# In[13]:
 
 
 import pandas as pd
@@ -252,10 +252,11 @@ perc_save(data,ps=ps)
 total_save(data,ps=ps)
 
 
-# In[15]:
+# In[ ]:
 
 
 data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
+
 
 
 # In[ ]:
@@ -264,7 +265,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[16]:
+# In[15]:
 
 
 directory = "../totals"
@@ -281,6 +282,7 @@ end_year=2024 if ps else 2025
 trail = '_ps' if ps else ''
 modern_years=[]
 for year in range(start_year,end_year+1):
+    print(year)
 
     yearframe=totals[totals.year==year].reset_index(drop=True)
     if trail =='' and year>=2010:
@@ -297,9 +299,19 @@ for year in range(start_year,end_year+1):
         
         yearframe['on-ball-time%'] = 100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
         yearframe['ON_BALL_TIME_PCT'] =  100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
+    if year>=2001:
+        yearframe['Stops'] = (
+        yearframe["Charge_Fouls_Drawn"].fillna(0) +
+        yearframe["Offensive_Fouls_Drawn"].fillna(0) +
+        yearframe["Steals"].fillna(0) +
+        yearframe["RecoveredBlocks"].fillna(0)
+    )
+
     yearframe.sort_values(by=['Points','Minutes'],inplace=True)
+    print('Saving to '+'../year_totals/'+str(year)+trail+'.csv')
     yearframe.to_csv('../year_totals/'+str(year)+trail+'.csv',index=False)
     yearframe.to_parquet('../year_totals/'+str(year)+trail+'.parquet',index=False)
+
 
 
     if year>=2014:
@@ -308,23 +320,11 @@ modern = pd.concat(modern_years)
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 
 
-# In[17]:
+# In[ ]:
 
 
 yearframe.sort_values('TIME_OF_POSS',inplace=True)
 yearframe[['TIME_OF_POSS','Minutes']]
-
-
-# In[18]:
-
-
-yearframe['Pos'].unique()
-
-
-# In[13]:
-
-
-yearframe[yearframe.Pos.isna()]
 
 
 # In[ ]:
