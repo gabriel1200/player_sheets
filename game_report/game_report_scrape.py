@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[15]:
 
 
 from nba_api.stats.static import players,teams
@@ -351,6 +351,7 @@ dateframe=get_dates(start_year,end_year)
 
 dates=dateframe['GAME_DATE'].unique().tolist()
 dates.sort()
+print(dates)
 df= pull_game_level(dateframe,start_year,end_year)
 #data=pull_game_level(dates)
 df
@@ -395,7 +396,7 @@ merge[merge.GAME_ID.isna()]
 '''
 
 
-# In[ ]:
+# In[5]:
 
 
 frames= []
@@ -555,7 +556,7 @@ for year in range(2025,2026):
 
 
 
-# In[14]:
+# In[6]:
 
 
 sumframe=df.groupby(['TEAM_ID','TEAM_ABBREVIATION','date']).sum(numeric_only=True)[['very_tight_FG3A','wide_open_FG3A','open_FG3A','tight_FG3A','very_tight_FG3M','wide_open_FG3M','open_FG3M','tight_FG3M',
@@ -567,14 +568,21 @@ sumframe=sumframe[sumframe.TEAM_ABBREVIATION.isin(selected_teams)]
 sumframe
 
 
-# In[15]:
+# In[7]:
 
 
 sumframe.columns
 
 
-# In[16]:
+# In[8]:
 
 
 sumframe['POTENTIAL_AST']
+
+
+# In[ ]:
+
+
+df=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/player_sheets/refs/heads/master/game_report/all_games/all_2025.csv')
+df['GAME_ID']
 
