@@ -16,22 +16,29 @@ from scipy.stats import zscore
 import sys
 import os
 import glob
+
+
+
 start_time = time.time()
 directory = "data/2025"
-
+ps = True
 
 # Use glob to find all CSV files in the directory
 csv_files = glob.glob(os.path.join(directory, "*.csv"))
 
-# Loop through the list of files and delete each one
+# Loop through the list of files and delete based on `ps`
 for file in csv_files:
-    try:
-        os.remove(file)
-        print(f"Deleted: {file}")
-    except Exception as e:
-        print(f"Error deleting {file}: {e}")
+    filename = os.path.basename(file)
+    if (ps and '_ps' in filename) or (not ps and '_ps' not in filename):
+        try:
+            os.remove(file)
+            print(f"Deleted: {file}")
+        except Exception as e:
+            print(f"Error deleting {file}: {e}")
 
-print("All CSV files deleted.")
+print("Relevant CSV files deleted.")
+time.sleep(1)
+
 time.sleep(1)
 
 
@@ -154,12 +161,12 @@ def pull_onoff(years, opp=False, ps=False):
 #pull_onoff(years,opp=True,ps=True) 
 #pull_onoff(years,opp=False,ps=True) 
 years=[i for i in range(2025,2026)]
-df = pull_onoff(years,opp=False,ps=False) 
-df = pull_onoff(years,opp=True,ps=False) 
+df = pull_onoff(years,opp=False,ps=ps) 
+df = pull_onoff(years,opp=True,ps=ps) 
 time.sleep(5)
 
-df = pull_onoff(years,opp=False,ps=False) 
-df = pull_onoff(years,opp=True,ps=False) 
+df = pull_onoff(years,opp=False,ps=ps) 
+df = pull_onoff(years,opp=True,ps=ps) 
 end_time = time.time()
 elapsed_time = end_time - start_time
 print(f"Time taken: {elapsed_time} seconds")

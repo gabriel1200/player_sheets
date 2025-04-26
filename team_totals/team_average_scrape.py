@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[26]:
 
 
 from nba_api.stats.static import players,teams
@@ -411,7 +411,7 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
 start_year=2025
 end_year=2026
 
-ps=False
+ps=True
 
 df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 #df= pull_game_avg(start_year,end_year,ps=True,unit='Team')
@@ -420,7 +420,7 @@ df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 df
 
 
-# In[2]:
+# In[27]:
 
 
 import requests
@@ -447,7 +447,7 @@ def scrape_teams(ps=False):
     start_season = 2024  # Example start season
     end_season = 2024  # Example end season
     if ps == True:
-        end_season=2023
+        end_season=2024
     # Empty list to collect all data
     all_data = []
     
@@ -507,7 +507,7 @@ def scrape_teams_vs(ps=False):
     
     end_season = 2024  # Example end season
     if ps == True:
-        end_season=2023
+        end_season=2024
     
     # Empty list to collect all data
     all_data = []
@@ -548,15 +548,17 @@ def scrape_teams_vs(ps=False):
 
 
 # Display a sample of the data
-scrape_teams(ps=False)
-scrape_teams_vs(ps=False)
+scrape_teams(ps=ps)
+scrape_teams_vs(ps=ps)
 
 
-# In[3]:
+# In[28]:
 
 
 trail = ''
-
+if ps==True:
+    trail='ps'
+print(trail)
 ortg = []
 orebperc = []
 total_points = []
@@ -717,21 +719,21 @@ testdf.to_csv('team_averages_ps.csv', index=False)
 
 
 
-# In[4]:
+# In[29]:
 
 
 for year in range(2001,2026):    
     trail='ps'
-    trail=''
+    #trail=''       
     ps = True if trail =='ps' else False
     pbp=pd.read_csv(str(year)+trail+('.csv'))
     pbpvs=pd.read_csv(str(year)+'vs'+trail+('.csv'))
  
 
-    pbp=four_factors_data(pbp,pbpvs,year,ps=ps)
+    pbp=four_factors_data(pbp,pbpvs,year,ps=False)
 
-    pbpvs=four_factors_data(pbpvs,pbp,year,ps=ps)
-    columns = ['ft_factor', 'oreb_factor', 'turnover_factor', '2shooting_factor', '3shooting_factor']
+    pbpvs=four_factors_data(pbpvs,pbp,year,ps=False)
+    columns = ['ft_factor', 'oreb_factor', 'turnover_factor', '2shooting_factor', '3shooting_factor','rimfactor','nonrim2factor','morey_factor']
     oppcolumns ={}
     for c in columns:
         oppcolumns[c]='opp_'+c
@@ -740,7 +742,7 @@ for year in range(2001,2026):
 
     vsframe=pbpvs[columns].reset_index(drop=True)
     vsframe.rename(columns=oppcolumns,inplace=True)
-
+    
 
     pbp=pbp.merge(vsframe,on='TeamId')
     pbp['OffMinutes'] = (pbp['SecondsPerPossOff'] * pbp['OffPoss']) / 60
@@ -780,10 +782,72 @@ for year in range(2001,2026):
     
 
 
-# In[5]:
+# In[33]:
 
 
-trail=''
+shooting_columns = [
+    "TeamId",
+    "TEAM_NAME",
+    "TeamAbbreviation",
+    "GamesPlayed",
+    "OffPoss",
+    "DefPoss",
+    "FG3M",
+    "FG3A",
+
+    "tight_FG3A",
+    "tight_FG3M",
+    "tight_FG3_PCT",
+    "tight_FG3A_FREQUENCY",
+
+    "very_tight_FG3A",
+    "very_tight_FG3M",
+    "very_tight_FG3_PCT",
+    "very_tight_FG3A_FREQUENCY",
+    "wide_open_FG3A_FREQUENCY",
+    "wide_open_FG3A",
+    "wide_open_FG3M",
+    "wide_open_FG3_PCT",
+    "open_FG3M",
+    "open_FG3A_FREQUENCY",
+    "open_FG3A",
+    "open_FG3_PCT",
+    "PULL_UP_FG3A",
+    "PULL_UP_FG3M",
+    "PULL_UP_FG3_PCT",
+    "opp_very_tight_FG3A",
+    "opp_very_tight_FG3M",
+    "opp_very_tight_FG3_PCT",
+    "opp_very_tight_FG3A_FREQUENCY",
+    "opp_tight_FG3A_FREQUENCY",
+    "opp_tight_FG3A",
+    "opp_tight_FG3_PCT",
+    "opp_tight_FG3M",
+    "opp_open_FG3A",
+    "opp_open_FG3M",
+    "opp_open_FG3_PCT",
+    "opp_open_FG3A_FREQUENCY",
+    "opp_wide_open_FG3M",
+    "opp_wide_open_FG3_PCT",
+    "opp_wide_open_FG3A",
+    "opp_wide_open_FG3A_FREQUENCY",
+    "year"
+]
+
+frames=[]
+for year in range(2001,2026):
+    df= pd.read_csv(str(year)+'_team_totals.csv')
+    df['year']=year
+
+    frames.append(df)
+master=pd.concat(frames)
+master.to_csv('all_teamyears.csv',index=False)
+shooting=master[shooting_columns]
+shooting.to_csv('team_threes.csv',index=False)
+shooting.to_csv('../../web_app/data/team_threes.csv',index=False)
+
+
+trail='ps'
 frames=[]
 for year in range(2001,2026):
     df= pd.read_csv(str(year)+trail+'_team_totals.csv')
@@ -791,22 +855,15 @@ for year in range(2001,2026):
 
     frames.append(df)
 master=pd.concat(frames)
-master.to_csv('all_teamyears.csv',index=False)
-
-
-trail='ps'
-frames=[]
-for year in range(2001,2025):
-    df= pd.read_csv(str(year)+trail+'_team_totals.csv')
-    df['year']=year
-
-    frames.append(df)
-master=pd.concat(frames)
 master.to_csv('all_teamyears_ps.csv',index=False)
 
+shooting=master[shooting_columns]
+shooting.to_csv('team_threes_ps.csv',index=False)
+shooting.to_csv('../../web_app/data/team_threes_ps.csv',index=False)
 
-# In[ ]:
+
+# In[31]:
 
 
-
+shooting.columns
 

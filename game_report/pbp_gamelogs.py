@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 import requests
@@ -38,32 +38,32 @@ class PBPStatsAPI:
         current_season="2024-25"
         for season in seasons:
             for season_type in self.season_types:
-                if season_type !='Playoffs':
+         
         
-                    try:
-                        params = {
-                            "Season": season,
-                            "SeasonType": season_type,
-                            "EntityId": team_id,
-                            "EntityType": entity_type
-                        }
-                        
-                        response = requests.get(self.base_url, params=params)
-                        data_response = response.json()
-                        raw_data = data_response["multi_row_table_data"]
-                        games_data = pd.DataFrame(raw_data)
-                        
-                        games_data['Season'] = season
-                        games_data['year'] = int(season.split('-')[0]) + 1
-                        games_data['SeasonType'] = season_type
-                        all_games.append(games_data)
-                                
-                        # Respect API rate limits
-                        time.sleep(5)
-                        
-                    except requests.exceptions.RequestException as e:
-                        logging.error(f"Error fetching data for {team_id} in {season} {season_type}: {str(e)}")
-                        continue
+                try:
+                    params = {
+                        "Season": season,
+                        "SeasonType": season_type,
+                        "EntityId": team_id,
+                        "EntityType": entity_type
+                    }
+                    
+                    response = requests.get(self.base_url, params=params)
+                    data_response = response.json()
+                    raw_data = data_response["multi_row_table_data"]
+                    games_data = pd.DataFrame(raw_data)
+                    
+                    games_data['Season'] = season
+                    games_data['year'] = int(season.split('-')[0]) + 1
+                    games_data['SeasonType'] = season_type
+                    all_games.append(games_data)
+                            
+                    # Respect API rate limits
+                    time.sleep(5)
+                    
+                except requests.exceptions.RequestException as e:
+                    logging.error(f"Error fetching data for {team_id} in {season} {season_type}: {str(e)}")
+                    continue
                     
         return pd.concat(all_games) if all_games else pd.DataFrame()
 
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     
 
 
-# In[1]:
+# In[2]:
 
 
 import os

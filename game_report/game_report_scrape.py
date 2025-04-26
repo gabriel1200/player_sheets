@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[15]:
+# In[10]:
 
 
 from nba_api.stats.static import players,teams
@@ -318,6 +318,7 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
         yeardata=pd.concat(year_frame)
         print(len(yeardata))
         yeardata['playoffs']=ps
+        print('year_files/'+str(year)+trail+'_games.csv')
         yeardata.to_csv('year_files/'+str(year)+trail+'_games.csv',index=False)
         dframes.append(yeardata)
         print(f"Year: {year}")
@@ -330,42 +331,49 @@ end_year=2026
 
 
 
-def get_dates(start_year,end_year):
-    dates=[]
-    for year in range(start_year,end_year):
-    
-        for team in teams.get_teams():
-            team_id=team['id']
-            base='https://raw.githubusercontent.com/gabriel1200/shot_data/refs/heads/master/team/'
-            path = base+str(year)+'/'+str(team_id)+'.csv'
-      
-            df=pd.read_csv(path)
 
-            df=df[['PLAYER_ID','TEAM_ID','HTM','VTM','GAME_DATE','GAME_ID']]
-            df.sort_values(by='GAME_DATE',inplace=True)
-            df.drop_duplicates(inplace=True)
-            df['year']=year
-            dates.append(df)
-    return pd.concat(dates)
-dateframe=get_dates(start_year,end_year)
+def get_dates(start_year, end_year, ps=False):
+    trail = 'ps' if ps else ''
+    dates = []
+
+    for year in range(start_year, end_year):
+        for team in teams.get_teams():
+            team_id = team['id']
+            base = 'https://raw.githubusercontent.com/gabriel1200/shot_data/refs/heads/master/team/'
+            path = f"{base}{year}{trail}/{team_id}.csv"
+            print(path)
+
+            try:
+                df = pd.read_csv(path)
+                df = df[['PLAYER_ID', 'TEAM_ID', 'HTM', 'VTM', 'GAME_DATE', 'GAME_ID']]
+                df.sort_values(by='GAME_DATE', inplace=True)
+                df.drop_duplicates(inplace=True)
+                df['year'] = year
+                dates.append(df)
+            except Exception as e:
+                print(f"Skipping {path}: {e}")
+    
+    return pd.concat(dates, ignore_index=True) if dates else pd.DataFrame()
+ps=True
+dateframe=get_dates(start_year,end_year,ps=ps)
 
 dates=dateframe['GAME_DATE'].unique().tolist()
 dates.sort()
-print(dates)
-df= pull_game_level(dateframe,start_year,end_year)
+
+df= pull_game_level(dateframe,start_year,end_year,ps=ps)
 #data=pull_game_level(dates)
 df
 df.drop_duplicates(subset=['PLAYER_ID','TEAM_ID','date'])
 
 
-# In[2]:
+# In[11]:
 
 
 dates.sort()
 dates
 
 
-# In[3]:
+# In[12]:
 
 
 test =pd.read_csv('year_files/2025_games.csv')
@@ -373,7 +381,7 @@ test.columns
 test[(test.date==20241201)&(test.TEAM_ID==1610612758)]
 
 
-# In[4]:
+# In[13]:
 
 
 '''
@@ -396,9 +404,14 @@ merge[merge.GAME_ID.isna()]
 '''
 
 
-# In[5]:
+# In[14]:
 
 
+if ps==False:
+    trail=''
+else:
+    trail='ps'
+print(trail)
 frames= []
 count=0
 index_master=pd.read_csv('index_master.csv')
@@ -411,7 +424,7 @@ index_master['nba_id']=index_master['nba_id'].astype(int)
 for year in range(2025,2026):
     # Load the game data for the specific year.
     games_collected=[]
-    df = pd.read_csv(f'year_files/{year}_games.csv')
+    df = pd.read_csv(f'year_files/{year}{trail}_games.csv')
 
     team_map=dict(zip(df['TEAM_ID'],df['TEAM_ABBREVIATION']))
     
@@ -534,9 +547,9 @@ for year in range(2025,2026):
 
 
 
-    all_games.to_csv('all_games/all_'+str(year)+'.csv',index=False)
-    all_games.to_parquet('all_games/all_'+str(year)+'.parquet', index=False)
-    all_games.head(1).to_csv('all_games/sample.csv')
+    all_games.to_csv('all_games/all_'+str(year)+trail+'.csv',index=False)
+    all_games.to_parquet('all_games/all_'+str(year)+trail+'.parquet', index=False)
+    #all_games.head(1).to_csv('all_games/sample.csv')
 
         
             
@@ -556,7 +569,7 @@ for year in range(2025,2026):
 
 
 
-# In[6]:
+# In[15]:
 
 
 sumframe=df.groupby(['TEAM_ID','TEAM_ABBREVIATION','date']).sum(numeric_only=True)[['very_tight_FG3A','wide_open_FG3A','open_FG3A','tight_FG3A','very_tight_FG3M','wide_open_FG3M','open_FG3M','tight_FG3M',
@@ -568,19 +581,19 @@ sumframe=sumframe[sumframe.TEAM_ABBREVIATION.isin(selected_teams)]
 sumframe
 
 
-# In[7]:
+# In[16]:
 
 
 sumframe.columns
 
 
-# In[8]:
+# In[17]:
 
 
 sumframe['POTENTIAL_AST']
 
 
-# In[ ]:
+# In[18]:
 
 
 df=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/player_sheets/refs/heads/master/game_report/all_games/all_2025.csv')

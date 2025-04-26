@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[4]:
 
 
 from nba_api.stats.static import players,teams
@@ -283,12 +283,13 @@ def get_dates(start_year,end_year,ps=False):
                 df['year']=year
                 dates.append(df)
     return pd.concat(dates)
-dateframe=get_dates(start_year,end_year,ps=False)
+ps=True
+dateframe=get_dates(start_year,end_year,ps=ps)
 
 dates=dateframe['GAME_DATE'].unique().tolist()
 
 dates.sort()
-df= pull_game_level_team(dateframe,start_year,end_year,ps=False)
+df= pull_game_level_team(dateframe,start_year,end_year,ps=ps)
 #data=pull_game_level(dates)
 inverted_team_dict = {
     '1610612760': 'OKC',
@@ -324,7 +325,7 @@ inverted_team_dict = {
 }
 
 
-# In[2]:
+# In[5]:
 
 
 for year in range(2026,2026):    
@@ -338,7 +339,8 @@ for year in range(2026,2026):
     pbp=four_factors_data(pbp,pbpvs,year,ps=ps)
 
     pbpvs=four_factors_data(pbpvs,pbp,year,ps=ps)
-    columns = ['ft_factor', 'oreb_factor', 'turnover_factor', '2shooting_factor', '3shooting_factor']
+    columns = ['ft_factor', 'oreb_factor', 'turnover_factor', '2shooting_factor', '3shooting_factor','rimfactor','nonrim2factor']
+
     oppcolumns ={}
     for c in columns:
         oppcolumns[c]='opp_'+c
@@ -386,7 +388,7 @@ for year in range(2026,2026):
     total.to_csv(str(year)+trail+'_team_totals.csv',index=False)
 
 
-# In[3]:
+# In[6]:
 
 
 import pandas as pd
@@ -398,8 +400,7 @@ ps=False
 trail='ps' if ps else ''
 start_year=2014
 end_year=2026
-if ps == True:
-    end_year=2025
+
 for year in range(start_year, end_year):
     # Read CSV files for each year
     pbp = pd.read_csv(f"../game_report/team/{year}all_logs.csv")
@@ -450,9 +451,11 @@ for year in range(start_year, end_year):
   
     pbp = four_factors_data(pbp, pbp_vs, year, ps=ps)
     pbp_vs = four_factors_data(pbp_vs, pbp, year, ps=ps)
+
     
-    # Prepare columns for merging
-    columns = ['ft_factor', 'oreb_factor', 'turnover_factor', '2shooting_factor', '3shooting_factor', 'TeamId','date','GameId']
+
+
+    columns = ['ft_factor', 'oreb_factor', 'morey_factor','turnover_factor', '2shooting_factor', '3shooting_factor','rimfactor','nonrim2factor', 'TeamId','date','GameId']
     oppcolumns = {c: 'opp_' + c for c in columns if c != 'TeamId' and c != 'date' and c != 'GameId'}
     columns.append('Points')
     
