@@ -396,7 +396,7 @@ import sys
 all_pbp = []
 all_pbp_vs = []
 all_nba = []
-ps=False
+ps=True
 trail='ps' if ps else ''
 start_year=2014
 end_year=2026
