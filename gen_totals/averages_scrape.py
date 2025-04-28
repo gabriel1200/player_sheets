@@ -381,11 +381,13 @@ def get_dates(start_year,end_year):
     return pd.concat(dates)
 start_year=2025
 end_year=2026
+ps=True
 #dateframe=get_dates(start_year,end_year)
 #dates=dateframe['GAME_DATE'].unique().tolist()
 dates=[]
-df= pull_avg(dates,start_year,end_year,ps=True)
+df= pull_avg(dates,start_year,end_year,ps=ps)
 #data=pull_game_level(dates)
+season_string='ps' if ps else 'rs'
 
 
 # In[4]:
@@ -473,5 +475,5 @@ def fetch_nba_data(start_year, end_year, season_type='rs', save_to_csv=True):
 
     return all_data
 start_year=2025
-data = fetch_nba_data(start_year, 2025, season_type='rs')
+data = fetch_nba_data(start_year, 2025, season_type=season_string)
 

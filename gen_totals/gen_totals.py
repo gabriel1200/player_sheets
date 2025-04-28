@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[13]:
+# In[10]:
 
 
 import pandas as pd
@@ -12,13 +12,13 @@ import glob
 import os
 
 
-ps=False
+ps=True
 def collect_yeardata(ps=False):
     frames = []
     trail=''
     if ps ==True:
         trail='_ps'
-    end_year = 2024 if ps else 2025
+    end_year = 2025
     for year in range(1997,end_year+1):
         file= str(year)+trail+'_avg.csv'
         
@@ -252,7 +252,7 @@ perc_save(data,ps=ps)
 total_save(data,ps=ps)
 
 
-# In[ ]:
+# In[11]:
 
 
 data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
@@ -265,7 +265,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[15]:
+# In[ ]:
 
 
 directory = "../totals"
@@ -278,7 +278,7 @@ totals.rename(columns={'3SecondViolations':'ThreeSecondViolations'},inplace=True
 
 lebron=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/lebron.csv')
 start_year=1997
-end_year=2024 if ps else 2025
+end_year=2025
 trail = '_ps' if ps else ''
 modern_years=[]
 for year in range(start_year,end_year+1):
@@ -320,7 +320,7 @@ modern = pd.concat(modern_years)
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 
 
-# In[ ]:
+# In[13]:
 
 
 yearframe.sort_values('TIME_OF_POSS',inplace=True)
