@@ -98,6 +98,7 @@ def pull_onoff(years, opp=False, ps=False):
     player_index = player_index[player_index.team != 'TOT']
     player_index = player_index[player_index.year > 2000]
     player_index = player_index.drop_duplicates()
+    player_index['team_id'] =player_index['team_id'].astype(int)
     all_frames = []
     
     for year in years:
@@ -115,7 +116,7 @@ def pull_onoff(years, opp=False, ps=False):
         
         for team_id in season_index.team_id.unique():
             # Generate filename for this team/year combination
-            filename = get_filename(team_id, year, opp, ps)
+            filename = get_filename(int(team_id), year, opp, ps)
             filepath = os.path.join(year_dir, filename)
             
             # Check if file already exists

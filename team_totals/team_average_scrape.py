@@ -472,6 +472,7 @@ def scrape_teams(ps=False):
     
     # Convert collected data into a DataFrame
     df = pd.concat(all_data)
+    df['TeamId']=df['TeamId'].astype(int)
 
     for team_id in df['TeamId'].unique().tolist():
         teamdf=df[df['TeamId']==team_id]
@@ -533,6 +534,7 @@ def scrape_teams_vs(ps=False):
     
     # Convert collected data into a DataFrame
     df = pd.concat(all_data)
+    df['TeamId']=df['TeamId'].astype(int)
     for team_id in df['TeamId'].unique().tolist():
         teamdf=df[df['TeamId']==team_id]
     
