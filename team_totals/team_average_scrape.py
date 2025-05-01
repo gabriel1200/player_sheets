@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[26]:
+# In[23]:
 
 
 from nba_api.stats.static import players,teams
@@ -420,7 +420,7 @@ df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 df
 
 
-# In[27]:
+# In[24]:
 
 
 import requests
@@ -477,14 +477,14 @@ def scrape_teams(ps=False):
     for team_id in df['TeamId'].unique().tolist():
         teamdf=df[df['TeamId']==team_id]
 
-        olddf=pd.read_csv(team_id+carry+'.csv')
+        olddf=pd.read_csv(str(team_id)+carry+'.csv')
 
         new_years = teamdf['year'].unique().tolist()
         olddf=olddf[~olddf.year.isin(new_years)]
         teamdf=pd.concat([olddf,teamdf])
         teamdf.drop_duplicates(inplace=False)
 
-        teamdf.to_csv(team_id+carry+".csv",index=False)
+        teamdf.to_csv(str(team_id)+carry+".csv",index=False)
     return df
 
 
@@ -538,14 +538,14 @@ def scrape_teams_vs(ps=False):
     for team_id in df['TeamId'].unique().tolist():
         teamdf=df[df['TeamId']==team_id]
     
-        olddf=pd.read_csv(team_id+carry+'.csv')
+        olddf=pd.read_csv(str(team_id)+carry+'.csv')
 
         new_years = teamdf['year'].unique().tolist()
         olddf=olddf[~olddf.year.isin(new_years)]
         teamdf=pd.concat([olddf,teamdf])
         teamdf.drop_duplicates(inplace=False)
     
-        teamdf.to_csv(team_id+'vs'+carry+".csv",index=False)
+        teamdf.to_csv(str(team_id)+'vs'+carry+".csv",index=False)
     return df
 
 
@@ -554,7 +554,41 @@ scrape_teams(ps=ps)
 scrape_teams_vs(ps=ps)
 
 
-# In[28]:
+# In[31]:
+
+
+import pandas as pd
+
+import pandas as pd
+
+def get_playtype_summary(ps=False):
+    # Load the data
+    url_regular = 'https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/teamplay.csv'
+    url_playoffs = 'https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/teamplay_p.csv'
+
+    df = pd.read_csv(url_playoffs if ps else url_regular)
+
+    # Keep only relevant columns
+    cols_to_keep = ['Team', 'year', 'playtype', 'PPP', 'POSS', 'FREQ%']
+    df = df[cols_to_keep]
+
+    # Pivot the table
+    pivoted = df.pivot_table(
+        index=['Team', 'year'], 
+        columns='playtype', 
+        values=['PPP', 'POSS', 'FREQ%']
+    )
+
+    # Flatten MultiIndex columns
+    pivoted.columns = [f"{stat}_{ptype}" for stat, ptype in pivoted.columns]
+    pivoted = pivoted.reset_index()
+
+    return pivoted
+playtype_test=get_playtype_summary()
+playtype_test.columns
+
+
+# In[26]:
 
 
 trail = ''
@@ -657,7 +691,7 @@ total_opp_fgdreb=[]
 total_opp_ftdreb=[]
 
 # Loop through each year for playoffs
-for year in range(2001, 2025):
+for year in range(2001, 2026):
     # Read the CSV file for the year
     # Read the CSV file for the year
     df = pd.read_csv(f"{year}{trail}.csv")
@@ -696,7 +730,7 @@ for year in range(2001, 2025):
     total_ftoreb.append(df['FTOffRebounds'].sum())
 # Create a DataFrame with the results for playoffs
 
-years = list(range(2001, 2025))
+years = list(range(2001, 2026))
 seasons=[str(year-1)+'-'+str(year)[-2:] for year in years]
 testdf = pd.DataFrame({
     'year': years,
@@ -721,70 +755,72 @@ testdf.to_csv('team_averages_ps.csv', index=False)
 
 
 
-# In[29]:
+# In[30]:
 
 
-for year in range(2001,2026):    
-    trail='ps'
-    #trail=''       
-    ps = True if trail =='ps' else False
-    pbp=pd.read_csv(str(year)+trail+('.csv'))
-    pbpvs=pd.read_csv(str(year)+'vs'+trail+('.csv'))
- 
+for year in range(2001, 2026):    
+    trail = 'ps'
+    ps = True if trail == 'ps' else False
 
-    pbp=four_factors_data(pbp,pbpvs,year,ps=False)
+    pbp = pd.read_csv(str(year) + trail + '.csv')
+    pbpvs = pd.read_csv(str(year) + 'vs' + trail + '.csv')
 
-    pbpvs=four_factors_data(pbpvs,pbp,year,ps=False)
-    columns = ['ft_factor', 'oreb_factor', 'turnover_factor', '2shooting_factor', '3shooting_factor','rimfactor','nonrim2factor','morey_factor']
-    oppcolumns ={}
-    for c in columns:
-        oppcolumns[c]='opp_'+c
-    columns.append('TeamId')
-   
+    pbp = four_factors_data(pbp, pbpvs, year, ps=False)
+    pbpvs = four_factors_data(pbpvs, pbp, year, ps=False)
 
-    vsframe=pbpvs[columns].reset_index(drop=True)
-    vsframe.rename(columns=oppcolumns,inplace=True)
-    
+    columns = ['ft_factor', 'oreb_factor', 'turnover_factor', '2shooting_factor', 
+               '3shooting_factor', 'rimfactor', 'nonrim2factor', 'morey_factor', 'TeamId']
+    oppcolumns = {c: 'opp_' + c for c in columns if c != 'TeamId'}
 
-    pbp=pbp.merge(vsframe,on='TeamId')
+    vsframe = pbpvs[columns].reset_index(drop=True)
+    vsframe.rename(columns=oppcolumns, inplace=True)
+
+    pbp = pbp.merge(vsframe, on='TeamId')
     pbp['OffMinutes'] = (pbp['SecondsPerPossOff'] * pbp['OffPoss']) / 60
     pbp['DefMinutes'] = (pbp['SecondsPerPossDef'] * pbp['DefPoss']) / 60
-    pbp['OPace'] = 48 * ((pbp['OffPoss']) / (2 * (pbp['OffMinutes'])))
-    pbp['DPace'] = 48 * ((pbp['DefPoss']) / (2 * (pbp['DefMinutes'])))
+    pbp['OPace'] = 48 * (pbp['OffPoss']) / (2 * pbp['OffMinutes'])
+    pbp['DPace'] = 48 * (pbp['DefPoss']) / (2 * pbp['DefMinutes'])
 
-    pbp['o_rating']=100* pbp['Points']/pbp['OffPoss']
-    pbp['d_rating']=100* pbp['OpponentPoints']/pbp['DefPoss']
-    pbp['3p_rate']=100* pbp['FG3A']/pbp['FGA']
+    pbp['o_rating'] = 100 * pbp['Points'] / pbp['OffPoss']
+    pbp['d_rating'] = 100 * pbp['OpponentPoints'] / pbp['DefPoss']
+    pbp['3p_rate'] = 100 * pbp['FG3A'] / pbp['FGA']
 
-    pbp['TEAM_ID']=pbp['TeamId']
+    pbp['TEAM_ID'] = pbp['TeamId']
 
-    if year>=2014:
+    if year >= 2014:
+        nba = pd.read_csv(str(year) + trail + '_team_games.csv')
 
-    
-        nba = pd.read_csv(str(year)+trail+'_team_games.csv')
-
-
-    
-    
-    
         keepcol = [col for col in nba.columns if col not in pbp.columns]
-        nokeep = [col for col in nba.columns if col in pbp.columns]
-  
-        
         keepcol.append('TEAM_ID')
-        nba=nba[keepcol]
-       
+        nba = nba[keepcol]
 
-        total=pbp.merge(nba,on='TEAM_ID')
+        total = pbp.merge(nba, on='TEAM_ID')
+
+        ### ✅ Merge playtype data ###
+        playtype_df = get_playtype_summary(ps)
+        playtype_df = playtype_df[playtype_df['year'] == year]
+
+        # Ensure 'TeamAbbreviation' exists and map if needed
+        if 'TeamAbbreviation' in total.columns:
+
+            playtype_df.rename(columns={'Team':'TeamAbbreviation'},inplace=True)
+            total = total.merge(playtype_df, how='left', on=['TeamAbbreviation', 'year'])
+            print(total[total['FREQ%_cut'].isna()])
 
     else:
-        total=pbp.reset_index()
-    total.rename({'3SecondViolations':'ThreeSecondViolations'},inplace=True)
-    total.to_csv(str(year)+trail+'_team_totals.csv',index=False)
-    
+        total = pbp.reset_index()
+
+    total.rename(columns={'3SecondViolations': 'ThreeSecondViolations'}, inplace=True)
+    total.to_csv(str(year) + trail + '_team_totals.csv', index=False)
 
 
-# In[33]:
+# In[ ]:
+
+
+
+
+
+# In[28]:
 
 
 shooting_columns = [
@@ -864,7 +900,7 @@ shooting.to_csv('team_threes_ps.csv',index=False)
 shooting.to_csv('../../web_app/data/team_threes_ps.csv',index=False)
 
 
-# In[31]:
+# In[29]:
 
 
 shooting.columns
