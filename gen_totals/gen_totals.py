@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[10]:
+# In[5]:
 
 
 import pandas as pd
@@ -86,7 +86,7 @@ sum_metrics = [
     "PULL_UP_PTS", "PULL_UP_FG3A", "PULL_UP_FGA", "PULL_UP_FGM", 
     "PULL_UP_FG3M", "PAINT_TOUCH_PTS", "ELBOW_TOUCH_PTS", "POST_TOUCH_PTS", 
     "CATCH_SHOOT_PTS", "FGM_LT_06", "FGA_LT_06", "PLUSMINUS", "CATCH_SHOOT_FG3M", "CATCH_SHOOT_FG3A", 
-    "CATCH_SHOOT_FGA", "CATCH_SHOOT_FGM",
+    "CATCH_SHOOT_FGA", "CATCH_SHOOT_FGM", "NBA_FANTASY_PTS",
 
     'more_15ft_def_REB_CHANCE_DEFER', 'less_10ft_def_PLUSMINUS', 'two_pt_def_FG2A', 'hustle_LOOSE_BALLS_RECOVERED', 'DIST_FEET', 
     'less_6ft_def_PLUSMINUS', 'DIST_MILES_DEF', 'post_touch_POST_TOUCH_FOULS', 'two_pt_def_FG2M', 'three_pt_def_FG3M', 'post_touch_POST_TOUCH_FGM', 
@@ -252,7 +252,7 @@ perc_save(data,ps=ps)
 total_save(data,ps=ps)
 
 
-# In[11]:
+# In[6]:
 
 
 data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
@@ -265,7 +265,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[ ]:
+# In[7]:
 
 
 directory = "../totals"
@@ -280,7 +280,7 @@ lebron=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs
 start_year=1997
 end_year=2025
 trail = '_ps' if ps else ''
-modern_years=[]
+modern_years=[] 
 for year in range(start_year,end_year+1):
     print(year)
 
@@ -307,6 +307,8 @@ for year in range(start_year,end_year+1):
         yearframe["RecoveredBlocks"].fillna(0)
     )
 
+
+
     yearframe.sort_values(by=['Points','Minutes'],inplace=True)
     print('Saving to '+'../year_totals/'+str(year)+trail+'.csv')
     yearframe.to_csv('../year_totals/'+str(year)+trail+'.csv',index=False)
@@ -320,7 +322,7 @@ modern = pd.concat(modern_years)
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 
 
-# In[13]:
+# In[8]:
 
 
 yearframe.sort_values('TIME_OF_POSS',inplace=True)
