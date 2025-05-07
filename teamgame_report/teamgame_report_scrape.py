@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
+# In[7]:
 
 
 from nba_api.stats.static import players,teams
@@ -325,7 +325,7 @@ inverted_team_dict = {
 }
 
 
-# In[5]:
+# In[8]:
 
 
 for year in range(2026,2026):    
@@ -388,7 +388,7 @@ for year in range(2026,2026):
     total.to_csv(str(year)+trail+'_team_totals.csv',index=False)
 
 
-# In[6]:
+# In[ ]:
 
 
 import pandas as pd
@@ -396,7 +396,7 @@ import sys
 all_pbp = []
 all_pbp_vs = []
 all_nba = []
-ps=True
+ps=False
 trail='ps' if ps else ''
 start_year=2014
 end_year=2026
@@ -569,8 +569,15 @@ for year in range(start_year, end_year):
     print(len(merged_data.columns))
     merged_data.to_csv(f"year_files/all_games_{year}{trail}.csv",index=False)
     merged_data.to_parquet(f"year_files/all_games_{year}{trail}.parquet",index=False)
+    # Create folder for the year if it doesn't exist
+    year_folder = f"games/{year}"
+    os.makedirs(year_folder, exist_ok=True)
 
-  
+    # Save each game's data to its own file
+    for game_id in merged_data['GameId'].unique():
+        game_df = merged_data[merged_data['GameId'] == game_id]
+        game_df.to_csv(f"{year_folder}/{game_id}.csv", index=False)
+
 
   
 
