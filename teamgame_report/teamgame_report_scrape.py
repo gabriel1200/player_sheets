@@ -388,7 +388,7 @@ for year in range(2026,2026):
     total.to_csv(str(year)+trail+'_team_totals.csv',index=False)
 
 
-# In[ ]:
+# In[10]:
 
 
 import pandas as pd
@@ -396,7 +396,7 @@ import sys
 all_pbp = []
 all_pbp_vs = []
 all_nba = []
-ps=False
+ps=True
 trail='ps' if ps else ''
 start_year=2014
 end_year=2026
