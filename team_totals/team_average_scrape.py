@@ -805,7 +805,7 @@ for year in range(2001, 2026):
 
             playtype_df.rename(columns={'Team':'TeamAbbreviation'},inplace=True)
             total = total.merge(playtype_df, how='left', on=['TeamAbbreviation', 'year'])
-            print(total[total['FREQ%_cut'].isna()])
+        
 
     else:
         total = pbp.reset_index()
