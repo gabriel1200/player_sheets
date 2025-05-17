@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[7]:
+# In[11]:
 
 
 from nba_api.stats.static import players,teams
@@ -325,7 +325,7 @@ inverted_team_dict = {
 }
 
 
-# In[8]:
+# In[12]:
 
 
 for year in range(2026,2026):    
@@ -388,7 +388,7 @@ for year in range(2026,2026):
     total.to_csv(str(year)+trail+'_team_totals.csv',index=False)
 
 
-# In[10]:
+# In[13]:
 
 
 import pandas as pd
