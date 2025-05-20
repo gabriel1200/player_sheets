@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[11]:
+# In[4]:
 
 
 from nba_api.stats.static import players,teams
@@ -325,7 +325,7 @@ inverted_team_dict = {
 }
 
 
-# In[12]:
+# In[ ]:
 
 
 for year in range(2026,2026):    
@@ -335,10 +335,12 @@ for year in range(2026,2026):
     pbp=pd.read_csv(str(year)+trail+('.csv'))
     pbpvs=pd.read_csv(str(year)+'vs'+trail+('.csv'))
  
-
+    print(len(pbp))
     pbp=four_factors_data(pbp,pbpvs,year,ps=ps)
+    print(len(pbp))
 
     pbpvs=four_factors_data(pbpvs,pbp,year,ps=ps)
+    print(len(pbp_vs))
     columns = ['ft_factor', 'oreb_factor', 'turnover_factor', '2shooting_factor', '3shooting_factor','rimfactor','nonrim2factor']
 
     oppcolumns ={}
@@ -388,7 +390,7 @@ for year in range(2026,2026):
     total.to_csv(str(year)+trail+'_team_totals.csv',index=False)
 
 
-# In[13]:
+# In[ ]:
 
 
 import pandas as pd
@@ -447,10 +449,13 @@ for year in range(start_year, end_year):
     pbp_vs['date'] = pbp_vs['Date'].str.replace('-', '', regex=False)
 
     # Apply four_factors_data function
-
+    print((len(pbp)))
   
     pbp = four_factors_data(pbp, pbp_vs, year, ps=ps)
+    print(len(pbp))
+    print(len(pbp_vs))
     pbp_vs = four_factors_data(pbp_vs, pbp, year, ps=ps)
+    print(len(pbp_vs))
 
     
 
@@ -567,6 +572,7 @@ for year in range(start_year, end_year):
     print(len(merged_data.columns))
     merged_data.drop(columns=ranked,inplace=True)
     print(len(merged_data.columns))
+    merged_data.drop_duplicates(subset=['GameId','TEAM_ID'],inplace=True)
     merged_data.to_csv(f"year_files/all_games_{year}{trail}.csv",index=False)
     merged_data.to_parquet(f"year_files/all_games_{year}{trail}.parquet",index=False)
     # Create folder for the year if it doesn't exist
