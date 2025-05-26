@@ -9301,7 +9301,7 @@ index,nba_id,Player,year,G
 9299,203937.0,Kyle Anderson,2025,2
 9300,203507.0,Giannis Antetokounmpo,2025,5
 9301,1630175.0,Cole Anthony,2025,5
-9302,1628384.0,OG Anunoby,2025,14
+9302,1628384.0,OG Anunoby,2025,15
 9303,1628963.0,Marvin Bagley III,2025,2
 9304,1631094.0,Paolo Banchero,2025,5
 9305,1630217.0,Desmond Bane,2025,4
@@ -9310,13 +9310,13 @@ index,nba_id,Player,year,G
 9308,1629048.0,Goga Bitadze,2025,3
 9309,1641710.0,Anthony Black,2025,5
 9310,203992.0,Bogdan Bogdanović,2025,7
-9311,1628396.0,Tony Bradley,2025,5
+9311,1628396.0,Tony Bradley,2025,6
 9312,1631128.0,Christian Braun,2025,14
-9313,1628969.0,Mikal Bridges,2025,14
+9313,1628969.0,Mikal Bridges,2025,15
 9314,1628415.0,Dillon Brooks,2025,7
 9315,1627759.0,Jaylen Brown,2025,11
 9316,1641738.0,Kobe Brown,2025,3
-9317,1628973.0,Jalen Brunson,2025,14
+9317,1628973.0,Jalen Brunson,2025,15
 9318,1628418.0,Thomas Bryant,2025,12
 9319,202692.0,Alec Burks,2025,1
 9320,202710.0,Jimmy Butler,2025,11
@@ -9359,12 +9359,12 @@ index,nba_id,Player,year,G
 9357,1629750.0,Javonte Green,2025,6
 9358,201145.0,Jeff Green,2025,3
 9359,1629060.0,Rui Hachimura,2025,5
-9360,1630169.0,Tyrese Haliburton,2025,12
+9360,1630169.0,Tyrese Haliburton,2025,13
 9361,203501.0,Tim Hardaway Jr.,2025,6
 9362,201935.0,James Harden,2025,7
 9363,203914.0,Gary Harris,2025,5
 9364,202699.0,Tobias Harris,2025,6
-9365,1628404.0,Josh Hart,2025,14
+9365,1628404.0,Josh Hart,2025,15
 9366,1628392.0,Isaiah Hartenstein,2025,14
 9367,1630573.0,Sam Hauser,2025,8
 9368,1629637.0,Jaxson Hayes,2025,4
@@ -9416,9 +9416,9 @@ index,nba_id,Player,year,G
 9414,1641753.0,Chris Livingston,2025,2
 9415,1626172.0,Kevon Looney,2025,12
 9416,201572.0,Brook Lopez,2025,5
-9417,1631097.0,Bennedict Mathurin,2025,11
-9418,1630540.0,Miles McBride,2025,14
-9419,204456.0,T.J. McConnell,2025,12
+9417,1631097.0,Bennedict Mathurin,2025,12
+9418,1630540.0,Miles McBride,2025,15
+9419,204456.0,T.J. McConnell,2025,13
 9420,1630183.0,Jaden McDaniels,2025,13
 9421,1630241.0,Sam Merrill,2025,8
 9422,1641757.0,Jordan Miller,2025,3
@@ -9433,8 +9433,8 @@ index,nba_id,Player,year,G
 9431,1630541.0,Moses Moody,2025,12
 9432,1629630.0,Ja Morant,2025,3
 9433,1627750.0,Jamal Murray,2025,14
-9434,1629614.0,Andrew Nembhard,2025,12
-9435,1630174.0,Aaron Nesmith,2025,12
+9434,1629614.0,Andrew Nembhard,2025,13
+9435,1630174.0,Aaron Nesmith,2025,13
 9436,1630192.0,Zeke Nnaji,2025,6
 9437,1629643.0,Chuma Okeke,2025,3
 9438,1630171.0,Isaac Okoro,2025,9
@@ -9458,17 +9458,17 @@ index,nba_id,Player,year,G
 9456,1630194.0,Paul Reed,2025,5
 9457,1629675.0,Naz Reid,2025,13
 9458,1629130.0,Duncan Robinson,2025,4
-9459,1629011.0,Mitchell Robinson,2025,14
+9459,1629011.0,Mitchell Robinson,2025,15
 9460,1631157.0,Ryan Rollins,2025,3
 9461,1630611.0,Gui Santos,2025,10
 9462,1631248.0,Baylor Scheierman,2025,4
 9463,203471.0,Dennis Schröder,2025,6
 9464,1630578.0,Alperen Şengün,2025,7
-9465,1629013.0,Landry Shamet,2025,7
+9465,1629013.0,Landry Shamet,2025,8
 9466,1630545.0,Terrence Shannon Jr.,2025,7
-9467,1641767.0,Ben Sheppard,2025,10
+9467,1641767.0,Ben Sheppard,2025,11
 9468,1642263.0,Reed Sheppard,2025,3
-9469,1627783.0,Pascal Siakam,2025,12
+9469,1627783.0,Pascal Siakam,2025,13
 9470,1627732.0,Ben Simmons,2025,5
 9471,1630579.0,Jericho Sims,2025,5
 9472,1631095.0,Jabari Smith Jr.,2025,7
@@ -9482,11 +9482,11 @@ index,nba_id,Player,year,G
 9480,1641709.0,Ausar Thompson,2025,6
 9481,202684.0,Tristan Thompson,2025,3
 9482,1630214.0,Xavier Tillman Sr.,2025,1
-9483,1630167.0,Obi Toppin,2025,12
-9484,1626157.0,Karl-Anthony Towns,2025,14
+9483,1630167.0,Obi Toppin,2025,13
+9484,1626157.0,Karl-Anthony Towns,2025,15
 9485,1629018.0,Gary Trent Jr.,2025,5
 9486,200782.0,P.J. Tucker,2025,1
-9487,1626167.0,Myles Turner,2025,12
+9487,1626167.0,Myles Turner,2025,13
 9488,1641816.0,Hunter Tyson,2025,5
 9489,1642281.0,Jaylon Tyson,2025,4
 9490,1629020.0,Jarred Vanderbilt,2025,5
@@ -9509,5 +9509,5 @@ index,nba_id,Player,year,G
 9507,1631466.0,Jeenathan Williams,2025,3
 9508,1629026.0,Kenrich Williams,2025,7
 9509,1631246.0,Vince Williams Jr.,2025,3
-9510,1626153.0,Delon Wright,2025,2
+9510,1626153.0,Delon Wright,2025,3
 9511,1627826.0,Ivica Zubac,2025,7
