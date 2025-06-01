@@ -16,10 +16,10 @@ import numpy as np
 def format_date_to_url(date):
     # Convert date from YYYYMMDD to datetime object
     date_obj = datetime.strptime(str(date), '%Y%m%d')
-    
+
     # Format the date as MM%2FDD%2FYYYY
     formatted_date = date_obj.strftime('%m%%2F%d%%2F%Y')
-    
+
     return formatted_date
 
 # Example usage
@@ -43,12 +43,12 @@ def pull_data(url):
 
     if len(json["resultSets"])== 1:
 
-        
+
         data = json["resultSets"][0]["rowSet"]
         #print(data)
         columns = json["resultSets"][0]["headers"]
         #print(columns)
-        
+
         df = pd.DataFrame.from_records(data, columns=columns)
     else:
 
@@ -71,7 +71,7 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
     dframes = []
     shotcolumns = ['FGA_FREQUENCY', 'FGM', 'FGA', 'FG_PCT', 'EFG_PCT', 'FG2A_FREQUENCY', 'FG2M', 'FG2A', 'FG2_PCT', 
                    'FG3A_FREQUENCY', 'FG3M', 'FG3A', 'FG3_PCT']
-    
+
     unit='Team'
     for year in range(start_year, end_year):
         count=0
@@ -92,13 +92,13 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
             print(len(df))
             if test != False:
                 df=df[df.date<game_date]
-            
+
             year_frame.append(df)
 
             year_dates=[int(date) for date in year_dates if date not in df['date'].unique().tolist()]
             year_dates=year_dates[::-1]
             print(len(year_frame))
-            
+
 
         season = str(year - 1) + '-' + str(year)[-2:]
         year_dates.sort()
@@ -107,43 +107,43 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
             try:
                 date_num = int(date)
                 date = format_date_to_url(date)
-    
-    
+
+
                 url = f'https://stats.nba.com/stats/leaguedashteamstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&MeasureType=Base&Month=0&OpponentTeamID=0&Outcome=&PORound=&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
-            
+
                 df = pull_data(url)
-    
+
                 url2 = f'https://stats.nba.com/stats/leaguedashteamstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&MeasureType=Advanced&Month=0&OpponentTeamID=0&Outcome=&PORound=&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
                 df2 = pull_data(url2)
-    
+
                 url3 = f'https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=&PerMode=Totals&PlayerExperience=&PlayerOrTeam={unit}&PlayerPosition=&PtMeasureType=Passing&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
                 df3 = pull_data(url3)
-    
+
                 url4 = f'https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=&PerMode=Totals&PlayerExperience=&PlayerOrTeam={unit}&PlayerPosition=&PtMeasureType=Drives&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
                 df4 = pull_data(url4)
-    
+
                 url5 = f'https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=&PerMode=Totals&PlayerExperience=&PlayerOrTeam={unit}&PlayerPosition=&PtMeasureType=Possessions&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
                 df5 = pull_data(url5)
-    
+
                 url6 = f'https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=&PerMode=Totals&PlayerExperience=&PlayerOrTeam={unit}&PlayerPosition=&PtMeasureType=Rebounding&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
                 df6 = pull_data(url6)
-    
+
                 url7 = f'https://stats.nba.com/stats/leaguedashteamptshot?CloseDefDistRange=0-2%20Feet%20-%20Very%20Tight&College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&DribbleRange=&GameScope=&GameSegment=&GeneralRange=&Height=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&ShotDistRange=&StarterBench=&TeamID=0&TouchTimeRange=&VsConference=&VsDivision=&Weight='
                 df7 = pull_data(url7)
-    
+
                 term = 'very_tight_'
                 df7.rename(columns={col: term + col for col in shotcolumns}, inplace=True)
-                
+
                 url8 = 'https://stats.nba.com/stats/leaguedashteamptshot?CloseDefDistRange=2-4%20Feet%20-%20Tight&College=&Conference=&Country=&DateFrom=' + date + '&DateTo=' + date + '&Division=&DraftPick=&DraftYear=&DribbleRange=&GameScope=&GameSegment=&GeneralRange=&Height=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&Season=' + season + '&SeasonSegment=&SeasonType='+stype+'&ShotClockRange=&ShotDistRange=&StarterBench=&TeamID=0&TouchTimeRange=&VsConference=&VsDivision=&Weight='
                 df8 = pull_data(url8)
                 term = 'tight_'
                 df8.rename(columns={col: term + col for col in shotcolumns},inplace=True)
-    
+
                 url9 = 'https://stats.nba.com/stats/leaguedashteamptshot?CloseDefDistRange=4-6%20Feet%20-%20Open&College=&Conference=&Country=&DateFrom=' + date + '&DateTo=' + date + '&Division=&DraftPick=&DraftYear=&DribbleRange=&GameScope=&GameSegment=&GeneralRange=&Height=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&Season=' + season + '&SeasonSegment=&SeasonType='+stype+'&ShotClockRange=&ShotDistRange=&StarterBench=&TeamID=0&TouchTimeRange=&VsConference=&VsDivision=&Weight='
                 df9 = pull_data(url9)
                 term = 'open_'
                 df9.rename(columns={col: term + col for col in shotcolumns},inplace=True)
-    
+
                 url10 = 'https://stats.nba.com/stats/leaguedashteamptshot?CloseDefDistRange=6%2B%20Feet%20-%20Wide%20Open&College=&Conference=&Country=&DateFrom=' + date + '&DateTo=' + date + '&Division=&DraftPick=&DraftYear=&DribbleRange=&GameScope=&GameSegment=&GeneralRange=&Height=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&Season=' + season + '&SeasonSegment=&SeasonType='+stype+'&ShotClockRange=&ShotDistRange=&StarterBench=&TeamID=0&TouchTimeRange=&VsConference=&VsDivision=&Weight='
                 df10 = pull_data(url10)
                 term = 'wide_open_'
@@ -153,36 +153,36 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
                 shotcolumns2=shotcolumns+['EFG%']
                 term='pullup_'
                 df11.rename(columns={col: term + col for col in shotcolumns2},inplace=True)
-    
+
                 url12 = 'https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom=' + date + '&DateTo=' + date + '&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=&PerMode=Totals&PlayerExperience=&PlayerOrTeam=Team&PlayerPosition=&PtMeasureType=Efficiency&Season=' + season + '&SeasonSegment=&SeasonType='+stype+'&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
 
 
                 df12 = pull_data(url12) 
                 url13=f"https://stats.nba.com/stats/leaguedashteamshotlocations?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DistanceRange=By%20Zone&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&Location=&MeasureType=Base&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
-                
+
                 df13=pull_data(url13)
                 #print(df13.columns)
-    
+
                 zone_columns=['TEAM_ID', 'TEAM_NAME',
                  'RA_FGM', 'RA_FGA', 'RA_FG_PCT',               # Restricted Area
                  'ITP_FGM', 'ITP_FGA', 'ITP_FG_PCT',             # In The Paint (Non-RA)
                  'MID_FGM', 'MID_FGA', 'MID_FG_PCT',             # Mid Range
                  'LEFT_CORNER_3_FGM', 'LEFT_CORNER_3_FGA', 'LEFT_CORNER_3_FG_PCT',  # Left Corner 3
                  'RIGHT_CORNER_3_FGM', 'RIGHT_CORNER_3_FGA', 'RIGHT_CORNER_3_FG_PCT', # Right Corner 3
-          
-    
+
+
                                # All Corner 3s
                  'ABOVE_BREAK_3_FGM', 'ABOVE_BREAK_3_FGA', 'ABOVE_BREAK_3_FG_PCT', 
                        'BACKCOURT_FGM', 'BACKCOURT_FGA', 'BACKCOURT_FG_PCT', # Right Corner 3
-                              
+
                               'CORNER_3_FGM', 'CORNER_3_FGA', 'CORNER_3_FG_PCT'  ]  # Above the Break 3
-    
+
                 df13.columns=zone_columns
                 url14=f"https://stats.nba.com/stats/leaguedashptteamdefend?College=&Conference=&Country=&DateFrom{date}=&DateTo={date}&DefenseCategory=Less%20Than%206Ft&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
                 df14=pull_data(url14)
                 #print(df14.columns)
                 df14.rename(columns={'CLOSE_DEF_PERSON_ID':'PLAYER_ID'},inplace=True)
-    
+
                 url15=f"https://stats.nba.com/stats/leaguedashteamshotlocations?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DistanceRange=5ft%20Range&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&Location=&MeasureType=Base&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
                 df15=pull_data(url15)
                 #print(df15.columns)
@@ -199,44 +199,44 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
                 ]
                 url16 = f'https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=&PerMode=Totals&PlayerExperience=&PlayerOrTeam={unit}&PlayerPosition=&PtMeasureType=CatchShoot&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
                 df16=pull_data(url16)
-    
-                
+
+
                 url17 = f'https://stats.nba.com/stats/leaguedashteamstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&MeasureType=Advanced&Month=0&OpponentTeamID=0&Outcome=&PORound=&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType=Playoffs&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
                 df17 = pull_data(url17)
                 df17=df17[['TEAM_ID','POSS']]
                 df17.columns=['TEAM_ID','team_poss']
-    
+
                 poss_map=dict(zip(df17['TEAM_ID'],df17['team_poss']  ))
-    
+
                 df['team_poss']=df['TEAM_ID'].map(poss_map)
                 url_misc = f'https://stats.nba.com/stats/leaguedashteamstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&MeasureType=Misc&Month=0&OpponentTeamID=0&Outcome=&PORound=&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
-                
+
                 df18 = pull_data(url_misc)
-               
+
                 frames = [df2, df3, df4, df5, df6, df7, df8, df9, df10,df11,df12,df13,df14,df15,df16,df18]
-           
+
                 framecount=1
                 for frame in frames:
                     framecount+=1
-                    
+
                     joined_columns = set(frame.columns) - set(df.columns)
                     joined_columns = list(joined_columns)
-            
+
 
                     joined_columns.append('TEAM_ID')
                     frame = frame[joined_columns]
-    
+
                     df = df.merge(frame, on='TEAM_ID',how='left').reset_index(drop=True)
-                    
-    
+
+
                 df['year'] = year
                 df['date']=date_num
-      
+
                 year_frame.append(df)
                 count+=1
                 print(date_num)
                 if count %5==0:
-            
+
                     yeardata=pd.concat(year_frame)
                     print(len(yeardata))
                     yeardata['playoffs']=ps
@@ -245,7 +245,7 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
                 print(str(e))
                 print(str(date_num))
                 time.sleep(1)
-    
+
 
         yeardata=pd.concat(year_frame)
         print(len(yeardata))
@@ -268,15 +268,15 @@ def get_dates(start_year,end_year,ps=False):
         trail=''
     dates=[]
     for year in range(start_year,end_year):
-    
+
         for team in teams.get_teams():
             team_id=team['id']
             path = '../../shot_data/team/'+str(year)+trail+'/'+str(team_id)+'.csv'
             if os.path.exists(path):
-             
+
 
                 df=pd.read_csv(path)
-    
+
                 df=df[['TEAM_ID','GAME_DATE','GAME_ID']]
                 df.sort_values(by='GAME_DATE',inplace=True)
                 df.drop_duplicates(inplace=True)
@@ -334,7 +334,7 @@ for year in range(2026,2026):
     ps = True if trail =='ps' else False
     pbp=pd.read_csv(str(year)+trail+('.csv'))
     pbpvs=pd.read_csv(str(year)+'vs'+trail+('.csv'))
- 
+
     print(len(pbp))
     pbp=four_factors_data(pbp,pbpvs,year,ps=ps)
     print(len(pbp))
@@ -347,7 +347,7 @@ for year in range(2026,2026):
     for c in columns:
         oppcolumns[c]='opp_'+c
     columns.append('TeamId')
-   
+
 
     vsframe=pbpvs[columns].reset_index(drop=True)
     vsframe.rename(columns=oppcolumns,inplace=True)
@@ -367,20 +367,20 @@ for year in range(2026,2026):
 
     if year>=2014:
 
-    
+
         nba = pd.read_csv(str(year)+trail+'_team_games.csv')
 
 
-    
-    
-    
+
+
+
         keepcol = [col for col in nba.columns if col not in pbp.columns]
         nokeep = [col for col in nba.columns if col in pbp.columns]
-  
-        
+
+
         keepcol.append('TEAM_ID')
         nba=nba[keepcol]
-       
+
 
         total=pbp.merge(nba,on='TEAM_ID')
 
@@ -410,19 +410,19 @@ for year in range(start_year, end_year):
     if ps ==False:
         pbp=pbp[pbp.SeasonType!='Playoffs']
 
-    
+
         pbp_vs=pbp_vs[pbp_vs.SeasonType!='Playoffs']
-        
+
     else:
         pbp=pbp[pbp.SeasonType=='Playoffs']
 
         print(pbp.SeasonType.unique())
-        
+
         pbp_vs=pbp_vs[pbp_vs.SeasonType=='Playoffs']
 
         pbp.dropna(subset='GameId',inplace=True)
         pbp_vs.dropna(subset='GameId',inplace=True)
-        
+
         pbp.dropna(subset='TeamId',inplace=True)
         pbp_vs.dropna(subset='TeamId',inplace=True)
         # For pbp DataFrame
@@ -441,7 +441,7 @@ for year in range(start_year, end_year):
 
     missing=nba[nba.TEAM_ABBREVIATION.isna()]
     missing.to_csv(f"{year}_missing.csv",index=False)
- 
+
     pbp.dropna(subset='GameId',inplace=True)
     pbp_vs.dropna(subset='GameId',inplace=True)
 
@@ -450,25 +450,25 @@ for year in range(start_year, end_year):
 
     # Apply four_factors_data function
     print((len(pbp)))
-  
+
     pbp = four_factors_data(pbp, pbp_vs, year, ps=ps)
     print(len(pbp))
     print(len(pbp_vs))
     pbp_vs = four_factors_data(pbp_vs, pbp, year, ps=ps)
     print(len(pbp_vs))
 
-    
+
 
 
     columns = ['ft_factor', 'oreb_factor', 'morey_factor','turnover_factor', '2shooting_factor', '3shooting_factor','rimfactor','nonrim2factor', 'TeamId','date','GameId']
     oppcolumns = {c: 'opp_' + c for c in columns if c != 'TeamId' and c != 'date' and c != 'GameId'}
     columns.append('Points')
-    
+
     vsframe = pbp_vs[columns].reset_index(drop=True)
-    
+
     vsframe.rename(columns=oppcolumns, inplace=True)
     vsframe.rename(columns={'Points':'OpponentPoints'},inplace=True)
-    
+
     # Merge pbp and vsframe
     pbp = pbp.merge(vsframe, on=['TeamId','date','GameId'])
     pbp.rename(columns={'TeamId': 'TEAM_ID'},inplace=True)
@@ -481,11 +481,11 @@ for year in range(start_year, end_year):
     pbp['d_rating'] = 100 * pbp['OpponentPoints'] / pbp['DefPoss']
     pbp['3p_rate'] = 100 * pbp['FG3A'] / pbp['FGA']
 
-    
+
     # Format date
-    
+
     nba['date'] = nba['date'].astype(str)
-    
+
 
 
 
@@ -534,7 +534,7 @@ for year in range(start_year, end_year):
         "DREB":"opp_DREB"
     }
     copied_data.rename(columns=opp_dict,inplace=True)
-    
+
     col_list = [
         'opp_very_tight_FG3A_FREQUENCY',
         'opp_very_tight_FG3A',
@@ -556,7 +556,7 @@ for year in range(start_year, end_year):
         'TEAM_ABBREVIATION',
         "opp_OREB",
         "opp_DREB",
-    
+
         'GameId'
     ]
 
@@ -585,7 +585,7 @@ for year in range(start_year, end_year):
         game_df.to_csv(f"{year_folder}/{game_id}.csv", index=False)
 
 
-  
+
 
 
 

@@ -21,13 +21,13 @@ def collect_yeardata(ps=False):
     end_year = 2025
     for year in range(1997,end_year+1):
         file= str(year)+trail+'_avg.csv'
-        
+
         df = pd.read_csv(file)
         df['PLAYER_ID']=df['PLAYER_ID'].astype(str)
 
         if year >2000:
             df2=pd.read_csv(str(year)+trail+'_pbp'+'.csv')
- 
+
             df2.rename(columns={'EntityId':'PLAYER_ID'},inplace=True)
 
             curcol =[col.lower() for col in df.columns]
@@ -212,17 +212,17 @@ def perc_save(df, ps=True):
     player_ids = df['PLAYER_ID'].unique().tolist()
 
     frame = df[index_col + sum_metrics + pct_metrics].reset_index().fillna(0)
-    
+
     # Calculate percentages
     for col in sum_metrics:
         frame[col] = 100 * frame[col].astype(int) / frame['POSS']
 
     # Rank metrics
     all_metrics = sum_metrics + pct_metrics
-    
+
     # Create a dictionary to store new columns
     rank_cols = {col + '_rank': frame.groupby('year')[col].rank(pct=True) for col in all_metrics}
-    
+
     # Use pd.concat to add all rank columns at once
     frame = pd.concat([frame, pd.DataFrame(rank_cols)], axis=1)
 
@@ -237,15 +237,15 @@ def perc_save(df, ps=True):
 def total_save(df,ps=False):
     trail ='_ps' if ps else ''
     player_ids=df['PLAYER_ID'].unique().tolist()
-    
+
     frame=df[index_col+sum_metrics+pct_metrics].reset_index()
     frame=frame.fillna(0)
 
 
     for id in player_ids:
-    
+
         player_frame=frame[frame.PLAYER_ID==id]
-    
+
         player_frame.to_csv('../totals/'+str(id)+trail+'.csv',index=False)
 perc_save(data,ps=ps)
 
@@ -287,16 +287,16 @@ for year in range(start_year,end_year+1):
     yearframe=totals[totals.year==year].reset_index(drop=True)
     if trail =='' and year>=2010:
         lebronyear=lebron[lebron.year==year].reset_index(drop=True)
-    
+
         lebronyear=lebronyear[['WAR','LEBRON','O-LEBRON','D-LEBRON','year','NBA ID','Pos', 'Offensive Archetype','Defensive Role']]
-        
+
         lebronyear.rename(columns={'WAR':'LEBRON_WAR','NBA ID':'PLAYER_ID','O-LEBRON':'O_LEBRON','D-LEBRON':'D_LEBRON',},inplace=True)
 
 
         yearframe=yearframe.merge(lebronyear,on=['PLAYER_ID','year'],how='left')
 
     if year>=2014:
-        
+
         yearframe['on-ball-time%'] = 100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
         yearframe['ON_BALL_TIME_PCT'] =  100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
     if year>=2001:
