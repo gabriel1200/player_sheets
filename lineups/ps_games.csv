@@ -9317,13 +9317,13 @@ index,nba_id,Player,year,G
 9315,1627759.0,Jaylen Brown,2025,11
 9316,1641738.0,Kobe Brown,2025,3
 9317,1628973.0,Jalen Brunson,2025,18
-9318,1628418.0,Thomas Bryant,2025,16
+9318,1628418.0,Thomas Bryant,2025,17
 9319,202692.0,Alec Burks,2025,1
 9320,202710.0,Jimmy Butler,2025,11
 9321,203484.0,Kentavious Caldwell-Pope,2025,5
 9322,1628427.0,Vlatko Čančar,2025,3
 9323,1628976.0,Wendell Carter Jr.,2025,5
-9324,1627936.0,Alex Caruso,2025,18
+9324,1627936.0,Alex Caruso,2025,19
 9325,1642353.0,Cam Christie,2025,3
 9326,1641740.0,Jaylen Clark,2025,5
 9327,201144.0,Mike Conley,2025,15
@@ -9338,7 +9338,7 @@ index,nba_id,Player,year,G
 9336,1642265.0,Rob Dillingham,2025,3
 9337,1628978.0,Donte DiVincenzo,2025,15
 9338,1629029.0,Luka Dončić,2025,5
-9339,1629652.0,Luguentz Dort,2025,18
+9339,1629652.0,Luguentz Dort,2025,19
 9340,1627739.0,Kris Dunn,2025,7
 9341,1631105.0,Jalen Duren,2025,6
 9342,1631106.0,Tari Eason,2025,7
@@ -9349,7 +9349,7 @@ index,nba_id,Player,year,G
 9347,1642277.0,Johnny Furphy,2025,8
 9348,1629636.0,Darius Garland,2025,5
 9349,1630568.0,Luka Garza,2025,5
-9350,1628983.0,Shai Gilgeous-Alexander,2025,18
+9350,1628983.0,Shai Gilgeous-Alexander,2025,19
 9351,203497.0,Rudy Gobert,2025,15
 9352,1630692.0,Jordan Goodwin,2025,4
 9353,203932.0,Aaron Gordon,2025,14
@@ -9359,13 +9359,13 @@ index,nba_id,Player,year,G
 9357,1629750.0,Javonte Green,2025,6
 9358,201145.0,Jeff Green,2025,3
 9359,1629060.0,Rui Hachimura,2025,5
-9360,1630169.0,Tyrese Haliburton,2025,18
+9360,1630169.0,Tyrese Haliburton,2025,19
 9361,203501.0,Tim Hardaway Jr.,2025,6
 9362,201935.0,James Harden,2025,7
 9363,203914.0,Gary Harris,2025,5
 9364,202699.0,Tobias Harris,2025,6
 9365,1628404.0,Josh Hart,2025,18
-9366,1628392.0,Isaiah Hartenstein,2025,18
+9366,1628392.0,Isaiah Hartenstein,2025,19
 9367,1630573.0,Sam Hauser,2025,8
 9368,1629637.0,Jaxson Hayes,2025,4
 9369,1629639.0,Tyler Herro,2025,4
@@ -9374,7 +9374,7 @@ index,nba_id,Player,year,G
 9372,1628988.0,Aaron Holiday,2025,3
 9373,201950.0,Jrue Holiday,2025,8
 9374,1641842.0,Ron Holland,2025,5
-9375,1631096.0,Chet Holmgren,2025,18
+9375,1631096.0,Chet Holmgren,2025,19
 9376,201143.0,Al Horford,2025,11
 9377,1631216.0,Caleb Houstan,2025,5
 9378,1641724.0,Jett Howard,2025,1
@@ -9389,7 +9389,7 @@ index,nba_id,Player,year,G
 9387,2544.0,LeBron James,2025,5
 9388,1631170.0,Jaime Jaquez Jr.,2025,3
 9389,1629660.0,Ty Jerome,2025,9
-9390,1630198.0,Isaiah Joe,2025,18
+9390,1630198.0,Isaiah Joe,2025,19
 9391,201949.0,James Johnson,2025,4
 9392,1642352.0,Keshad Johnson,2025,2
 9393,203999.0,Nikola Jokić,2025,14
@@ -9416,9 +9416,9 @@ index,nba_id,Player,year,G
 9414,1641753.0,Chris Livingston,2025,2
 9415,1626172.0,Kevon Looney,2025,12
 9416,201572.0,Brook Lopez,2025,5
-9417,1631097.0,Bennedict Mathurin,2025,17
+9417,1631097.0,Bennedict Mathurin,2025,18
 9418,1630540.0,Miles McBride,2025,18
-9419,204456.0,T.J. McConnell,2025,18
+9419,204456.0,T.J. McConnell,2025,19
 9420,1630183.0,Jaden McDaniels,2025,15
 9421,1630241.0,Sam Merrill,2025,8
 9422,1641757.0,Jordan Miller,2025,3
@@ -9433,8 +9433,8 @@ index,nba_id,Player,year,G
 9431,1630541.0,Moses Moody,2025,12
 9432,1629630.0,Ja Morant,2025,3
 9433,1627750.0,Jamal Murray,2025,14
-9434,1629614.0,Andrew Nembhard,2025,18
-9435,1630174.0,Aaron Nesmith,2025,18
+9434,1629614.0,Andrew Nembhard,2025,19
+9435,1630174.0,Aaron Nesmith,2025,19
 9436,1630192.0,Zeke Nnaji,2025,6
 9437,1629643.0,Chuma Okeke,2025,3
 9438,1630171.0,Isaac Okoro,2025,9
@@ -9466,9 +9466,9 @@ index,nba_id,Player,year,G
 9464,1630578.0,Alperen Şengün,2025,7
 9465,1629013.0,Landry Shamet,2025,11
 9466,1630545.0,Terrence Shannon Jr.,2025,9
-9467,1641767.0,Ben Sheppard,2025,16
+9467,1641767.0,Ben Sheppard,2025,17
 9468,1642263.0,Reed Sheppard,2025,3
-9469,1627783.0,Pascal Siakam,2025,18
+9469,1627783.0,Pascal Siakam,2025,19
 9470,1627732.0,Ben Simmons,2025,5
 9471,1630579.0,Jericho Sims,2025,5
 9472,1631095.0,Jabari Smith Jr.,2025,7
@@ -9482,11 +9482,11 @@ index,nba_id,Player,year,G
 9480,1641709.0,Ausar Thompson,2025,6
 9481,202684.0,Tristan Thompson,2025,3
 9482,1630214.0,Xavier Tillman Sr.,2025,1
-9483,1630167.0,Obi Toppin,2025,18
+9483,1630167.0,Obi Toppin,2025,19
 9484,1626157.0,Karl-Anthony Towns,2025,18
 9485,1629018.0,Gary Trent Jr.,2025,5
 9486,200782.0,P.J. Tucker,2025,1
-9487,1626167.0,Myles Turner,2025,18
+9487,1626167.0,Myles Turner,2025,19
 9488,1641816.0,Hunter Tyson,2025,5
 9489,1642281.0,Jaylon Tyson,2025,4
 9490,1629020.0,Jarred Vanderbilt,2025,5
@@ -9495,19 +9495,19 @@ index,nba_id,Player,year,G
 9493,1629731.0,Dean Wade,2025,9
 9494,1630532.0,Franz Wagner,2025,5
 9495,1641716.0,Jarace Walker,2025,12
-9496,1641717.0,Cason Wallace,2025,18
+9496,1641717.0,Cason Wallace,2025,19
 9497,1641775.0,Jordan Walsh,2025,5
 9498,1642276.0,Kel'el Ware,2025,4
 9499,1631212.0,Peyton Watson,2025,14
 9500,201566.0,Russell Westbrook,2025,13
 9501,1628401.0,Derrick White,2025,11
 9502,1641715.0,Cam Whitmore,2025,3
-9503,1630598.0,Aaron Wiggins,2025,17
+9503,1630598.0,Aaron Wiggins,2025,18
 9504,203952.0,Andrew Wiggins,2025,4
-9505,1631114.0,Jalen Williams,2025,18
-9506,1631119.0,Jaylin Williams,2025,15
+9505,1631114.0,Jalen Williams,2025,19
+9506,1631119.0,Jaylin Williams,2025,16
 9507,1631466.0,Jeenathan Williams,2025,3
-9508,1629026.0,Kenrich Williams,2025,11
+9508,1629026.0,Kenrich Williams,2025,12
 9509,1631246.0,Vince Williams Jr.,2025,3
 9510,1626153.0,Delon Wright,2025,6
 9511,1627826.0,Ivica Zubac,2025,7
