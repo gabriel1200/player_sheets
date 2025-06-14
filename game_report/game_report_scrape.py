@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[10]:
+# In[ ]:
 
 
 from nba_api.stats.static import players,teams
@@ -366,14 +366,14 @@ df
 df.drop_duplicates(subset=['PLAYER_ID','TEAM_ID','date'])
 
 
-# In[11]:
+# In[ ]:
 
 
 dates.sort()
 dates
 
 
-# In[12]:
+# In[ ]:
 
 
 test =pd.read_csv('year_files/2025_games.csv')
@@ -381,7 +381,7 @@ test.columns
 test[(test.date==20241201)&(test.TEAM_ID==1610612758)]
 
 
-# In[13]:
+# In[ ]:
 
 
 '''
@@ -404,7 +404,7 @@ merge[merge.GAME_ID.isna()]
 '''
 
 
-# In[14]:
+# In[ ]:
 
 
 if ps==False:
@@ -569,31 +569,19 @@ for year in range(2025,2026):
 
 
 
-# In[15]:
-
-
-sumframe=df.groupby(['TEAM_ID','TEAM_ABBREVIATION','date']).sum(numeric_only=True)[['very_tight_FG3A','wide_open_FG3A','open_FG3A','tight_FG3A','very_tight_FG3M','wide_open_FG3M','open_FG3M','tight_FG3M',
-                                                                       'FGA','FTA','PULL_UP_FGA','PULL_UP_FGM','PULL_UP_FG3M','DRIVES','POTENTIAL_AST','TOV','RA_FGA','FRONT_CT_TOUCHES']].reset_index()
-selected_teams=['LAL','MIN']
-sumframe=sumframe[sumframe.TEAM_ABBREVIATION.isin(selected_teams)]
-
-
-sumframe
-
-
-# In[16]:
+# In[ ]:
 
 
 sumframe.columns
 
 
-# In[17]:
+# In[ ]:
 
 
 sumframe['POTENTIAL_AST']
 
 
-# In[18]:
+# In[ ]:
 
 
 df=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/player_sheets/refs/heads/master/game_report/all_games/all_2025.csv')
