@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 from nba_api.stats.static import players,teams
@@ -366,14 +366,14 @@ df
 df.drop_duplicates(subset=['PLAYER_ID','TEAM_ID','date'])
 
 
-# In[ ]:
+# In[2]:
 
 
 dates.sort()
 dates
 
 
-# In[ ]:
+# In[3]:
 
 
 test =pd.read_csv('year_files/2025_games.csv')
@@ -381,7 +381,7 @@ test.columns
 test[(test.date==20241201)&(test.TEAM_ID==1610612758)]
 
 
-# In[ ]:
+# In[4]:
 
 
 '''
@@ -404,7 +404,7 @@ merge[merge.GAME_ID.isna()]
 '''
 
 
-# In[ ]:
+# In[5]:
 
 
 if ps==False:
@@ -567,23 +567,4 @@ for year in range(2025,2026):
 
 
 
-
-
-# In[ ]:
-
-
-sumframe.columns
-
-
-# In[ ]:
-
-
-sumframe['POTENTIAL_AST']
-
-
-# In[ ]:
-
-
-df=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/player_sheets/refs/heads/master/game_report/all_games/all_2025.csv')
-df['GAME_ID']
 

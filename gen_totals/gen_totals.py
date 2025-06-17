@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import glob
 import os
-
+import numpy as np
 
 ps=True
 def collect_yeardata(ps=False):
@@ -300,12 +300,40 @@ for year in range(start_year,end_year+1):
         yearframe['on-ball-time%'] = 100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
         yearframe['ON_BALL_TIME_PCT'] =  100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
     if year>=2001:
+
         yearframe['Stops'] = (
         yearframe["Charge_Fouls_Drawn"].fillna(0) +
         yearframe["Offensive_Fouls_Drawn"].fillna(0) +
         yearframe["Steals"].fillna(0) +
-        yearframe["RecoveredBlocks"].fillna(0)
+        yearframe["RecoveredBlocks"].fillna(0)    
     )
+
+
+    # Fill missing values with 0 for all involved columns
+    cols_to_fill = [
+        "FG2A", "FG3A", "FTA", "2pt_And_1_Free_Throw_Trips", "3pt_And_1_Free_Throw_Trips",
+        "Turnovers", "BadPassTurnovers", "Points", "SelfOReb"
+    ]
+    yearframe[cols_to_fill] = yearframe[cols_to_fill].fillna(0)
+
+    # Calculate improved TSA
+    yearframe["improved_tsa"] = (
+        yearframe["FG2A"]
+        + yearframe["FG3A"]
+        + (0.5 * (yearframe["FTA"]     - yearframe["2pt_And_1_Free_Throw_Trips"]
+        - yearframe["3pt_And_1_Free_Throw_Trips"]))
+
+    )
+
+    # Calculate Non-Pass Turnovers
+    yearframe["NonPassTurnover"] = yearframe["Turnovers"] - yearframe["BadPassTurnovers"]
+
+
+
+    # Avoid divide-by-zero
+    yearframe["adjusted_trueshooting_pct"] =yearframe['PTS']/(
+        (yearframe["improved_tsa"] - yearframe["SelfOReb"]
+          + yearframe["NonPassTurnover"]))/2
 
 
 
@@ -325,8 +353,12 @@ modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 # In[4]:
 
 
-yearframe.sort_values('TIME_OF_POSS',inplace=True)
-yearframe[['TIME_OF_POSS','Minutes']]
+cols_to_fill = [
+        "FG2A", "FG3A", "FTA", "2pt_And_1_Free_Throw_Trips", "3pt_And_1_Free_Throw_Trips",
+        "Turnovers", "BadPassTurnovers", "Points", "SelfOReb","improved_tsa","adjusted_trueshooting_pct"
+    ]
+for col in cols_to_fill:
+    print(modern[col].value_counts())
 
 
 # In[ ]:
