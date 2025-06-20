@@ -13,6 +13,33 @@ import os
 import numpy as np
 
 ps=True
+
+
+avg = pd.read_csv('../team_totals/team_averages.csv')
+
+# Convert necessary columns to integers
+avg['total_fgoreb'] = avg['total_fgoreb'].astype(int)
+avg['total_opp_fgdreb'] = avg['total_opp_fgdreb'].astype(int)
+
+# Calculate 'fgoreb%'
+avg['fgoreb%'] = avg['total_fgoreb'] / (avg['total_fgoreb'] + avg['total_opp_fgdreb'])
+
+# Rename columns
+avg.rename(columns={'oreb%': 'ORB%', 'ortg': 'ORtg', 'season': 'Season'}, inplace=True)
+
+# Add missing seasons with real historical values
+missing_data = pd.DataFrame({
+    'Season': [1997, 1998, 1999, 2000],
+    'fgoreb%': [0.308, 0.314, 0.302, 0.289],
+    'ORtg': [1.067, 1.050, 1.022, 1.041]
+})
+
+# Append missing data to the DataFrame
+AVERAGE = pd.concat([avg, missing_data], ignore_index=True)
+
+
+
+
 def collect_yeardata(ps=False):
     frames = []
     trail=''
@@ -247,6 +274,75 @@ def total_save(df,ps=False):
         player_frame=frame[frame.PLAYER_ID==id]
 
         player_frame.to_csv('../totals/'+str(id)+trail+'.csv',index=False)
+
+
+def player_factors(df, year):
+    # Copy relevant columns
+    df['FTM'] = df['FtPoints']
+    df['RimFGA'] = df['AtRimFGA']
+    df['RimFGM'] = df['AtRimFGM']
+
+    # Load average season data
+    avg = AVERAGE.copy()
+    avg = avg.rename(columns={'oreb%': 'ORB%', 'ortg': 'ORtg', 'season': 'Season'})
+    avg = avg[avg.year == year]
+    avg['fgoreb%'] = avg['total_fgoreb'].astype(int) / (avg['total_fgoreb'].astype(int) + avg['total_opp_fgdreb'].astype(int))
+    aorb, aortg = avg[['ORB%', 'ORtg']].iloc[0]
+
+    # Add average values to df
+    df['avg_ortg'] = aortg
+    df['avg_orb%'] = aorb
+
+    # Compute FGA and FGM
+    df['FG2_miss'] = df['FG2A'] - df['FG2M']
+    df['FG3_miss'] = df['FG3A'] - df['FG3M']
+    df['FG2_points'] = df['FG2M'] * 2
+    df['FG3_points'] = df['FG3M'] * 3
+    df['FGA'] = df['FG2A'] + df['FG3A']
+
+    # Rim and non-rim values
+    df['RimPoints'] = df['RimFGM'] * 2
+    df['RimMiss'] = df['RimFGA'] - df['RimFGM']
+    df['NonRim2FGA'] = df['FG2A'] - df['RimFGA']
+    df['NonRim2FGM'] = df['FG2M'] - df['RimFGM']
+    df['NonRimPoints'] = df['NonRim2FGM'] * 2
+
+    # Factors (still using avg_orb%)
+    df['2shooting_factor'] = (
+        df['FG2_points'] -
+        df['FG2M'] * df['avg_ortg'] -
+        (1 - df['avg_orb%']) * df['FG2_miss'] * df['avg_ortg']
+    )
+    df['3shooting_factor'] = (
+        df['FG3_points'] -
+        df['FG3M'] * df['avg_ortg'] -
+        (1 - df['avg_orb%']) * df['FG3_miss'] * df['avg_ortg']
+    )
+    df['rimfactor'] = (
+        df['RimPoints'] -
+        df['RimFGM'] * df['avg_ortg'] -
+        (1 - df['avg_orb%']) * df['RimMiss'] * df['avg_ortg']
+    )
+    df['nonrim2factor'] = (
+        df['NonRimPoints'] -
+        df['NonRim2FGM'] * df['avg_ortg'] -
+        (1 - df['avg_orb%']) * (df['NonRim2FGA'] - df['NonRim2FGM']) * df['avg_ortg']
+    )
+    df['morey_factor'] = (
+        df['RimPoints'] + df['FG3_points'] -
+        (df['RimFGM'] + df['FG3M']) * df['avg_ortg'] -
+        (1 - df['avg_orb%']) * (df['RimMiss'] + df['FG3_miss']) * df['avg_ortg']
+    )
+
+    df['turnover_factor'] = -df['Turnovers'] * df['avg_ortg']
+    df['ft_factor'] = df['FTM'] - 0.4 * df['FTA'] * df['avg_ortg'] + 0.06 * (df['FTA'] - df['FTM']) * df['avg_ortg']
+
+    df['shooting_factor']=df['3shooting_factor']+df['2shooting_factor']
+    df['scoring_factor']=df['ft_factor']+df['3shooting_factor']+df['2shooting_factor']
+
+    return df
+
+
 perc_save(data,ps=ps)
 
 total_save(data,ps=ps)
@@ -309,38 +405,49 @@ for year in range(start_year,end_year+1):
     )
 
 
-    # Fill missing values with 0 for all involved columns
-    cols_to_fill = [
-        "FG2A", "FG3A", "FTA", "2pt_And_1_Free_Throw_Trips", "3pt_And_1_Free_Throw_Trips",
-        "Turnovers", "BadPassTurnovers", "Points", "SelfOReb"
-    ]
-    yearframe[cols_to_fill] = yearframe[cols_to_fill].fillna(0)
+        # Fill missing values with 0 for all involved columns
+        cols_to_fill = [
+            "FG2A", "FG3A", "FTA", "2pt_And_1_Free_Throw_Trips", "3pt_And_1_Free_Throw_Trips",
+            "Turnovers", "BadPassTurnovers", "Points", "SelfOReb"
+        ]
+        yearframe[cols_to_fill] = yearframe[cols_to_fill].fillna(0)
 
-    # Calculate improved TSA
-    yearframe["improved_tsa"] = (
-        yearframe["FG2A"]
-        + yearframe["FG3A"]
-        + (0.5 * (yearframe["FTA"]     - yearframe["2pt_And_1_Free_Throw_Trips"]
-        - yearframe["3pt_And_1_Free_Throw_Trips"]))
+        # Calculate improved TSA
+        yearframe["improved_tsa"] = (
+            yearframe["FG2A"]
+            + yearframe["FG3A"]
+            + (0.5 * (yearframe["FTA"]     - yearframe["2pt_And_1_Free_Throw_Trips"]
+            - yearframe["3pt_And_1_Free_Throw_Trips"]))
 
-    )
+        )
 
-    # Calculate Non-Pass Turnovers
-    yearframe["NonPassTurnover"] = yearframe["Turnovers"] - yearframe["BadPassTurnovers"]
-
-
-
-    # Avoid divide-by-zero
-    yearframe["adjusted_trueshooting_pct"] =yearframe['PTS']/(
-        (yearframe["improved_tsa"] - yearframe["SelfOReb"]
-          + yearframe["NonPassTurnover"]))/2
+        # Calculate Non-Pass Turnovers
+        yearframe["NonPassTurnover"] = yearframe["Turnovers"] - yearframe["BadPassTurnovers"]
 
 
 
-    yearframe.sort_values(by=['Points','Minutes'],inplace=True)
-    print('Saving to '+'../year_totals/'+str(year)+trail+'.csv')
-    yearframe.to_csv('../year_totals/'+str(year)+trail+'.csv',index=False)
-    yearframe.to_parquet('../year_totals/'+str(year)+trail+'.parquet',index=False)
+        # Avoid divide-by-zero
+        yearframe["adjusted_trueshooting_pct"] =yearframe['PTS']/(
+            (yearframe["improved_tsa"] - yearframe["SelfOReb"]
+              + yearframe["NonPassTurnover"]))/2
+
+        # Compute league totals
+        total_points = yearframe["PTS"].sum()
+        total_possessions = yearframe["improved_tsa"].sum()- yearframe["SelfOReb"].sum()+ yearframe["NonPassTurnover"].sum()
+
+
+        league_avg_ts = total_points / (total_possessions )/2
+
+        # Add relative adjusted true shooting column
+        yearframe["relative_adjusted_ts_pct"] = yearframe["adjusted_trueshooting_pct"] - league_avg_ts
+
+        yearframe=player_factors(yearframe,year)
+
+        # Sort and save
+    yearframe.sort_values(by=['Points', 'Minutes'], inplace=True)
+    print('Saving to ' + '../year_totals/' + str(year) + trail + '.csv')
+    yearframe.to_csv('../year_totals/' + str(year) + trail + '.csv', index=False)
+    yearframe.to_parquet('../year_totals/' + str(year) + trail + '.parquet', index=False)
 
 
 
@@ -353,12 +460,7 @@ modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 # In[4]:
 
 
-cols_to_fill = [
-        "FG2A", "FG3A", "FTA", "2pt_And_1_Free_Throw_Trips", "3pt_And_1_Free_Throw_Trips",
-        "Turnovers", "BadPassTurnovers", "Points", "SelfOReb","improved_tsa","adjusted_trueshooting_pct"
-    ]
-for col in cols_to_fill:
-    print(modern[col].value_counts())
+modern['adjusted_trueshooting_pct'].value_counts()
 
 
 # In[ ]:
