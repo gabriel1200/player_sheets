@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[23]:
+# In[1]:
 
 
 from nba_api.stats.static import players,teams
@@ -76,6 +76,7 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
 
 
     for year in range(start_year, end_year):
+        print(year)
 
 
 
@@ -361,11 +362,16 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
 
             url22 = f'https://stats.nba.com/stats/leaguedashteamstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&MeasureType=Misc&Month=0&OpponentTeamID=0&Outcome=&PORound=&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
             df22=pull_data(url22)
+
+
+            url23 = f'https://stats.nba.com/stats/leaguedashteamstats?Conference=&DateFrom={date}&DateTo={date}&Division=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&MeasureType=Opponent&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&TwoWay=0&VsConference=&VsDivision='
+            df23=pull_data(url23)
+
             poss_map=dict(zip(df17['TEAM_ID'],df17['team_poss']  ))
             df['team_poss']=df['TEAM_ID'].map(poss_map)
             df['team_poss']=df['TEAM_ID'].map(poss_map)
 
-            frames = [df2, df3, df4, df5, df6, df7, df8, df9, df10,df11,df12,df13,df14,df15,df16,df18,df19,df20,df21,df22]
+            frames = [df2, df3, df4, df5, df6, df7, df8, df9, df10,df11,df12,df13,df14,df15,df16,df18,df19,df20,df21,df22,df23]
             i=1
             for frame in frames:
 
@@ -420,7 +426,7 @@ df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 df
 
 
-# In[24]:
+# In[2]:
 
 
 import requests
@@ -554,7 +560,7 @@ scrape_teams(ps=ps)
 scrape_teams_vs(ps=ps)
 
 
-# In[31]:
+# In[3]:
 
 
 import pandas as pd
@@ -588,7 +594,7 @@ playtype_test=get_playtype_summary()
 playtype_test.columns
 
 
-# In[26]:
+# In[4]:
 
 
 trail = ''
@@ -696,6 +702,7 @@ for year in range(2001, 2026):
     # Read the CSV file for the year
     df = pd.read_csv(f"{year}{trail}.csv")
     opp = pd.read_csv(f"{year}vs{trail}.csv")
+
     opp_def_rebounds=opp['DefRebounds'].sum()
     opp_def_rebounds=opp['DefRebounds'].sum()
 
@@ -755,7 +762,7 @@ testdf.to_csv('team_averages_ps.csv', index=False)
 
 
 
-# In[30]:
+# In[12]:
 
 
 for year in range(2001, 2026):    
@@ -789,7 +796,7 @@ for year in range(2001, 2026):
 
     if year >= 2014:
         nba = pd.read_csv(str(year) + trail + '_team_games.csv')
-
+        nba['opp_3p_rate']=100*nba['OPP_FG3A']/nba['OPP_FGA']
         keepcol = [col for col in nba.columns if col not in pbp.columns]
         keepcol.append('TEAM_ID')
         nba = nba[keepcol]
@@ -820,7 +827,7 @@ for year in range(2001, 2026):
 
 
 
-# In[28]:
+# In[13]:
 
 
 shooting_columns = [
@@ -900,8 +907,14 @@ shooting.to_csv('team_threes_ps.csv',index=False)
 shooting.to_csv('../../web_app/data/team_threes_ps.csv',index=False)
 
 
-# In[29]:
+# In[7]:
 
 
 shooting.columns
+
+
+# In[ ]:
+
+
+
 
