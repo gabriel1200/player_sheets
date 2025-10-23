@@ -30,7 +30,7 @@ cd ..
 
 
 cd team_totals
-python team_average_scrape.py
+ython averages_scrape.py --start 2025 --end 2026
 cp team_averages.csv ../teamgame_report/team_averages.csv
 cp team_averages_ps.csv ../teamgame_report/team_averages_ps.csv
 cd ..
