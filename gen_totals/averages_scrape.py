@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 
 from nba_api.stats.static import players,teams
@@ -237,7 +237,12 @@ def pull_avg(dates, start_year,end_year,ps=False):
             url26 = f'https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=Totals&PlayerExperience=&PlayerOrTeam=Player&PlayerPosition=&PtMeasureType=SpeedDistance&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
 
             df26 = pull_data(url26)
-            frames = [df2, df3, df4, df5, df6, df7, df8, df9, df10,df11,df12,df13,df14,df15,df16,df18,df19,df20,df21,df22,df23,df24,df25,df26]
+
+            url27=f'https://stats.nba.com/stats/leaguedashplayerbiostats?College=&Conference=&Country=&DateFrom=&DateTo=&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+            df27=pull_data(url27)
+            df27=df27[['PLAYER_ID','AGE','PLAYER_HEIGHT_INCHES', 'PLAYER_WEIGHT', 'COLLEGE', 'COUNTRY', 'DRAFT_YEAR', 'DRAFT_ROUND', 'DRAFT_NUMBER']]
+
+            frames = [df2, df3, df4, df5, df6, df7, df8, df9, df10,df11,df12,df13,df14,df15,df16,df18,df19,df20,df21,df22,df23,df24,df25,df26,df27]
             for frame in frames:
 
                 joined_columns = set(frame.columns) - set(df.columns)
@@ -338,8 +343,10 @@ def pull_avg_classic(dates, start_year,end_year,ps=False):
          'FGM_35_39', 'FGA_35_39', 'FGP_35_39',   # 35-39 feet
          'FGM_40_PLUS', 'FGA_40_PLUS', 'FGP_40_PLUS'  # 40+ feet
         ]
-
-        frames = [df2, df3, df4]
+        url5=f'https://stats.nba.com/stats/leaguedashplayerbiostats?College=&Conference=&Country=&DateFrom=&DateTo=&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+        df5=pull_data(url5)
+        df5=df5[['PLAYER_ID','AGE','PLAYER_HEIGHT_INCHES', 'PLAYER_WEIGHT', 'COLLEGE', 'COUNTRY', 'DRAFT_YEAR', 'DRAFT_ROUND', 'DRAFT_NUMBER']]
+        frames = [df2, df3, df4,df5]
         for frame in frames:
 
             joined_columns = set(frame.columns) - set(df.columns)
@@ -378,9 +385,9 @@ def get_dates(start_year,end_year):
             df.drop_duplicates(inplace=True)
             dates.append(df)
     return pd.concat(dates)
-start_year=2025
-end_year=2026
-ps=True
+start_year=2026
+end_year=start_year+1
+ps=False
 #dateframe=get_dates(start_year,end_year)
 #dates=dateframe['GAME_DATE'].unique().tolist()
 dates=[]
@@ -392,15 +399,15 @@ season_string='ps' if ps else 'rs'
 
 
 
-# In[2]:
+# In[ ]:
 
 
-start_year=2014
-end_year=2026
+#start_year=2014
+#end_year=2026
 #df= pull_avg(dates,start_year,end_year,ps=True)
 
-start_year=1997
-end_year=2014
+#start_year=1997
+#end_year=2014
 #df= pull_avg_classic(dates,start_year,end_year,ps=True)
 
 
@@ -476,6 +483,6 @@ def fetch_nba_data(start_year, end_year, season_type='rs', save_to_csv=True):
             print(f"Error fetching data for {season} {season_type_label}: {e}")
 
     return all_data
-start_year=2025
-data = fetch_nba_data(start_year, 2025, season_type=season_string)
+
+data = fetch_nba_data(start_year, start_year, season_type=season_string)
 

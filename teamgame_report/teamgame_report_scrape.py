@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 from nba_api.stats.static import players,teams
@@ -23,7 +23,7 @@ def format_date_to_url(date):
     return formatted_date
 
 # Example usage
-
+SEASON_YEAR=2026
 def pull_data(url):
     headers = {
         "Host": "stats.nba.com",
@@ -257,8 +257,8 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
     total = pd.concat(dframes)
     return total
 
-start_year=2025
-end_year=2026
+start_year=SEASON_YEAR
+end_year=start_year+1
 
 
 
@@ -283,11 +283,11 @@ def get_dates(start_year,end_year,ps=False):
                 df['year']=year
                 dates.append(df)
     return pd.concat(dates)
-ps=True
+ps=False
 dateframe=get_dates(start_year,end_year,ps=ps)
 
 dates=dateframe['GAME_DATE'].unique().tolist()
-
+print(dates)
 dates.sort()
 df= pull_game_level_team(dateframe,start_year,end_year,ps=ps)
 #data=pull_game_level(dates)
@@ -325,13 +325,11 @@ inverted_team_dict = {
 }
 
 
-# In[2]:
+# In[9]:
 
 
 for year in range(2026,2026):    
-    trail='ps'
-    trail=''
-    ps = True if trail =='ps' else False
+    trail='ps' if ps else ''
     pbp=pd.read_csv(str(year)+trail+('.csv'))
     pbpvs=pd.read_csv(str(year)+'vs'+trail+('.csv'))
 
@@ -340,7 +338,7 @@ for year in range(2026,2026):
     print(len(pbp))
 
     pbpvs=four_factors_data(pbpvs,pbp,year,ps=ps)
-    print(len(pbp_vs))
+
     columns = ['ft_factor', 'oreb_factor', 'turnover_factor', '2shooting_factor', '3shooting_factor','rimfactor','nonrim2factor']
 
     oppcolumns ={}
@@ -390,7 +388,7 @@ for year in range(2026,2026):
     total.to_csv(str(year)+trail+'_team_totals.csv',index=False)
 
 
-# In[3]:
+# In[10]:
 
 
 import pandas as pd
@@ -398,10 +396,9 @@ import sys
 all_pbp = []
 all_pbp_vs = []
 all_nba = []
-ps=True
 trail='ps' if ps else ''
 start_year=2014
-end_year=2026
+end_year=SEASON_YEAR+1
 
 for year in range(start_year, end_year):
     # Read CSV files for each year

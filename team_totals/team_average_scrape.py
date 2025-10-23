@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[18]:
 
 
 from nba_api.stats.static import players,teams
@@ -58,7 +58,8 @@ def pull_data(url):
         ##print(columns)
         df = pd.DataFrame.from_records(data, columns=columns)
 
-    time.sleep(1.2)
+    time.sleep(2)
+    print('pulled')
     return df
 
 
@@ -81,7 +82,7 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
 
 
         season = str(year - 1) + '-' + str(year)[-2:]
-
+        print(season)
 
         try:
 
@@ -398,12 +399,13 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
             df['playoffs']=ps
             #print(df)
             df.to_csv(str(year)+trail+'_games.csv',index=False)
+            df.to_csv(str(year)+trail+'_games.csv',index=False)
         except Exception as e:
             #print(str(e))
 
             #print(str(date_num))
             time.sleep(1)
-            sys.exit()
+
 
 
 
@@ -413,11 +415,11 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
 
     return yeardata
 
+START_SEASON=2026
+start_year=START_SEASON
+end_year=start_year+1
 
-start_year=2025
-end_year=2026
-
-ps=True
+ps=False
 
 df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 #df= pull_game_avg(start_year,end_year,ps=True,unit='Team')
@@ -426,7 +428,7 @@ df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 df
 
 
-# In[2]:
+# In[19]:
 
 
 import requests
@@ -450,15 +452,16 @@ def scrape_teams(ps=False):
     }
 
     # Define the range of seasons you want data for
-    start_season = 2024  # Example start season
-    end_season = 2024  # Example end season
+    start_year = START_SEASON -1 # Example start season
+    end_year = start_year+1  # Example end season
     if ps == True:
-        end_season=2024
+        end_season=start_year
     # Empty list to collect all data
     all_data = []
 
     # Loop through each season to fetch possessions data
-    for season in range(start_season, end_season + 1):
+    for season in range(start_year, end_year):
+        print(season)
         params["Season"] = f"{season}-{str(season + 1)[-2:]}"
 
 
@@ -478,6 +481,7 @@ def scrape_teams(ps=False):
 
     # Convert collected data into a DataFrame
     df = pd.concat(all_data)
+    print(df)
     df['TeamId']=df['TeamId'].astype(int)
 
     for team_id in df['TeamId'].unique().tolist():
@@ -510,17 +514,15 @@ def scrape_teams_vs(ps=False):
     }
 
     # Define the range of seasons you want data for
-    start_season = 2024  # Example start season
-
-    end_season = 2024  # Example end season
+    start_year = START_SEASON -1 # Example start season
+    end_year = start_year+1  # Example end season
     if ps == True:
-        end_season=2024
-
+        end_season=start_year
     # Empty list to collect all data
     all_data = []
 
     # Loop through each season to fetch possessions data
-    for season in range(start_season, end_season + 1):
+    for season in range(start_year, end_year):
         params["Season"] = f"{season}-{str(season + 1)[-2:]}"
 
 
@@ -560,7 +562,7 @@ scrape_teams(ps=ps)
 scrape_teams_vs(ps=ps)
 
 
-# In[3]:
+# In[20]:
 
 
 import pandas as pd
@@ -594,7 +596,7 @@ playtype_test=get_playtype_summary()
 playtype_test.columns
 
 
-# In[4]:
+# In[21]:
 
 
 trail = ''
@@ -616,7 +618,8 @@ total_fgoreb=[]
 total_opp_fgdreb=[]
 total_opp_ftdreb=[]
 # Loop through each year for regular season
-for year in range(2001, 2026):
+end_year= START_SEASON+1
+for year in range(2001, end_year):
     # Read the CSV file for the year
     df = pd.read_csv(f"{year}{trail}.csv")
     opp = pd.read_csv(f"{year}vs{trail}.csv")
@@ -653,9 +656,10 @@ for year in range(2001, 2026):
     total_ftoreb.append(df['FTOffRebounds'].sum())
 
 # Create a DataFrame with the results for regular season
-years = list(range(2001, 2026))
+years = list(range(2001, end_year))
 
 seasons=[str(year-1)+'-'+str(year)[-2:] for year in years]
+print(seasons)
 testdf = pd.DataFrame({
     'year': years,
      'season':seasons,
@@ -697,7 +701,7 @@ total_opp_fgdreb=[]
 total_opp_ftdreb=[]
 
 # Loop through each year for playoffs
-for year in range(2001, 2026):
+for year in range(2001, end_year-1):
     # Read the CSV file for the year
     # Read the CSV file for the year
     df = pd.read_csv(f"{year}{trail}.csv")
@@ -737,7 +741,7 @@ for year in range(2001, 2026):
     total_ftoreb.append(df['FTOffRebounds'].sum())
 # Create a DataFrame with the results for playoffs
 
-years = list(range(2001, 2026))
+years = list(range(2001, end_year-1))
 seasons=[str(year-1)+'-'+str(year)[-2:] for year in years]
 testdf = pd.DataFrame({
     'year': years,
@@ -762,16 +766,19 @@ testdf.to_csv('team_averages_ps.csv', index=False)
 
 
 
-# In[12]:
+# In[22]:
 
 
-for year in range(2001, 2026):    
-    trail = 'ps'
+end_year=START_SEASON+1
+for year in range(2001, end_year):    
+    trail = ''
     ps = True if trail == 'ps' else False
 
     pbp = pd.read_csv(str(year) + trail + '.csv')
     pbpvs = pd.read_csv(str(year) + 'vs' + trail + '.csv')
-
+    if year==2026:
+        print(pbp)
+        print(pbpvs)
     pbp = four_factors_data(pbp, pbpvs, year, ps=False)
     pbpvs = four_factors_data(pbpvs, pbp, year, ps=False)
 
@@ -827,7 +834,7 @@ for year in range(2001, 2026):
 
 
 
-# In[13]:
+# In[ ]:
 
 
 shooting_columns = [
@@ -880,7 +887,7 @@ shooting_columns = [
 ]
 
 frames=[]
-for year in range(2001,2026):
+for year in range(2001,end_year):
     df= pd.read_csv(str(year)+'_team_totals.csv')
     df['year']=year
 
@@ -894,7 +901,7 @@ shooting.to_csv('../../web_app/data/team_threes.csv',index=False)
 
 trail='ps'
 frames=[]
-for year in range(2001,2026):
+for year in range(2001,end_year-1):
     df= pd.read_csv(str(year)+trail+'_team_totals.csv')
     df['year']=year
 
@@ -907,7 +914,7 @@ shooting.to_csv('team_threes_ps.csv',index=False)
 shooting.to_csv('../../web_app/data/team_threes_ps.csv',index=False)
 
 
-# In[7]:
+# In[ ]:
 
 
 shooting.columns

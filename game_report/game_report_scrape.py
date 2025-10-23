@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 from nba_api.stats.static import players,teams
@@ -58,6 +58,7 @@ def pull_data(url):
         df = pd.DataFrame.from_records(data, columns=columns)
 
     time.sleep(1.2)
+    print('pulled')
     return df
 
 
@@ -326,8 +327,8 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
     total = pd.concat(dframes)
     return total
 
-start_year=2025
-end_year=2026
+start_year=2026
+end_year=2027
 
 
 
@@ -354,7 +355,7 @@ def get_dates(start_year, end_year, ps=False):
                 print(f"Skipping {path}: {e}")
 
     return pd.concat(dates, ignore_index=True) if dates else pd.DataFrame()
-ps=True
+ps=False
 dateframe=get_dates(start_year,end_year,ps=ps)
 
 dates=dateframe['GAME_DATE'].unique().tolist()
@@ -366,14 +367,14 @@ df
 df.drop_duplicates(subset=['PLAYER_ID','TEAM_ID','date'])
 
 
-# In[2]:
+# In[ ]:
 
 
 dates.sort()
 dates
 
 
-# In[3]:
+# In[ ]:
 
 
 test =pd.read_csv('year_files/2025_games.csv')
@@ -381,7 +382,7 @@ test.columns
 test[(test.date==20241201)&(test.TEAM_ID==1610612758)]
 
 
-# In[4]:
+# In[ ]:
 
 
 '''
@@ -404,7 +405,7 @@ merge[merge.GAME_ID.isna()]
 '''
 
 
-# In[5]:
+# In[ ]:
 
 
 if ps==False:
@@ -421,7 +422,7 @@ index_master['nba_id']=index_master['nba_id'].astype(int)
 
 
 
-for year in range(2025,2026):
+for year in range(start_year,end_year):
     # Load the game data for the specific year.
     games_collected=[]
     df = pd.read_csv(f'year_files/{year}{trail}_games.csv')

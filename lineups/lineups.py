@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import pandas as pd
@@ -20,8 +20,9 @@ import glob
 
 
 start_time = time.time()
-directory = "data/2025"
-ps = True
+SEASONYEAR=2026
+directory = "data/2026"
+ps = False
 
 # Use glob to find all CSV files in the directory
 csv_files = glob.glob(os.path.join(directory, "*.csv"))
@@ -42,7 +43,7 @@ time.sleep(1)
 time.sleep(1)
 
 
-# In[ ]:
+# In[13]:
 
 
 def lineuppull(team_id, season, opp=False, ps=False):
@@ -97,6 +98,7 @@ def pull_onoff(years, opp=False, ps=False):
          player_index = pd.read_csv('index_master_ps.csv')
     player_index = player_index[player_index.team != 'TOT']
     player_index = player_index[player_index.year > 2000]
+    print(player_index[player_index.team_id.isna()])
     player_index = player_index.drop_duplicates()
     player_index['team_id'] =player_index['team_id'].astype(int)
     all_frames = []
@@ -161,7 +163,8 @@ def pull_onoff(years, opp=False, ps=False):
 
 #pull_onoff(years,opp=True,ps=True) 
 #pull_onoff(years,opp=False,ps=True) 
-years=[i for i in range(2025,2026)]
+years=[i for i in range(SEASONYEAR,SEASONYEAR+1)]
+print(years)
 df = pull_onoff(years,opp=False,ps=ps) 
 df = pull_onoff(years,opp=True,ps=ps) 
 time.sleep(5)
@@ -171,7 +174,7 @@ df = pull_onoff(years,opp=True,ps=ps)
 end_time = time.time()
 elapsed_time = end_time - start_time
 print(f"Time taken: {elapsed_time} seconds")
-years=[i for i in range(2001,2025)]
+years=[i for i in range(2001,SEASONYEAR)]
 #df = pull_onoff(years,opp=False,ps=True) 
 #df = pull_onoff(years,opp=True,ps=True) 
 
@@ -655,7 +658,7 @@ print(f"Time taken: {elapsed_time} seconds")
 
 
 
-# In[3]:
+# In[14]:
 
 
 df

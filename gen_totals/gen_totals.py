@@ -12,9 +12,9 @@ import glob
 import os
 import numpy as np
 
-ps=True
+ps=False
 
-
+SEASON_YEAR=2026
 avg = pd.read_csv('../team_totals/team_averages.csv')
 
 # Convert necessary columns to integers
@@ -45,7 +45,7 @@ def collect_yeardata(ps=False):
     trail=''
     if ps ==True:
         trail='_ps'
-    end_year = 2025
+    end_year = SEASON_YEAR
     for year in range(1997,end_year+1):
         file= str(year)+trail+'_avg.csv'
 
@@ -213,10 +213,17 @@ pbp_columns = [
     "Period2Fouls4Minutes"
 ]
 
-index_col=["PLAYER_ID","PLAYER_NAME","W","GP","year","POSS","TEAM_ABBREVIATION","TEAM_ID","AGE"]
+
+index_col=["PLAYER_ID","PLAYER_NAME","W","GP","year","POSS","TEAM_ABBREVIATION","TEAM_ID","AGE",'PLAYER_HEIGHT_INCHES', 'PLAYER_WEIGHT', 'COLLEGE',
+       'COUNTRY', 'DRAFT_YEAR', 'DRAFT_ROUND', 'DRAFT_NUMBER']
 other_col = index_col+sum_metrics+pct_metrics
 pbp_col =[ col for col in pbp_columns if col not in other_col]
 data=collect_yeardata(ps=ps)
+
+data['POINTS'] = data['POINTS'].fillna(data['Points'])
+
+# Fill Points nulls with POINTS
+data['Points'] = data['Points'].fillna(data['POINTS'])
 total_columns = index_col+sum_metrics+pct_metrics+pbp_columns
 
 total_columns=list(set(total_columns))
@@ -361,7 +368,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[3]:
+# In[ ]:
 
 
 directory = "../totals"
@@ -374,7 +381,7 @@ totals.rename(columns={'3SecondViolations':'ThreeSecondViolations'},inplace=True
 
 lebron=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/lebron.csv')
 start_year=1997
-end_year=2025
+end_year=SEASON_YEAR
 trail = '_ps' if ps else ''
 modern_years=[] 
 for year in range(start_year,end_year+1):

@@ -14,7 +14,8 @@ import logging
 class PBPStatsAPI:
     def __init__(self, start_year: int = 2013, end_year: int = 2024):
         self.base_url = "https://api.pbpstats.com/get-game-logs/nba?"
-        self.season_types = ["Regular Season", "Playoffs"]
+        self.season_types = ["Regular Season","Playoffs"]
+        self.season_types = ["Regular Season"]
         self.start_year = start_year
         self.end_year = end_year
 
@@ -35,7 +36,7 @@ class PBPStatsAPI:
         all_games = []
         seasons = self.get_season_years()
         #print(seasons)
-        current_season="2024-25"
+        current_season="2025-26"
         for season in seasons:
             for season_type in self.season_types:
 
@@ -59,7 +60,7 @@ class PBPStatsAPI:
                     all_games.append(games_data)
 
                     # Respect API rate limits
-                    time.sleep(5)
+                    time.sleep(3)
 
                 except requests.exceptions.RequestException as e:
                     logging.error(f"Error fetching data for {team_id} in {season} {season_type}: {str(e)}")
@@ -118,18 +119,19 @@ def fetch_all_teams_game_logs(team_ids: List[str], start_year: int, end_year: in
     """
     api = PBPStatsAPI(start_year=start_year, end_year=end_year)
     team_games = {}
-
+    print(start_year)
+    print(end_year)
     for team_id in team_ids:
         logging.info(f"Fetching game logs for team {team_id}")
         team_games[team_id] = api.get_team_game_logs(team_id,entity_type)
 
     return team_games
+start_year = 2025
+end_year =2026
 
 # Example usage
 if __name__ == "__main__":
     # Example team IDs (you'll need to use the correct IDs from PBP Stats)
-    start_year = 2025
-    end_year =2025
 
 
     df = pd.read_csv('index_master.csv')
@@ -185,12 +187,12 @@ if __name__ == "__main__":
 
 
 
-# In[2]:
+# In[ ]:
 
 
 import os
 import pandas as pd
-for year in range(2014,2026):
+for year in range(2014,end_year+1):
     directory = "team/"+str(year)
     files = os.listdir(directory)
     files =[file for file in files if 'game_logs' not in file and '.csv' in file and 'vs' not in file]
@@ -238,7 +240,7 @@ for year in range(2014,2026):
     master.to_csv(directory+'all_logs.csv')
 
 
-for year in range(2014,2026):
+for year in range(2014,end_year+1):
     directory = "team/"+str(year)
     files = os.listdir(directory)
     files =[file for file in files if 'game_logs' not in file and '.csv' in file and 'vs' in file]
