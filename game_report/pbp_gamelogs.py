@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import requests
@@ -15,7 +15,7 @@ class PBPStatsAPI:
     def __init__(self, start_year: int = 2013, end_year: int = 2024):
         self.base_url = "https://api.pbpstats.com/get-game-logs/nba?"
         self.season_types = ["Regular Season","Playoffs"]
-        self.season_types = ["Regular Season"]
+        #self.season_types = ["Regular Season"]
         self.start_year = start_year
         self.end_year = end_year
 
@@ -126,8 +126,8 @@ def fetch_all_teams_game_logs(team_ids: List[str], start_year: int, end_year: in
         team_games[team_id] = api.get_team_game_logs(team_id,entity_type)
 
     return team_games
-start_year = 2025
-end_year =2026
+start_year = 2024
+end_year =start_year +1
 
 # Example usage
 if __name__ == "__main__":
@@ -187,7 +187,7 @@ if __name__ == "__main__":
 
 
 
-# In[ ]:
+# In[3]:
 
 
 import os
