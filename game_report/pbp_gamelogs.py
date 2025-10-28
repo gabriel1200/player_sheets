@@ -14,16 +14,16 @@ import logging
 class PBPStatsAPI:
     def __init__(self, start_year: int = 2013, end_year: int = 2024):
         self.base_url = "https://api.pbpstats.com/get-game-logs/nba?"
-        self.season_types = ["Regular Season","Playoffs"]
-        #self.season_types = ["Regular Season"]
+        #self.season_types = ["Regular Season","Playoffs"]
+        self.season_types = ["Regular Season"]
         self.start_year = start_year
-        self.end_year = end_year
+        self.end_year = end_year    
 
     def get_season_years(self) -> List[str]:
         """Generate season strings from start_year to end_year."""
         return [f"{year-1}-{str(year)[2:]}" for year in range(self.start_year, self.end_year + 1)]
 
-    def get_team_game_logs(self, team_id: str,entity_type: str ="Team") -> pd.DataFrame:
+    def get_team_game_logs(self, team_id: str, entity_type: str = "Team") -> pd.DataFrame:
         """
         Fetch all game logs for a specific team within the specified year range.
 
@@ -35,38 +35,49 @@ class PBPStatsAPI:
         """
         all_games = []
         seasons = self.get_season_years()
-        #print(seasons)
-        current_season="2025-26"
+        current_season = "2025-26"
+        print(seasons)
+
         for season in seasons:
             for season_type in self.season_types:
+                params = {
+                    "Season": season,
+                    "SeasonType": season_type,
+                    "EntityId": team_id,
+                    "EntityType": entity_type
+                }
 
+                # Retry logic
+                max_retries = 3
+                for attempt in range(max_retries):
+                    try:
+                        response = requests.get(self.base_url, params=params, timeout=10)
+                        response.raise_for_status()
+                        data_response = response.json()
 
-                try:
-                    params = {
-                        "Season": season,
-                        "SeasonType": season_type,
-                        "EntityId": team_id,
-                        "EntityType": entity_type
-                    }
+                        raw_data = data_response["multi_row_table_data"]
+                        games_data = pd.DataFrame(raw_data)
 
-                    response = requests.get(self.base_url, params=params)
-                    data_response = response.json()
-                    raw_data = data_response["multi_row_table_data"]
-                    games_data = pd.DataFrame(raw_data)
+                        games_data["Season"] = season
+                        games_data["year"] = int(season.split("-")[0]) + 1
+                        games_data["SeasonType"] = season_type
+                        all_games.append(games_data)
 
-                    games_data['Season'] = season
-                    games_data['year'] = int(season.split('-')[0]) + 1
-                    games_data['SeasonType'] = season_type
-                    all_games.append(games_data)
+                        # Respect API rate limits — increased delay
+                        time.sleep(3.5)
+                        break  # Success, break out of retry loop
 
-                    # Respect API rate limits
-                    time.sleep(3)
+                    except (requests.exceptions.RequestException, ValueError) as e:
+                        wait_time = (attempt + 1) * 2  # exponential backoff
+                        logging.warning(
+                            f"Attempt {attempt + 1}/{max_retries} failed for team {team_id} "
+                            f"in {season} {season_type}: {str(e)}. Retrying in {wait_time}s..."
+                        )
+                        time.sleep(wait_time)
+                else:
+                    logging.error(f"All retries failed for team {team_id} in {season} {season_type}.")
 
-                except requests.exceptions.RequestException as e:
-                    logging.error(f"Error fetching data for {team_id} in {season} {season_type}: {str(e)}")
-                    continue
-
-        return pd.concat(all_games) if all_games else pd.DataFrame()
+        return pd.concat(all_games, ignore_index=True) if all_games else pd.DataFrame()
 
 def get_team_abbreviations():
     """
@@ -126,17 +137,18 @@ def fetch_all_teams_game_logs(team_ids: List[str], start_year: int, end_year: in
         team_games[team_id] = api.get_team_game_logs(team_id,entity_type)
 
     return team_games
-start_year = 2024
-end_year =start_year +1
+start_year = 2026
+end_year =start_year
 
 # Example usage
 if __name__ == "__main__":
     # Example team IDs (you'll need to use the correct IDs from PBP Stats)
 
 
-    df = pd.read_csv('index_master.csv')
+    df = pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/index_master.csv')
     df = df[df.year >= start_year]
     df = df[df.team != 'TOT']
+    df['team_id']=df['team_id'].astype(int)
     team_ids = df['team_id'].unique().tolist()
 
     # Input start and end years
@@ -187,12 +199,12 @@ if __name__ == "__main__":
 
 
 
-# In[3]:
+# In[ ]:
 
 
 import os
 import pandas as pd
-for year in range(2014,end_year+1):
+for year in range(2014,end_year):
     directory = "team/"+str(year)
     files = os.listdir(directory)
     files =[file for file in files if 'game_logs' not in file and '.csv' in file and 'vs' not in file]
@@ -240,7 +252,7 @@ for year in range(2014,end_year+1):
     master.to_csv(directory+'all_logs.csv')
 
 
-for year in range(2014,end_year+1):
+for year in range(2014,end_year + 1):
     directory = "team/"+str(year)
     files = os.listdir(directory)
     files =[file for file in files if 'game_logs' not in file and '.csv' in file and 'vs' in file]

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 from nba_api.stats.static import players,teams
@@ -58,7 +58,8 @@ def pull_data(url):
         #print(columns)
         df = pd.DataFrame.from_records(data, columns=columns)
 
-    time.sleep(.1)
+    time.sleep(1)
+    print('pulled')
     return df
 
 
@@ -89,7 +90,7 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
             df['date']=df['date'].astype(int)
             df.sort_values(by='date',ascending=False)
             df.drop_duplicates(subset=['date','TEAM_ID'],inplace=True)
-            print(len(df))
+
             if test != False:
                 df=df[df.date<game_date]
 
@@ -97,7 +98,7 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
 
             year_dates=[int(date) for date in year_dates if date not in df['date'].unique().tolist()]
             year_dates=year_dates[::-1]
-            print(len(year_frame))
+
 
 
         season = str(year - 1) + '-' + str(year)[-2:]
@@ -248,7 +249,7 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
 
 
         yeardata=pd.concat(year_frame)
-        print(len(yeardata))
+
         yeardata['playoffs']=ps
         yeardata.to_csv('year_files/'+str(year)+trail+'_teamgames.csv',index=False)
         dframes.append(yeardata)
@@ -325,7 +326,7 @@ inverted_team_dict = {
 }
 
 
-# In[9]:
+# In[2]:
 
 
 for year in range(2026,2026):    
@@ -388,7 +389,7 @@ for year in range(2026,2026):
     total.to_csv(str(year)+trail+'_team_totals.csv',index=False)
 
 
-# In[10]:
+# In[ ]:
 
 
 import pandas as pd
@@ -397,7 +398,7 @@ all_pbp = []
 all_pbp_vs = []
 all_nba = []
 trail='ps' if ps else ''
-start_year=2014
+start_year=2026
 end_year=SEASON_YEAR+1
 
 for year in range(start_year, end_year):
@@ -446,13 +447,11 @@ for year in range(start_year, end_year):
     pbp_vs['date'] = pbp_vs['Date'].str.replace('-', '', regex=False)
 
     # Apply four_factors_data function
-    print((len(pbp)))
 
     pbp = four_factors_data(pbp, pbp_vs, year, ps=ps)
-    print(len(pbp))
-    print(len(pbp_vs))
+
     pbp_vs = four_factors_data(pbp_vs, pbp, year, ps=ps)
-    print(len(pbp_vs))
+
 
 
 
@@ -497,6 +496,10 @@ for year in range(start_year, end_year):
     merged_data['FGA']=merged_data['FG2A']+merged_data['FG3A']
     merged_data['FGM']=merged_data['FG2M']+merged_data['FG3M']
     merged_data['FG_missed']=merged_data['FGA']-merged_data['FGM']
+    print(len(merged_data))
+    merged_data.dropna(subset='GameId',inplace=True)
+    print(len(merged_data))
+    print(merged_data)
     merged_data['GameId']=merged_data['GameId'].astype(int)
     merged_data['date']=merged_data['date'].astype(int)
     merged_data.sort_values(by=['date','GameId'],inplace=True)
@@ -566,9 +569,9 @@ for year in range(start_year, end_year):
     merged_data["team_dreb_chances"]=merged_data["DREB"]+merged_data["opp_OREB"]
 
     ranked=[col for col in merged_data.columns if 'rank' in col.lower()]
-    print(len(merged_data.columns))
+
     merged_data.drop(columns=ranked,inplace=True)
-    print(len(merged_data.columns))
+
     merged_data.drop_duplicates(subset=['GameId','TEAM_ID'],inplace=True)
     merged_data.to_csv(f"year_files/all_games_{year}{trail}.csv",index=False)
     merged_data.to_parquet(f"year_files/all_games_{year}{trail}.parquet",index=False)
