@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[5]:
 
 
 import requests
@@ -204,7 +204,7 @@ if __name__ == "__main__":
 
 import os
 import pandas as pd
-for year in range(2014,end_year):
+for year in range(2014,end_year+1):
     directory = "team/"+str(year)
     files = os.listdir(directory)
     files =[file for file in files if 'game_logs' not in file and '.csv' in file and 'vs' not in file]
