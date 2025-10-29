@@ -5,6 +5,11 @@ cd game_report
 jupyter nbconvert --to script game_report_scrape.ipynb
 jupyter nbconvert --to script pbp_gamelogs.ipynb
 cd ..
+
+
+cd game_report/all_games
+jupyter nbconvert --to script master_record.ipynb
+cd ..
 cd teamgame_report
 jupyter nbconvert --to script teamgame_report_scrape.ipynb
 cd ..
@@ -26,6 +31,9 @@ cd ..
 cd game_report
 python game_report_scrape.py
 python pbp_gamelogs.py
+
+
+python all_games/master_record.py
 cd ..
 
 
