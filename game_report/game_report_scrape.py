@@ -11,6 +11,7 @@ import sys
 import os
 import time
 from datetime import datetime
+from requests.exceptions import RequestException # Import for better error handling
 
 def format_date_to_url(date):
     # Convert date from YYYYMMDD to datetime object
@@ -23,7 +24,18 @@ def format_date_to_url(date):
 
 # Example usage
 
-def pull_data(url):
+def pull_data(url, max_retries=3, delay_seconds=5):
+    """
+    Pulls data from a URL with retry logic for handling transient errors.
+
+    Args:
+        url (str): The API endpoint URL.
+        max_retries (int): The maximum number of times to retry the request.
+        delay_seconds (int): The time in seconds to wait between retries.
+
+    Returns:
+        pandas.DataFrame or None: The parsed data as a DataFrame, or None if all retries fail.
+    """
     headers = {
         "Host": "stats.nba.com",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
@@ -38,28 +50,42 @@ def pull_data(url):
         "Sec-Fetch-Site": "same-origin",
     }
 
-    json = requests.get(url,headers = headers).json()
+    for attempt in range(max_retries):
+        try:
+            # --- API Request Attempt ---
+            response = requests.get(url, headers=headers)
+            response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
+            json_data = response.json()
 
-    if len(json["resultSets"])== 1:
+            # --- Data Parsing Logic (from your original code) ---
+            if len(json_data.get("resultSets", [])) == 1:
+                data = json_data["resultSets"][0]["rowSet"]
+                columns = json_data["resultSets"][0]["headers"]
+                df = pd.DataFrame.from_records(data, columns=columns)
+            else:
+                # Assuming this else block is for a different structure
+                data = json_data["resultSets"]["rowSet"]
+                # Assuming 'headers' is a list of dicts and the second element has 'columnNames'
+                columns = json_data["resultSets"]["headers"][1]['columnNames']
+                df = pd.DataFrame.from_records(data, columns=columns)
 
+            time.sleep(1.2)
+            print('pulled successfully')
+            return df
 
-        data = json["resultSets"][0]["rowSet"]
-        #print(data)
-        columns = json["resultSets"][0]["headers"]
-        #print(columns)
+        except (RequestException, ValueError, KeyError) as e:
+            # Handle request errors (e.g., network issues, timeouts) or JSON/Key errors
+            print(f"Error on attempt {attempt + 1}: {e}")
+            if attempt < max_retries - 1:
+                print(f"Waiting {delay_seconds} seconds before retrying...")
+                time.sleep(delay_seconds)
+            else:
+                print(f"Max retries ({max_retries}) reached. Failed to pull data.")
+                # You can log the error or return a specific value here
+                time.sleep(8) # Maintain the original delay even on final failure before returning
+                return None # Return None or raise an exception if preferred
 
-        df = pd.DataFrame.from_records(data, columns=columns)
-    else:
-
-        data = json["resultSets"]["rowSet"]
-        #print(json)
-        columns = json["resultSets"]["headers"][1]['columnNames']
-        #print(columns)
-        df = pd.DataFrame.from_records(data, columns=columns)
-
-    time.sleep(1.2)
-    print('pulled')
-    return df
+    return None # Should not be reached, but good practice
 
 
 def pull_game_level(dateframe, start_year,end_year,ps=False):
