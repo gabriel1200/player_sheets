@@ -9,7 +9,7 @@ cd ..
 
 cd game_report/all_games
 jupyter nbconvert --to script master_record.ipynb
-cd ..
+cd ../..
 cd teamgame_report
 jupyter nbconvert --to script teamgame_report_scrape.ipynb
 cd ..
@@ -32,9 +32,10 @@ cd game_report
 python game_report_scrape.py
 python pbp_gamelogs.py
 
+cd all_games/
 
-python all_games/master_record.py
-cd ..
+python master_record.py
+cd ../..
 
 
 cd team_totals

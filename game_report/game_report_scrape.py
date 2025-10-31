@@ -12,7 +12,6 @@ import os
 import time
 from datetime import datetime
 from requests.exceptions import RequestException # Import for better error handling
-
 def format_date_to_url(date):
     # Convert date from YYYYMMDD to datetime object
     date_obj = datetime.strptime(str(date), '%Y%m%d')
@@ -53,6 +52,7 @@ def pull_data(url, max_retries=3, delay_seconds=5):
     for attempt in range(max_retries):
         try:
             # --- API Request Attempt ---
+            print(f"Attempt {attempt + 1} of {max_retries} to pull data from {url}")
             response = requests.get(url, headers=headers)
             response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
             json_data = response.json()
@@ -82,7 +82,7 @@ def pull_data(url, max_retries=3, delay_seconds=5):
             else:
                 print(f"Max retries ({max_retries}) reached. Failed to pull data.")
                 # You can log the error or return a specific value here
-                time.sleep(8) # Maintain the original delay even on final failure before returning
+                time.sleep(1.2) # Maintain the original delay even on final failure before returning
                 return None # Return None or raise an exception if preferred
 
     return None # Should not be reached, but good practice
@@ -398,14 +398,6 @@ df.drop_duplicates(subset=['PLAYER_ID','TEAM_ID','date'])
 
 dates.sort()
 dates
-
-
-# In[ ]:
-
-
-test =pd.read_csv('year_files/2025_games.csv')
-test.columns
-test[(test.date==20241201)&(test.TEAM_ID==1610612758)]
 
 
 # In[ ]:
