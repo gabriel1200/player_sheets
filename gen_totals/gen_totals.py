@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[5]:
 
 
 import pandas as pd
@@ -355,7 +355,7 @@ perc_save(data,ps=ps)
 total_save(data,ps=ps)
 
 
-# In[2]:
+# In[6]:
 
 
 data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
@@ -368,7 +368,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[ ]:
+# In[7]:
 
 
 directory = "../totals"
@@ -464,7 +464,7 @@ modern = pd.concat(modern_years)
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 
 
-# In[4]:
+# In[8]:
 
 
 modern['adjusted_trueshooting_pct'].value_counts()

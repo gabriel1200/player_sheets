@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[15]:
 
 
 import pandas as pd
@@ -43,7 +43,7 @@ time.sleep(1)
 time.sleep(1)
 
 
-# In[13]:
+# In[ ]:
 
 
 def lineuppull(team_id, season, opp=False, ps=False):
@@ -658,7 +658,7 @@ print(f"Time taken: {elapsed_time} seconds")
 
 
 
-# In[14]:
+# In[ ]:
 
 
 df

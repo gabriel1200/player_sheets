@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[4]:
 
 
 from nba_api.stats.static import players,teams
@@ -399,7 +399,7 @@ season_string='ps' if ps else 'rs'
 
 
 
-# In[ ]:
+# In[5]:
 
 
 #start_year=2014
