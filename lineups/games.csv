@@ -26482,24 +26482,25 @@ nba_id,Player,year,G
 1631214.0,Alondes Williams,2025,1
 1642389.0,Zyon Pullin,2025,3
 1626143.0,Jahlil Okafor,2025,1
+1626164.0,Devin Booker,2026,0
 1630178.0,Tyrese Maxey,2026,0
 1629060.0,Rui Hachimura,2026,0
 1628983.0,Shai Gilgeous-Alexander,2026,0
+1628960.0,Grayson Allen,2026,0
 1642845.0,VJ Edgecombe,2026,0
 1626162.0,Kelly Oubre Jr.,2026,0
 1628374.0,Lauri Markkanen,2026,0
 201942.0,DeMar DeRozan,2026,0
-1626164.0,Devin Booker,2026,0
 1630595.0,Cade Cunningham,2026,0
 1630202.0,Payton Pritchard,2026,0
 1628401.0,Derrick White,2026,0
+1626220.0,Royce O'Neale,2026,0
 1627783.0,Pascal Siakam,2026,0
 1630530.0,Trey Murphy III,2026,0
 1628969.0,Mikal Bridges,2026,0
 1627759.0,Jaylen Brown,2026,0
 203944.0,Julius Randle,2026,0
 1630228.0,Jonathan Kuminga,2026,0
-1628960.0,Grayson Allen,2026,0
 1641718.0,Keyonte George,2026,0
 1629023.0,P.J. Washington,2026,0
 1631094.0,Paolo Banchero,2026,0
@@ -26526,7 +26527,6 @@ nba_id,Player,year,G
 203897.0,Zach LaVine,2026,0
 1630567.0,Scottie Barnes,2026,0
 1629130.0,Duncan Robinson,2026,0
-1626220.0,Royce O'Neale,2026,0
 1630578.0,Alperen Şengün,2026,0
 203497.0,Rudy Gobert,2026,0
 1630174.0,Aaron Nesmith,2026,0
@@ -26568,6 +26568,7 @@ nba_id,Player,year,G
 1630217.0,Desmond Bane,2026,0
 1629651.0,Nic Claxton,2026,0
 1629018.0,Gary Trent Jr.,2026,0
+1627826.0,Ivica Zubac,2026,0
 201566.0,Russell Westbrook,2026,0
 1642264.0,Stephon Castle,2026,0
 1642377.0,Jaylen Wells,2026,0
@@ -26576,8 +26577,10 @@ nba_id,Player,year,G
 1628976.0,Wendell Carter Jr.,2026,0
 1629004.0,Svi Mykhailiuk,2026,0
 1630560.0,Cam Thomas,2026,0
+1642346.0,Ryan Dunn,2026,0
 202696.0,Nikola Vučević,2026,0
 203484.0,Kentavious Caldwell-Pope,2026,0
+1631221.0,Collin Gillespie,2026,0
 1629611.0,Terance Mann,2026,0
 1642259.0,Alex Sarr,2026,0
 1641709.0,Ausar Thompson,2026,0
@@ -26607,21 +26610,22 @@ nba_id,Player,year,G
 1631095.0,Jabari Smith Jr.,2026,0
 1642848.0,Tre Johnson,2026,0
 1641824.0,Matas Buzelis,2026,0
-1627826.0,Ivica Zubac,2026,0
 1642847.0,Jeremiah Fears,2026,0
 1628379.0,Luke Kennard,2026,0
+1631109.0,Mark Williams,2026,0
 203935.0,Marcus Smart,2026,0
 202695.0,Kawhi Leonard,2026,0
-1642346.0,Ryan Dunn,2026,0
 1630163.0,LaMelo Ball,2026,0
 1642281.0,Jaylon Tyson,2026,0
 1630180.0,Saddiq Bey,2026,0
-1631221.0,Collin Gillespie,2026,0
 1630191.0,Isaiah Stewart,2026,0
 1642270.0,Donovan Clingan,2026,0
 1629029.0,Luka Dončić,2026,0
 1642883.0,Sion James,2026,0
+1628381.0,John Collins,2026,0
+1627884.0,Derrick Jones Jr.,2026,0
 202699.0,Tobias Harris,2026,0
+1627739.0,Kris Dunn,2026,0
 1630230.0,Naji Marshall,2026,0
 1629661.0,Cameron Johnson,2026,0
 1629675.0,Naz Reid,2026,0
@@ -26632,14 +26636,11 @@ nba_id,Player,year,G
 1629020.0,Jarred Vanderbilt,2026,0
 1641842.0,Ron Holland,2026,0
 1628989.0,Kevin Huerter,2026,0
-1631109.0,Mark Williams,2026,0
 201144.0,Mike Conley,2026,0
 203994.0,Jusuf Nurkić,2026,0
 1629731.0,Dean Wade,2026,0
 1641783.0,Tristan Da Silva,2026,0
 1631107.0,Nikola Jović,2026,0
-1627884.0,Derrick Jones Jr.,2026,0
-1628381.0,John Collins,2026,0
 1627752.0,Taurean Prince,2026,0
 1628366.0,Lonzo Ball,2026,0
 1628404.0,Josh Hart,2026,0
@@ -26647,7 +26648,6 @@ nba_id,Player,year,G
 1630171.0,Isaac Okoro,2026,0
 1630544.0,Tre Mann,2026,0
 1631213.0,Tyrese Martin,2026,0
-1627739.0,Kris Dunn,2026,0
 1631096.0,Chet Holmgren,2026,0
 1628386.0,Jarrett Allen,2026,0
 1630541.0,Moses Moody,2026,0
@@ -26665,6 +26665,7 @@ nba_id,Player,year,G
 1631200.0,Kris Murray,2026,0
 1642285.0,Cam Spencer,2026,0
 1626171.0,Bobby Portis,2026,0
+1642345.0,Oso Ighodaro,2026,0
 1631117.0,Walker Kessler,2026,0
 204001.0,Kristaps Porziņģis,2026,0
 1627741.0,Buddy Hield,2026,0
@@ -26684,7 +26685,6 @@ nba_id,Player,year,G
 1630175.0,Cole Anthony,2026,0
 1628971.0,Bruce Brown,2026,0
 1642846.0,Ace Bailey,2026,0
-1642345.0,Oso Ighodaro,2026,0
 1629013.0,Landry Shamet,2026,0
 1630572.0,Sandro Mamukelashvili,2026,0
 1642484.0,RayJ Dennis,2026,0
@@ -26707,6 +26707,7 @@ nba_id,Player,year,G
 1641707.0,Taylor Hendricks,2026,0
 1630245.0,Ayo Dosunmu,2026,0
 1641711.0,Gradey Dick,2026,0
+201572.0,Brook Lopez,2026,0
 1630241.0,Sam Merrill,2026,0
 1630549.0,Day'Ron Sharpe,2026,0
 203903.0,Jordan Clarkson,2026,0
@@ -26717,6 +26718,7 @@ nba_id,Player,year,G
 1630533.0,Ziaire Williams,2026,0
 1629234.0,Drew Eubanks,2026,0
 1641715.0,Cam Whitmore,2026,0
+201587.0,Nicolas Batum,2026,0
 203083.0,Andre Drummond,2026,0
 1642954.0,Will Richard,2026,0
 1630591.0,Jalen Suggs,2026,0
@@ -26726,7 +26728,6 @@ nba_id,Player,year,G
 1630545.0,Terrence Shannon Jr.,2026,0
 203954.0,Joel Embiid,2026,0
 1626145.0,Tyus Jones,2026,0
-201572.0,Brook Lopez,2026,0
 1627751.0,Jakob Poeltl,2026,0
 1631133.0,Jabari Walker,2026,0
 1630534.0,Ochai Agbaji,2026,0
@@ -26734,11 +26735,12 @@ nba_id,Player,year,G
 1627936.0,Alex Caruso,2026,0
 1630162.0,Anthony Edwards,2026,0
 1630568.0,Luka Garza,2026,0
+101108.0,Chris Paul,2026,0
 1630188.0,Jalen Smith,2026,0
 1642864.0,Hugo González,2026,0
 1641722.0,Jordan Hawkins,2026,0
+203078.0,Bradley Beal,2026,0
 1631245.0,Quenton Jackson,2026,0
-201587.0,Nicolas Batum,2026,0
 1642914.0,Javon Small,2026,0
 1628396.0,Tony Bradley,2026,0
 1631104.0,Blake Wesley,2026,0
@@ -26748,29 +26750,28 @@ nba_id,Player,year,G
 1629723.0,John Konchar,2026,0
 1627747.0,Caris LeVert,2026,0
 1641731.0,Bilal Coulibaly,2026,0
-101108.0,Chris Paul,2026,0
 1642879.0,Ben Saraf,2026,0
+203992.0,Bogdan Bogdanović,2026,0
 1642363.0,Nique Clifford,2026,0
 1628415.0,Dillon Brooks,2026,0
 1630538.0,Bones Hyland,2026,0
 1642348.0,Justin Edwards,2026,0
 1641729.0,Brice Sensabaugh,2026,0
 1630314.0,Brandon Williams,2026,0
+1630208.0,Nick Richards,2026,0
 1642275.0,Tidjane Salaün,2026,0
 202685.0,Jonas Valančiūnas,2026,0
-203078.0,Bradley Beal,2026,0
+1630692.0,Jordan Goodwin,2026,0
 1630167.0,Obi Toppin,2026,0
-1629599.0,Amir Coffey,2026,0
 1628502.0,Nigel Hayes-Davis,2026,0
+1629599.0,Amir Coffey,2026,0
 203939.0,Dwight Powell,2026,0
 1630811.0,Keaton Wallace,2026,0
 1642265.0,Rob Dillingham,2026,0
 203991.0,Clint Capela,2026,0
 1642878.0,Tyrese Proctor,2026,0
 1631097.0,Bennedict Mathurin,2026,0
-1630692.0,Jordan Goodwin,2026,0
 1629216.0,Gabe Vincent,2026,0
-1630208.0,Nick Richards,2026,0
 1642355.0,Bronny James,2026,0
 1627780.0,Gary Payton II,2026,0
 1631248.0,Baylor Scheierman,2026,0
@@ -26783,7 +26784,6 @@ nba_id,Player,year,G
 1642862.0,Liam McNeeley,2026,0
 1630249.0,Vit Krejci,2026,0
 1641733.0,Nick Smith Jr.,2026,0
-203992.0,Bogdan Bogdanović,2026,0
 1630214.0,Xavier Tillman Sr.,2026,0
 1642278.0,Tyler Kolek,2026,0
 1642266.0,Ja'Kobe Walter,2026,0
@@ -26797,6 +26797,7 @@ nba_id,Player,year,G
 1631218.0,Trayce Jackson-Davis,2026,0
 1641726.0,Dereck Lively II,2026,0
 1630611.0,Gui Santos,2026,0
+1642353.0,Cam Christie,2026,0
 1631230.0,Dominick Barlow,2026,0
 1628436.0,Luke Kornet,2026,0
 1642964.0,Brooks Barnhizer,2026,0
@@ -26823,6 +26824,7 @@ nba_id,Player,year,G
 1642868.0,Carter Bryant,2026,0
 1642262.0,Cody Williams,2026,0
 1642959.0,Chris Youngblood,2026,0
+1641738.0,Kobe Brown,2026,0
 1642277.0,Johnny Furphy,2026,0
 203937.0,Kyle Anderson,2026,0
 1642877.0,Micah Peavy,2026,0
@@ -26850,29 +26852,29 @@ nba_id,Player,year,G
 1628988.0,Aaron Holiday,2026,0
 1631126.0,Caleb Love,2026,0
 1629636.0,Darius Garland,2026,0
-1642353.0,Cam Christie,2026,0
 1641712.0,Rayan Rupert,2026,0
-1631247.0,Luke Travers,2026,0
 1642863.0,Khaman Maluach,2026,0
+1631247.0,Luke Travers,2026,0
 1631207.0,Dalen Terry,2026,0
 1631321.0,Sidy Cissoko,2026,0
 201599.0,DeAndre Jordan,2026,0
+1630224.0,Jalen Green,2026,0
 1631110.0,Jeremy Sochan,2026,0
+1642949.0,Yanic Konan Niederhauser,2026,0
 1630579.0,Jericho Sims,2026,0
 1630619.0,Moussa Cisse,2026,0
 1631124.0,Julian Strawther,2026,0
-1641738.0,Kobe Brown,2026,0
 1631103.0,Malaki Branham,2026,0
-1642949.0,Yanic Konan Niederhauser,2026,0
+1642853.0,Rasheer Fleming,2026,0
 1641713.0,GG Jackson II,2026,0
 1642352.0,Keshad Johnson,2026,0
 1630164.0,James Wiseman,2026,0
-1642853.0,Rasheer Fleming,2026,0
 1641790.0,PJ Hall,2026,0
 1631120.0,JD Davison,2026,0
 1642403.0,Isaac Jones,2026,0
 1629614.0,Andrew Nembhard,2026,0
 1629618.0,Jalen Pickett,2026,0
+1643141.0,Jahmyl Telfort,2026,0
 201569.0,Eric Gordon,2026,0
 1642866.0,Joan Beringer,2026,0
 1642461.0,Spencer Jones,2026,0
@@ -26896,7 +26898,6 @@ nba_id,Player,year,G
 1642443.0,Jahmir Young,2026,0
 1630604.0,E.J. Liddell,2026,0
 1642920.0,Kobe Sanders,2026,0
-1643141.0,Jahmyl Telfort,2026,0
 1630173.0,Precious Achiuwa,2026,0
 203482.0,Kelly Olynyk,2026,0
 1629645.0,Kevin Porter Jr.,2026,0
