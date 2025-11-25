@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 from nba_api.stats.static import players,teams
@@ -393,14 +393,14 @@ df
 df.drop_duplicates(subset=['PLAYER_ID','TEAM_ID','date'])
 
 
-# In[ ]:
+# In[2]:
 
 
 dates.sort()
 dates
 
 
-# In[ ]:
+# In[3]:
 
 
 '''
@@ -433,13 +433,17 @@ else:
 print(trail)
 frames= []
 count=0
-index_master=pd.read_csv('index_master.csv')
+index_master=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/index_master.csv')
 index_master=index_master[index_master.team!='TOT']
 index_master['team_id']=index_master['team_id'].astype(int)
 index_master['nba_id']=index_master['nba_id'].astype(int)
 
 
-
+game_dates= pd.read_csv('https://raw.githubusercontent.com/gabriel1200/shot_data/refs/heads/master/game_dates.csv')
+team_id_map = game_dates[['team', 'TEAM_ID']].drop_duplicates().set_index('team')['TEAM_ID'].to_dict()
+game_dates['year'] = game_dates['season'].apply(lambda x: int(x.split('-')[0]) + 1)
+# 2. Map the 'opp_team' column using this dictionary to create the new column
+game_dates['OPP_TEAM_ID'] = game_dates['opp_team'].map(team_id_map)
 for year in range(start_year,end_year):
     # Load the game data for the specific year.
     games_collected=[]
@@ -513,6 +517,7 @@ for year in range(start_year,end_year):
             missing.drop(columns='GAME_ID',inplace=True)
             save_frame.dropna(subset='GAME_ID',inplace=True)
             missed=[]
+            print(missed_player)
 
             for missed_player in missing['PLAYER_ID'].unique().tolist():
                 missing_frame=missing[missing.PLAYER_ID==missed_player].reset_index(drop=True)
@@ -563,8 +568,14 @@ for year in range(start_year,end_year):
             count += 1
     all_games=pd.concat(games_collected)
 
+    year_dates= game_dates[game_dates.year==year]
 
+    year_dates=year_dates[['GAME_ID','TEAM_ID','opp_team','OPP_TEAM_ID']]
 
+    year_dates.rename(columns={'opp_team':'opp_team_abbr','OPP_TEAM_ID':'opp_team_id '},inplace=True)
+
+    all_games=all_games.merge(year_dates,how='left',on=['GAME_ID','TEAM_ID'])
+    print(all_games.tail())
 
     all_games.to_csv('all_games/all_'+str(year)+trail+'.csv',index=False)
     all_games.to_parquet('all_games/all_'+str(year)+trail+'.parquet', index=False)
