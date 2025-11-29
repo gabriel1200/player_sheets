@@ -19,6 +19,7 @@ jupyter nbconvert --to script team_average_scrape.ipynb
 cd ..
 
 cd gen_totals
+
 jupyter nbconvert --to script averages_scrape.ipynb
 jupyter nbconvert --to script gen_totals.ipynb
 cd ..
@@ -45,6 +46,7 @@ cp team_averages_ps.csv ../teamgame_report/team_averages_ps.csv
 cd ..
 
 cd gen_totals
+python bio.py
 python averages_scrape.py
 python gen_totals.py
 cd ..

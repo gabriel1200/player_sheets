@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[5]:
+# In[16]:
 
 
 import pandas as pd
@@ -355,7 +355,7 @@ perc_save(data,ps=ps)
 total_save(data,ps=ps)
 
 
-# In[6]:
+# In[17]:
 
 
 data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
@@ -368,7 +368,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[7]:
+# In[ ]:
 
 
 directory = "../totals"
@@ -395,8 +395,17 @@ for year in range(start_year,end_year+1):
 
         lebronyear.rename(columns={'WAR':'LEBRON_WAR','NBA ID':'PLAYER_ID','O-LEBRON':'O_LEBRON','D-LEBRON':'D_LEBRON',},inplace=True)
 
+        if len(lebronyear)>0:
+            yearframe=yearframe.merge(lebronyear,on=['PLAYER_ID','year'],how='left')
+        elif len(lebronyear)==0:
+            temp_index=pd.read_csv('modern_index.csv')
+            temp_index=temp_index[temp_index.year==year]
+            if len(temp_index)>0:
+                temp_index = temp_index[['nba_id','Pos']]
+                temp_index.rename(columns={'nba_id':'PLAYER_ID'},inplace=True)
+                yearframe = yearframe.merge(temp_index, on='PLAYER_ID')
 
-        yearframe=yearframe.merge(lebronyear,on=['PLAYER_ID','year'],how='left')
+                print(yearframe[yearframe.Pos.isna()])
 
     if year>=2014:
 
@@ -464,7 +473,7 @@ modern = pd.concat(modern_years)
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 
 
-# In[8]:
+# In[19]:
 
 
 modern['adjusted_trueshooting_pct'].value_counts()
