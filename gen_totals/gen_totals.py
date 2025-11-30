@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[16]:
+# In[20]:
 
 
 import pandas as pd
@@ -355,7 +355,7 @@ perc_save(data,ps=ps)
 total_save(data,ps=ps)
 
 
-# In[17]:
+# In[21]:
 
 
 data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
@@ -395,9 +395,10 @@ for year in range(start_year,end_year+1):
 
         lebronyear.rename(columns={'WAR':'LEBRON_WAR','NBA ID':'PLAYER_ID','O-LEBRON':'O_LEBRON','D-LEBRON':'D_LEBRON',},inplace=True)
 
-        if len(lebronyear)>0:
-            yearframe=yearframe.merge(lebronyear,on=['PLAYER_ID','year'],how='left')
-        elif len(lebronyear)==0:
+
+        yearframe=yearframe.merge(lebronyear,on=['PLAYER_ID','year'],how='left')
+        if len(lebronyear)==0:
+            yearframe.drop(columns='Pos',inplace=True)
             temp_index=pd.read_csv('modern_index.csv')
             temp_index=temp_index[temp_index.year==year]
             if len(temp_index)>0:
@@ -473,7 +474,7 @@ modern = pd.concat(modern_years)
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 
 
-# In[19]:
+# In[23]:
 
 
 modern['adjusted_trueshooting_pct'].value_counts()
