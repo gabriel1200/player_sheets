@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[20]:
+# In[ ]:
 
 
 import pandas as pd
@@ -355,7 +355,7 @@ perc_save(data,ps=ps)
 total_save(data,ps=ps)
 
 
-# In[21]:
+# In[2]:
 
 
 data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
@@ -410,8 +410,8 @@ for year in range(start_year,end_year+1):
 
     if year>=2014:
 
-        yearframe['on-ball-time%'] = 100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
-        yearframe['ON_BALL_TIME_PCT'] =  100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['Minutes'])
+        yearframe['on-ball-time%'] = 100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['MIN'])
+        yearframe['ON_BALL_TIME_PCT'] =  100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['MIN'])
     if year>=2001:
 
         yearframe['Stops'] = (
@@ -474,7 +474,7 @@ modern = pd.concat(modern_years)
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 
 
-# In[23]:
+# In[4]:
 
 
 modern['adjusted_trueshooting_pct'].value_counts()
