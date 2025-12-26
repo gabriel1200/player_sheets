@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
+# In[1]:
 
 
 from nba_api.stats.static import players,teams
@@ -399,7 +399,7 @@ season_string='ps' if ps else 'rs'
 
 
 
-# In[5]:
+# In[ ]:
 
 
 #start_year=2014
@@ -482,7 +482,7 @@ def fetch_nba_data(start_year, end_year, season_type='rs', save_to_csv=True):
         except Exception as e:
             print(f"Error fetching data for {season} {season_type_label}: {e}")
 
-    return all_data
+    return all_data 
 
-data = fetch_nba_data(start_year, start_year, season_type=season_string)
+data = fetch_nba_data(start_year , start_year, season_type=season_string)
 
