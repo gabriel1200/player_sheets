@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[15]:
+# In[ ]:
 
 
 import pandas as pd
@@ -27,20 +27,7 @@ ps = False
 # Use glob to find all CSV files in the directory
 csv_files = glob.glob(os.path.join(directory, "*.csv"))
 
-# Loop through the list of files and delete based on `ps`
-for file in csv_files:
-    filename = os.path.basename(file)
-    if (ps and '_ps' in filename) or (not ps and '_ps' not in filename):
-        try:
-            os.remove(file)
-            print(f"Deleted: {file}")
-        except Exception as e:
-            print(f"Error deleting {file}: {e}")
 
-print("Relevant CSV files deleted.")
-time.sleep(1)
-
-time.sleep(1)
 
 
 # In[ ]:
@@ -90,17 +77,27 @@ def get_filename(team_id, year, opp=False, ps=False):
     filename += ".csv"
     return filename
 
-def pull_onoff(years, opp=False, ps=False):
+def pull_onoff(years, opp=False, ps=False, force_refresh=False):
+    """
+    Pull on-off data with safe file handling.
+
+    Args:
+        years: List of years to pull
+        opp: Whether to pull opponent data
+        ps: Whether to pull playoff data
+        force_refresh: If True, delete existing files and re-pull. If False, keep existing files on failure.
+    """
     count = 0
     if ps == False:
         player_index = pd.read_csv('index_master.csv')
     else:
-         player_index = pd.read_csv('index_master_ps.csv')
+        player_index = pd.read_csv('index_master_ps.csv')
+
     player_index = player_index[player_index.team != 'TOT']
     player_index = player_index[player_index.year > 2000]
     print(player_index[player_index.team_id.isna()])
     player_index = player_index.drop_duplicates()
-    player_index['team_id'] =player_index['team_id'].astype(int)
+    player_index['team_id'] = player_index['team_id'].astype(int)
     all_frames = []
 
     for year in years:
@@ -113,20 +110,23 @@ def pull_onoff(years, opp=False, ps=False):
 
         frames = []
         fail_list = []
+        success_count = 0
+        temp_files = []  # Track temporary files for this pull
 
-        season_index.dropna(subset='team_id',inplace=True)
+        season_index.dropna(subset='team_id', inplace=True)
 
         for team_id in season_index.team_id.unique():
             # Generate filename for this team/year combination
             filename = get_filename(int(team_id), year, opp, ps)
             filepath = os.path.join(year_dir, filename)
+            temp_filepath = filepath + ".temp"
 
-            # Check if file already exists
-            if os.path.exists(filepath):
+            # Check if file already exists and we're not forcing refresh
+            if os.path.exists(filepath) and not force_refresh:
                 print(f"File already exists for team {team_id} in {year}, skipping...")
-                # Optionally read existing file and add to frames
                 existing_df = pd.read_csv(filepath)
                 frames.append(existing_df)
+                success_count += 1
                 continue
 
             try:
@@ -137,27 +137,48 @@ def pull_onoff(years, opp=False, ps=False):
                 df['season'] = season
                 df['team_vs'] = opp
 
-                # Save individual team file
-                df.to_csv(filepath, index=False)
+                # Save to temporary file first
+                df.to_csv(temp_filepath, index=False)
+                temp_files.append((temp_filepath, filepath))
+
                 time.sleep(4)
-                print(f"Saved data for team {team_id} in {year}")
+                print(f"Successfully pulled data for team {team_id} in {year}")
 
                 frames.append(df)
                 count += 1
+                success_count += 1
 
             except Exception as e:
                 print(f"Error processing team {team_id} in {year}: {str(e)}")
                 fail_list.append((team_id, year))
 
-        if frames:
-            year_frame = pd.concat(frames)
-            all_frames.append(year_frame)
-            print(f'Year {year} Completed')
+        # Only commit changes if we had some success
+        if success_count > 0:
+            # Move temp files to permanent location
+            for temp_path, final_path in temp_files:
+                if os.path.exists(temp_path):
+                    # Delete old file if force_refresh
+                    if force_refresh and os.path.exists(final_path):
+                        os.remove(final_path)
+                    # Move temp to final
+                    os.rename(temp_path, final_path)
+                    print(f"Committed: {final_path}")
 
-    if fail_list:
-        print("\nFailed to process the following team/year combinations:")
-        for team, year in fail_list:
-            print(f"Team: {team}, Year: {year}")
+            if frames:
+                year_frame = pd.concat(frames)
+                all_frames.append(year_frame)
+                print(f'Year {year} Completed with {success_count} successful pulls')
+        else:
+            # Clean up temp files if everything failed
+            print(f"All pulls failed for year {year}. Keeping existing files.")
+            for temp_path, _ in temp_files:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+
+        if fail_list:
+            print(f"\nFailed to process the following team/year combinations for {year}:")
+            for team, yr in fail_list:
+                print(f"Team: {team}, Year: {yr}")
 
     return pd.concat(all_frames) if all_frames else pd.DataFrame()
 
