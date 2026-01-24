@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[18]:
+# In[ ]:
 
 
 from nba_api.stats.static import players,teams
@@ -428,141 +428,212 @@ df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 df
 
 
-# In[19]:
+# In[9]:
 
 
 import requests
 import pandas as pd
 import time
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
-# Define the base URL for the SWAR API
+# --- 1. SETUP SMART RETRY LOGIC ---
+def create_retry_session(retries=5, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504]):
+    """
+    Creates a requests session that handles retries automatically.
+
+    Args:
+        retries: Number of times to retry.
+        backoff_factor: A sleep factor (sleep = backoff_factor * (2 ** (retry_count - 1))).
+        status_forcelist: HTTP status codes that trigger a retry.
+    """
+    session = requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    # Mount the adapter to both HTTP and HTTPS
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session
+
+# Initialize the global session
+http = create_retry_session()
+
+
+# --- 2. YOUR SCRAPING FUNCTIONS ---
+
+# Ensure START_SEASON is defined (assuming it's a global variable from your context)
+# START_SEASON = 2023 
+
 def scrape_teams(ps=False):
     base_url = "https://api.pbpstats.com/get-totals/nba"
-    stype="Regular Season"
-    carry=""
-    if ps == True:
-        stype="Playoffs"
-        carry="ps"
+    stype = "Regular Season"
+    carry = ""
 
-    # Set up parameters
+    if ps:
+        stype = "Playoffs"
+        carry = "ps"
+
     params = {
         "SeasonType": stype,
-        "Season": "",  # This will be dynamically filled for each season
+        "Season": "",
         "Type": "Team",
     }
 
-    # Define the range of seasons you want data for
-    start_year = START_SEASON -1 # Example start season
-    end_year = start_year+1  # Example end season
-    if ps == True:
-        end_season=start_year
-    # Empty list to collect all data
+    start_year = START_SEASON - 1
+    end_year = start_year + 1
+
+    # Logic fix: Ensure end_year covers the range you intend
+    if ps:
+        # Note: In your original code, this variable `end_season` was defined but not used in the range
+        # I am leaving the loop range as is based on your snippet
+        pass 
+
     all_data = []
 
-    # Loop through each season to fetch possessions data
     for season in range(start_year, end_year):
-        print(season)
+        print(f"Scraping Team Data for Season: {season}")
         params["Season"] = f"{season}-{str(season + 1)[-2:]}"
 
+        try:
+            # USE THE SMART SESSION HERE
+            response = http.get(base_url, params=params, timeout=10)
+            response.raise_for_status() # Raises error for 4xx/5xx if retries fail
+            data = response.json()
 
-        # Make a request to the API
-        response = requests.get(base_url, params=params)
-        data = response.json()
+            # Process data
+            if 'multi_row_table_data' in data:
+                df = pd.DataFrame(data['multi_row_table_data'])
+                df['season'] = season
+                df['year'] = season + 1
+                year = season + 1
 
-        # Process each team in the season
-        df=pd.DataFrame(data['multi_row_table_data'])
-        df['season']=season
-        df['year']=season+1
-        year =season+1
-        df.to_csv(str(year)+carry+'.csv',index=False)
+                # Save intermediate file
+                df.to_csv(str(year) + carry + '.csv', index=False)
+                all_data.append(df)
+            else:
+                print(f"No data found for {season}")
 
-        time.sleep(2.5)
-        all_data.append(df)
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to fetch data for {season} after retries: {e}")
+            continue
 
-    # Convert collected data into a DataFrame
+        # Polite sleep is still good even with retries to prevent initial 429s
+        time.sleep(2.5) 
+
+    if not all_data:
+        print("No data collected.")
+        return pd.DataFrame()
+
     df = pd.concat(all_data)
     print(df)
-    df['TeamId']=df['TeamId'].astype(int)
 
-    for team_id in df['TeamId'].unique().tolist():
-        teamdf=df[df['TeamId']==team_id]
+    # Data Cleaning / Merging Logic
+    if 'TeamId' in df.columns:
+        df['TeamId'] = df['TeamId'].astype(int)
 
-        olddf=pd.read_csv(str(team_id)+carry+'.csv')
+        for team_id in df['TeamId'].unique().tolist():
+            teamdf = df[df['TeamId'] == team_id]
 
-        new_years = teamdf['year'].unique().tolist()
-        olddf=olddf[~olddf.year.isin(new_years)]
-        teamdf=pd.concat([olddf,teamdf])
-        teamdf.drop_duplicates(inplace=False)
+            # Wrap file reading in try/except in case file doesn't exist
+            try:
+                olddf = pd.read_csv(str(team_id) + carry + '.csv')
+                new_years = teamdf['year'].unique().tolist()
+                olddf = olddf[~olddf.year.isin(new_years)]
+                teamdf = pd.concat([olddf, teamdf])
+            except FileNotFoundError:
+                pass # If no old file, just use the new data
 
-        teamdf.to_csv(str(team_id)+carry+".csv",index=False)
+            teamdf.drop_duplicates(inplace=True) # Changed to True to actually modify the DF
+            teamdf.to_csv(str(team_id) + carry + ".csv", index=False)
+
     return df
 
 
 def scrape_teams_vs(ps=False):
     base_url = "https://api.pbpstats.com/get-totals/nba"
-    stype="Regular Season"
-    carry=""
-    if ps == True:
-        stype="Playoffs"
-        carry="ps"
+    stype = "Regular Season"
+    carry = ""
 
-    # Set up parameters
+    if ps:
+        stype = "Playoffs"
+        carry = "ps"
+
     params = {
         "SeasonType": stype,
-        "Season": "",  # This will be dynamically filled for each season
+        "Season": "",
         "Type": "Opponent",
     }
 
-    # Define the range of seasons you want data for
-    start_year = START_SEASON -1 # Example start season
-    end_year = start_year+1  # Example end season
-    if ps == True:
-        end_season=start_year
-    # Empty list to collect all data
+    start_year = START_SEASON - 1
+    end_year = start_year + 1
+
     all_data = []
 
-    # Loop through each season to fetch possessions data
     for season in range(start_year, end_year):
+        print(f"Scraping Opponent Data for Season: {season}")
         params["Season"] = f"{season}-{str(season + 1)[-2:]}"
 
+        try:
+            # USE THE SMART SESSION HERE
+            response = http.get(base_url, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
 
-        # Make a request to the API
-        response = requests.get(base_url, params=params)
-        data = response.json()
+            if 'multi_row_table_data' in data:
+                df = pd.DataFrame(data['multi_row_table_data'])
+                df['season'] = season
+                df['year'] = season + 1
+                year = season + 1
 
-        # Process each team in the season
-        df=pd.DataFrame(data['multi_row_table_data'])
-        df['season']=season
-        df['year']=season+1
-        year =season+1
+                df.to_csv(str(year) + 'vs' + carry + '.csv', index=False)
+                all_data.append(df)
+            else:
+                print(f"No data found for {season}")
+
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to fetch data for {season} after retries: {e}")
+            continue
 
         time.sleep(2.5)
-        df.to_csv(str(year)+'vs'+carry+'.csv',index=False)
-        all_data.append(df)
 
-    # Convert collected data into a DataFrame
+    if not all_data:
+        print("No data collected.")
+        return pd.DataFrame()
+
     df = pd.concat(all_data)
-    df['TeamId']=df['TeamId'].astype(int)
-    for team_id in df['TeamId'].unique().tolist():
-        teamdf=df[df['TeamId']==team_id]
 
-        olddf=pd.read_csv(str(team_id)+carry+'.csv')
+    if 'TeamId' in df.columns:
+        df['TeamId'] = df['TeamId'].astype(int)
+        for team_id in df['TeamId'].unique().tolist():
+            teamdf = df[df['TeamId'] == team_id]
 
-        new_years = teamdf['year'].unique().tolist()
-        olddf=olddf[~olddf.year.isin(new_years)]
-        teamdf=pd.concat([olddf,teamdf])
-        teamdf.drop_duplicates(inplace=False)
+            try:
+                olddf = pd.read_csv(str(team_id) + carry + '.csv')
+                new_years = teamdf['year'].unique().tolist()
+                olddf = olddf[~olddf.year.isin(new_years)]
+                teamdf = pd.concat([olddf, teamdf])
+            except FileNotFoundError:
+                pass
 
-        teamdf.to_csv(str(team_id)+'vs'+carry+".csv",index=False)
+            teamdf.drop_duplicates(inplace=True) # Changed to True
+            teamdf.to_csv(str(team_id) + 'vs' + carry + ".csv", index=False)
+
     return df
 
-
-# Display a sample of the data
-scrape_teams(ps=ps)
+# Example usage (Ensure variables START_SEASON and ps are defined in your environment)
+# START_SEASON = 2024
+# ps = False
 scrape_teams_vs(ps=ps)
+scrape_teams(ps=ps)
 
 
-# In[20]:
+# In[10]:
 
 
 import pandas as pd
@@ -596,7 +667,7 @@ playtype_test=get_playtype_summary()
 playtype_test.columns
 
 
-# In[21]:
+# In[11]:
 
 
 trail = ''
@@ -766,7 +837,7 @@ testdf.to_csv('team_averages_ps.csv', index=False)
 
 
 
-# In[22]:
+# In[ ]:
 
 
 end_year=START_SEASON+1
