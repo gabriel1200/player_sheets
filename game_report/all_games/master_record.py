@@ -35,10 +35,10 @@ else:
     print("No CSV files were loaded.")
 
 
-# In[2]:
+# In[7]:
 
 
-index_col=['PLAYER_ID', 'PLAYER_NAME','TEAM_ABBREVIATION','TEAM_ID','GAME_ID','year','MIN']
+index_col=['PLAYER_ID', 'PLAYER_NAME','TEAM_ABBREVIATION','TEAM_ID','GAME_ID','year','MIN','date']
 
 game_record=combined_df[index_col]
 game_record.drop_duplicates(inplace=True)
@@ -52,10 +52,11 @@ game_record
 game_record
 
 
-# In[4]:
+# In[ ]:
 
 
-game_record[game_record.MIN>5]
+game_record.sort_values(by='date',inplace=True)
+game_record
 
 
 # In[ ]:
