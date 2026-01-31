@@ -52,7 +52,7 @@ def pull_data(url, max_retries=3, delay_seconds=5):
     for attempt in range(max_retries):
         try:
             # --- API Request Attempt ---
-            print(f"Attempt {attempt + 1} of {max_retries} to pull data from {url}")
+            print(f"Attempt {attempt + 1} of {max_retries} to pull data")
             response = requests.get(url, headers=headers)
             response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
             json_data = response.json()
@@ -338,7 +338,7 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
                     yeardata=pd.concat(year_frame)
                     print(len(yeardata))
                     yeardata['playoffs']=ps
-                    yeardata.to_csv(str(year)+trail+'_games.csv',index=False)
+                    yeardata.to_csv('year_files/'+str(year)+trail+'_games.csv',index=False)
             except Exception as e:
                 print(str(e))
                 print(str(date_num))
