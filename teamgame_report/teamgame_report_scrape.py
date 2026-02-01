@@ -24,10 +24,13 @@ def format_date_to_url(date):
 
 # Example usage
 SEASON_YEAR=2026
-def pull_data(url):
+
+def pull_data(url, max_retries=3, sleep_seconds=1):
     headers = {
         "Host": "stats.nba.com",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/116.0.0.0 Safari/537.36",
         "Accept": "application/json, text/plain, */*",
         "Accept-Language": "en-US,en;q=0.9",
         "Accept-Encoding": "gzip, deflate, br",
@@ -39,29 +42,42 @@ def pull_data(url):
         "Sec-Fetch-Site": "same-origin",
     }
 
-    json = requests.get(url,headers = headers).json()
+    for attempt in range(1, max_retries + 1):
+        try:
+            response = requests.get(url, headers=headers, timeout=15)
+            response.raise_for_status()
 
-    if len(json["resultSets"])== 1:
+            try:
+                json_data = response.json()
+            except json_lib.JSONDecodeError as e:
+                # This is the classic "Expecting value" bug
+                raise ValueError("JSON decode failed") from e
 
+            # ---- normal parsing logic ----
+            if len(json_data["resultSets"]) == 1:
+                data = json_data["resultSets"][0]["rowSet"]
+                columns = json_data["resultSets"][0]["headers"]
+            else:
+                data = json_data["resultSets"]["rowSet"]
+                columns = json_data["resultSets"]["headers"][1]["columnNames"]
 
-        data = json["resultSets"][0]["rowSet"]
-        #print(data)
-        columns = json["resultSets"][0]["headers"]
-        #print(columns)
+            df = pd.DataFrame.from_records(data, columns=columns)
 
-        df = pd.DataFrame.from_records(data, columns=columns)
-    else:
+            time.sleep(sleep_seconds)
+            print("pulled")
+            return df
 
-        data = json["resultSets"]["rowSet"]
-        #print(json)
-        columns = json["resultSets"]["headers"][1]['columnNames']
-        #print(columns)
-        df = pd.DataFrame.from_records(data, columns=columns)
+        except Exception as e:
+            if attempt > 1:
+                print(f"[Retry {attempt}/{max_retries}] URL:")
+                print(url)
 
-    time.sleep(1)
-    print('pulled')
-    return df
+            print(f"Attempt {attempt} failed: {e}")
 
+            if attempt == max_retries:
+                raise
+
+            time.sleep(sleep_seconds * attempt)  # light backoff
 
 def pull_game_level_team(dateframe, start_year,end_year,ps=False):
     stype = 'Regular%20Season'
