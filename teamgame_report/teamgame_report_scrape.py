@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 from nba_api.stats.static import players,teams
@@ -78,6 +78,7 @@ def pull_data(url, max_retries=3, sleep_seconds=1):
                 raise
 
             time.sleep(sleep_seconds * attempt)  # light backoff
+
 
 def pull_game_level_team(dateframe, start_year,end_year,ps=False):
     stype = 'Regular%20Season'
