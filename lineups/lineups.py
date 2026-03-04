@@ -79,13 +79,14 @@ def get_filename(team_id, year, opp=False, ps=False):
 
 def pull_onoff(years, opp=False, ps=False, force_refresh=False):
     """
-    Pull on-off data with safe file handling.
+    Pull on-off data. Always attempts to scrape first.
+    If scrape fails, falls back to existing local file if available.
 
     Args:
         years: List of years to pull
         opp: Whether to pull opponent data
         ps: Whether to pull playoff data
-        force_refresh: If True, delete existing files and re-pull. If False, keep existing files on failure.
+        force_refresh: (Deprecated in logic, effectively True now)
     """
     count = 0
     if ps == False:
@@ -95,7 +96,7 @@ def pull_onoff(years, opp=False, ps=False, force_refresh=False):
 
     player_index = player_index[player_index.team != 'TOT']
     player_index = player_index[player_index.year > 2000]
-    print(player_index[player_index.team_id.isna()])
+    # print(player_index[player_index.team_id.isna()]) # Optional debug
     player_index = player_index.drop_duplicates()
     player_index['team_id'] = player_index['team_id'].astype(int)
     all_frames = []
@@ -121,16 +122,14 @@ def pull_onoff(years, opp=False, ps=False, force_refresh=False):
             filepath = os.path.join(year_dir, filename)
             temp_filepath = filepath + ".temp"
 
-            # Check if file already exists and we're not forcing refresh
-            if os.path.exists(filepath) and not force_refresh:
-                print(f"File already exists for team {team_id} in {year}, skipping...")
-                existing_df = pd.read_csv(filepath)
-                frames.append(existing_df)
-                success_count += 1
-                continue
-
+            # ---------------------------------------------------------
+            # MODIFIED LOGIC: Always try scrape first, fallback to file
+            # ---------------------------------------------------------
             try:
+                print(f"Attempting scrape for Team {team_id} ({season})...")
                 df = lineuppull(team_id, season, opp=opp, ps=ps)
+                
+                # Process the scraped data
                 df = df.reset_index(drop=True)
                 df['team_id'] = team_id
                 df['year'] = year
@@ -142,41 +141,55 @@ def pull_onoff(years, opp=False, ps=False, force_refresh=False):
                 temp_files.append((temp_filepath, filepath))
 
                 time.sleep(4)
-                print(f"Successfully pulled data for team {team_id} in {year}")
+                print(f"Successfully scraped data for team {team_id}")
 
                 frames.append(df)
                 count += 1
                 success_count += 1
 
             except Exception as e:
-                print(f"Error processing team {team_id} in {year}: {str(e)}")
-                fail_list.append((team_id, year))
+                print(f"Scrape FAILED for team {team_id} in {year}: {str(e)}")
+                
+                # Check if we have an existing file to fall back on
+                if os.path.exists(filepath):
+                    print(f"-> Falling back to existing file: {filename}")
+                    try:
+                        existing_df = pd.read_csv(filepath)
+                        frames.append(existing_df)
+                        success_count += 1
+                        # Note: We do NOT increment 'count' or add to 'temp_files' 
+                        # because we aren't writing new data, just reading old data.
+                    except Exception as load_e:
+                        print(f"-> Could not load existing file either: {str(load_e)}")
+                        fail_list.append((team_id, year))
+                else:
+                    print(f"-> No existing file found. Skipping.")
+                    fail_list.append((team_id, year))
 
-        # Only commit changes if we had some success
-        if success_count > 0:
-            # Move temp files to permanent location
+        # Only commit changes (rename temp files) if we had successful scrapes
+        if temp_files:
             for temp_path, final_path in temp_files:
                 if os.path.exists(temp_path):
-                    # Delete old file if force_refresh
-                    if force_refresh and os.path.exists(final_path):
+                    # Delete old file if it exists (since we have a fresh scrape in temp)
+                    if os.path.exists(final_path):
                         os.remove(final_path)
                     # Move temp to final
                     os.rename(temp_path, final_path)
                     print(f"Committed: {final_path}")
 
-            if frames:
-                year_frame = pd.concat(frames)
-                all_frames.append(year_frame)
-                print(f'Year {year} Completed with {success_count} successful pulls')
+        if frames:
+            year_frame = pd.concat(frames)
+            all_frames.append(year_frame)
+            print(f'Year {year} Completed with {success_count} teams (fresh + cached)')
         else:
-            # Clean up temp files if everything failed
-            print(f"All pulls failed for year {year}. Keeping existing files.")
+            print(f"All operations failed for year {year}.")
+            # Clean up temp files if everything failed totally (unlikely with this logic but good safety)
             for temp_path, _ in temp_files:
                 if os.path.exists(temp_path):
                     os.remove(temp_path)
 
         if fail_list:
-            print(f"\nFailed to process the following team/year combinations for {year}:")
+            print(f"\nFailed to retrieve data (scrape or file) for the following:")
             for team, yr in fail_list:
                 print(f"Team: {team}, Year: {yr}")
 
