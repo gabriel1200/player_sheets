@@ -7,11 +7,17 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# In[ ]:
+
+
+#!/usr/bin/env python
+# coding: utf-8
+
 import requests
 import pandas as pd
 from datetime import datetime
 import time
-from typing import List, Dict
+from typing import List, Dict, Tuple
 import logging
 import os
 
@@ -86,30 +92,122 @@ def get_team_abbreviations():
         '1610612763': 'MEM', '1610612740': 'NOP'
     }
 
-def fetch_all_teams_game_logs(team_ids: List[str], start_year: int, end_year: int, entity_type:str ="Team") -> Dict[str, pd.DataFrame]:
+def fetch_all_teams_game_logs(
+    team_ids: List[str],
+    start_year: int,
+    end_year: int,
+    entity_type: str = "Team"
+) -> Tuple[Dict[str, pd.DataFrame], List[str]]:
+    """
+    Fetches game logs for all given teams.
+
+    Returns:
+        team_games: Dict mapping team_id -> DataFrame of game logs (empty DF on failure)
+        failed_ids: List of team_ids whose logs came back empty after all per-request retries
+    """
     api = PBPStatsAPI(start_year=start_year, end_year=end_year)
     team_games = {}
+    failed_ids = []
     total_teams = len(team_ids)
 
-    print(f"Starting scrape for {total_teams} teams ({start_year}-{end_year})...")
+    print(f"Starting scrape for {total_teams} teams ({start_year}-{end_year}) [{entity_type}]...")
 
     for idx, team_id in enumerate(team_ids):
         t_id_str = str(team_id)
-        logging.info(f"[{idx+1}/{total_teams}] Fetching logs for {t_id_str} ({entity_type})...")
-        team_games[t_id_str] = api.get_team_game_logs(t_id_str, entity_type)
+        logging.info(f"[{idx+1}/{total_teams}] Fetching {entity_type} logs for {t_id_str}...")
+        result = api.get_team_game_logs(t_id_str, entity_type)
+        team_games[t_id_str] = result
 
-    return team_games
+        if result.empty:
+            failed_ids.append(t_id_str)
+            logging.warning(f"[{entity_type}] Empty result for team {t_id_str} — flagged for team-level retry.")
+
+    return team_games, failed_ids
+
+
+def retry_failed_teams(
+    failed_ids: List[str],
+    start_year: int,
+    end_year: int,
+    entity_type: str,
+    wait_between: int = 5
+) -> Tuple[Dict[str, pd.DataFrame], List[str]]:
+    """
+    One additional team-level retry pass for any teams that came back empty.
+    Waits `wait_between` seconds before each retry to give the API a breather.
+
+    Returns:
+        recovered: Dict of team_id -> DataFrame for teams that now have data
+        still_failed: List of team_ids that are still empty after the retry
+    """
+    if not failed_ids:
+        return {}, []
+
+    logging.info(f"[{entity_type}] Retrying {len(failed_ids)} failed team(s): {failed_ids}")
+    api = PBPStatsAPI(start_year=start_year, end_year=end_year)
+    recovered = {}
+    still_failed = []
+
+    for team_id in failed_ids:
+        logging.info(f"[{entity_type}] Team-level retry for {team_id}...")
+        time.sleep(wait_between)
+        result = api.get_team_game_logs(team_id, entity_type)
+
+        if result.empty:
+            still_failed.append(team_id)
+            logging.error(f"[{entity_type}] Team {team_id} still empty after team-level retry.")
+        else:
+            recovered[team_id] = result
+            logging.info(f"[{entity_type}] Team {team_id} recovered successfully.")
+
+    return recovered, still_failed
+
+
+def log_final_failures(entity_type: str, still_failed: List[str]) -> None:
+    """Logs a clear summary of teams that could not be fetched after all retries."""
+    if not still_failed:
+        logging.info(f"[{entity_type}] All teams fetched successfully.")
+        return
+
+    logging.error(
+        f"\n{'='*60}\n"
+        f"[{entity_type}] FINAL FAILURES — {len(still_failed)} team(s) could not be fetched:\n"
+        f"  {still_failed}\n"
+        f"These teams will NOT have updated {'VS' if entity_type == 'Opponent' else ''} files.\n"
+        f"Re-run the script or investigate the API for these IDs.\n"
+        f"{'='*60}"
+    )
+
+def _parse_dates_from_df(df: pd.DataFrame, label: str) -> Dict[int, datetime]:
+    """
+    Shared helper: extracts {team_id (int): max Date} from a DataFrame.
+    Handles float/string team_id coercion.
+    """
+    if df.empty or 'Date' not in df.columns:
+        return {}
+
+    df = df.copy()
+    df['Date'] = pd.to_datetime(df['Date'])
+
+    try:
+        df['team_id'] = df['team_id'].astype(int)
+    except Exception as e:
+        logging.warning(f"[{label}] Error converting team_id to int: {e}")
+        df['team_id'] = pd.to_numeric(df['team_id'], errors='coerce')
+        df = df.dropna(subset=['team_id'])
+        df['team_id'] = df['team_id'].astype(int)
+
+    return df.groupby('team_id')['Date'].max().to_dict()
+
 
 def get_latest_local_dates(year_dir: str) -> Dict[int, datetime]:
     """
-    Reads local CSVs to find the max date played for each team.
+    Reads local Team CSVs to find the max date played for each team.
     Returns: Dict {team_id (int): last_game_date (datetime)}
     """
-    local_dates = {}
     all_logs_path = os.path.join(year_dir, 'all_logs.csv')
     df = pd.DataFrame()
 
-    # 1. Try reading the master file
     if os.path.exists(all_logs_path):
         try:
             df = pd.read_csv(all_logs_path)
@@ -117,7 +215,6 @@ def get_latest_local_dates(year_dir: str) -> Dict[int, datetime]:
         except Exception as e:
             logging.warning(f"Could not read {all_logs_path}, scanning individual files. Error: {e}")
 
-    # 2. If master file is empty or missing, scan individual files
     if df.empty and os.path.exists(year_dir):
         logging.info("Scanning individual team files for dates...")
         files = [f for f in os.listdir(year_dir) if f.endswith('.csv') and 'vs' not in f and 'all_logs' not in f]
@@ -125,53 +222,86 @@ def get_latest_local_dates(year_dir: str) -> Dict[int, datetime]:
         for f in files:
             try:
                 temp_df = pd.read_csv(os.path.join(year_dir, f))
-                # If team_id is missing, grab from filename and force INT
                 if 'team_id' not in temp_df.columns:
-                     # Ensure we convert the filename part to int immediately
-                     try:
-                         tid = int(f.split('.')[0])
-                         temp_df['team_id'] = tid
-                     except ValueError:
-                         logging.warning(f"Could not parse team_id from filename {f}, skipping.")
-                         continue
+                    try:
+                        temp_df['team_id'] = int(f.split('.')[0])
+                    except ValueError:
+                        logging.warning(f"Could not parse team_id from filename {f}, skipping.")
+                        continue
                 frames.append(temp_df)
             except:
                 continue
         if frames:
             df = pd.concat(frames)
 
-    if not df.empty:
-        if 'Date' in df.columns:
-            df['Date'] = pd.to_datetime(df['Date'])
+    return _parse_dates_from_df(df, label="Team")
 
-            # --- FORCE INT TYPE FOR TEAM_ID ---
-            # This handles cases where it might be loaded as float (e.g. 1610612744.0) or string
+
+def get_latest_local_dates_vs(year_dir: str) -> Dict[int, datetime]:
+    """
+    Reads local Opponent (VS) CSVs to find the max date played for each team.
+    Returns: Dict {team_id (int): last_game_date (datetime)}
+    """
+    vs_all_logs_path = os.path.join(year_dir, 'vs_all_logs.csv')
+    df = pd.DataFrame()
+
+    if os.path.exists(vs_all_logs_path):
+        try:
+            df = pd.read_csv(vs_all_logs_path)
+            logging.info(f"Loaded existing local VS data from {vs_all_logs_path}")
+        except Exception as e:
+            logging.warning(f"Could not read {vs_all_logs_path}, scanning individual VS files. Error: {e}")
+
+    if df.empty and os.path.exists(year_dir):
+        logging.info("Scanning individual VS team files for dates...")
+        files = [f for f in os.listdir(year_dir) if f.endswith('.csv') and 'vs' in f and 'all_logs' not in f]
+        frames = []
+        for f in files:
             try:
-                df['team_id'] = df['team_id'].astype(int)
-            except Exception as e:
-                logging.warning(f"Error converting team_id to int: {e}")
-                # Fallback: try to coerce non-numeric to NaN then drop, then int
-                df['team_id'] = pd.to_numeric(df['team_id'], errors='coerce')
-                df = df.dropna(subset=['team_id'])
-                df['team_id'] = df['team_id'].astype(int)
+                temp_df = pd.read_csv(os.path.join(year_dir, f))
+                if 'team_id' not in temp_df.columns:
+                    try:
+                        # filenames are like 1610612746vs.csv
+                        temp_df['team_id'] = int(f.split('vs')[0])
+                    except ValueError:
+                        logging.warning(f"Could not parse team_id from VS filename {f}, skipping.")
+                        continue
+                frames.append(temp_df)
+            except:
+                continue
+        if frames:
+            df = pd.concat(frames)
 
-            max_dates = df.groupby('team_id')['Date'].max()
-            local_dates = max_dates.to_dict() # Dictionary keys are now Integers
+    return _parse_dates_from_df(df, label="Opponent")
 
-    return local_dates
+def _needs_update(team_id: int, local_dates: Dict[int, datetime], ref_max_dates: Dict[int, datetime]) -> Tuple[bool, str]:
+    """Returns (should_update, reason) for a single team/entity-type combination."""
+    ref_date = ref_max_dates.get(team_id)
+    local_date = local_dates.get(team_id)
 
-def get_teams_needing_update(reference_file: str, local_dates: Dict[int, datetime], all_team_ids: List[int], debug_mode: bool = True) -> List[int]:
+    if team_id not in local_dates:
+        return True, "No Local Data"
+    if team_id not in ref_max_dates or pd.isna(ref_date):
+        return True, "No Ref Data"
+    if ref_date > local_date:
+        return True, "Ref > Local"
+    return False, "Up to Date"
+
+
+def get_teams_needing_update(
+    reference_file: str,
+    local_dates: Dict[int, datetime],
+    local_dates_vs: Dict[int, datetime],
+    all_team_ids: List[int],
+    debug_mode: bool = True
+) -> Tuple[List[int], List[int]]:
     """
-    Compares reference dates (GitHub) vs Local dates.
-    Uses INTEGERS for team_ids to match correctly.
+    Compares reference dates vs local Team and Opponent dates independently.
+    Returns two lists: (teams_needing_team_update, teams_needing_opp_update)
     """
-    teams_to_scrape = []
-
     try:
         logging.info(f"Reading reference dates from {reference_file}...")
-
         ref_df = pd.read_csv(reference_file)
-
         ref_df.columns = [c.lower() for c in ref_df.columns]
 
         date_col = next((col for col in ref_df.columns if 'date' in col), None)
@@ -179,72 +309,54 @@ def get_teams_needing_update(reference_file: str, local_dates: Dict[int, datetim
 
         if not date_col or not team_col:
             logging.warning("Could not identify Date or Team columns in reference CSV. Scraping ALL teams.")
-            return all_team_ids
+            return all_team_ids, all_team_ids
 
-        # --- FIX: Convert integer YYYYMMDD to datetime ---
         if pd.api.types.is_numeric_dtype(ref_df[date_col]):
-             ref_df[date_col] = pd.to_datetime(ref_df[date_col].astype(str), format='%Y%m%d', errors='coerce')
+            ref_df[date_col] = pd.to_datetime(ref_df[date_col].astype(str), format='%Y%m%d', errors='coerce')
         else:
-             ref_df[date_col] = pd.to_datetime(ref_df[date_col], errors='coerce')
+            ref_df[date_col] = pd.to_datetime(ref_df[date_col], errors='coerce')
 
-        # --- FIX: Ensure Reference Team IDs are INTs ---
         ref_df[team_col] = ref_df[team_col].astype(int)
-
-        # Get max date per team (Key is INT)
         ref_max_dates = ref_df.groupby(team_col)[date_col].max().to_dict()
 
+        teams_team = []
+        teams_opp = []
+
         if debug_mode:
-            print(f"\n{'='*65}")
-            print(f"{'TEAM ID':<12} | {'LOCAL DATE':<12} | {'REF DATE':<12} | {'ACTION'}")
-            print(f"{'-'*65}")
+            print(f"\n{'='*95}")
+            print(f"{'TEAM ID':<12} | {'REF DATE':<12} | {'TEAM LOCAL':<12} | {'TEAM ACTION':<20} | {'OPP LOCAL':<12} | {'OPP ACTION'}")
+            print(f"{'-'*95}")
 
         for team_id in all_team_ids:
-            # team_id is already an INT from the master index list
-
-            should_update = False
-            reason = ""
-
             ref_date = ref_max_dates.get(team_id)
-            local_date = local_dates.get(team_id)
+            r_str = ref_date.strftime('%Y-%m-%d') if (ref_date and not pd.isna(ref_date)) else "None"
 
-            # Case 1: No local data at all -> UPDATE
-            if team_id not in local_dates:
-                should_update = True
-                reason = "No Local Data"
+            team_update, team_reason = _needs_update(team_id, local_dates, ref_max_dates)
+            opp_update, opp_reason = _needs_update(team_id, local_dates_vs, ref_max_dates)
 
-            # Case 2: No reference data -> Safety Update
-            elif team_id not in ref_max_dates or pd.isna(ref_date):
-                should_update = True
-                reason = "No Ref Data"
-
-            # Case 3: Reference date is newer than local date -> UPDATE
-            elif ref_date > local_date:
-                should_update = True
-                reason = "Ref > Local"
-
-            # Case 4: Up to date -> SKIP
-            else:
-                should_update = False
-                reason = "Up to Date"
-
-            if should_update:
-                teams_to_scrape.append(team_id)
+            if team_update:
+                teams_team.append(team_id)
+            if opp_update:
+                teams_opp.append(team_id)
 
             if debug_mode:
-                l_str = local_date.strftime('%Y-%m-%d') if local_date else "None"
-                r_str = ref_date.strftime('%Y-%m-%d') if (ref_date and not pd.isna(ref_date)) else "None"
-                action = "UPDATE" if should_update else "SKIP"
-                print(f"{team_id:<12} | {l_str:<12} | {r_str:<12} | {action} ({reason})")
+                local_date = local_dates.get(team_id)
+                local_date_vs = local_dates_vs.get(team_id)
+                tl_str = local_date.strftime('%Y-%m-%d') if local_date else "None"
+                ol_str = local_date_vs.strftime('%Y-%m-%d') if local_date_vs else "None"
+                t_action = f"UPDATE ({team_reason})" if team_update else "SKIP"
+                o_action = f"UPDATE ({opp_reason})" if opp_update else "SKIP"
+                print(f"{team_id:<12} | {r_str:<12} | {tl_str:<12} | {t_action:<20} | {ol_str:<12} | {o_action}")
 
         if debug_mode:
-            print(f"{'='*65}\n")
+            print(f"{'='*95}\n")
 
-        return teams_to_scrape
+        return teams_team, teams_opp
 
     except Exception as e:
         logging.error(f"Failed to fetch or parse reference dates: {e}")
         logging.warning("Defaulting to scraping ALL teams.")
-        return all_team_ids
+        return all_team_ids, all_team_ids
 
 if __name__ == "__main__":
     start_year = 2026
@@ -274,17 +386,29 @@ if __name__ == "__main__":
         logging.info(f"Using remote reference file: {reference_path}")
 
     local_dates_map = get_latest_local_dates(year_dir)
+    local_dates_vs_map = get_latest_local_dates_vs(year_dir)
 
-    teams_to_scrape = get_teams_needing_update(reference_path, local_dates_map, all_team_ids, debug_mode=True)
+    teams_needing_team, teams_needing_opp = get_teams_needing_update(
+        reference_path, local_dates_map, local_dates_vs_map, all_team_ids, debug_mode=True
+    )
 
     logging.info(f"Total Teams: {len(all_team_ids)}")
-    logging.info(f"Teams requiring update: {len(teams_to_scrape)}")
+    logging.info(f"Teams requiring Team update: {len(teams_needing_team)}")
+    logging.info(f"Teams requiring Opponent update: {len(teams_needing_opp)}")
 
-    if teams_to_scrape:
-        # Convert IDs back to string for the API Calls
-        teams_to_scrape_str = [str(t) for t in teams_to_scrape]
+    if teams_needing_team:
+        teams_to_scrape_str = [str(t) for t in teams_needing_team]
 
-        team_game_logs = fetch_all_teams_game_logs(teams_to_scrape_str, start_year, end_year, entity_type="Team")
+        # --- TEAM LOGS ---
+        team_game_logs, team_failed = fetch_all_teams_game_logs(
+            teams_to_scrape_str, start_year, end_year, entity_type="Team"
+        )
+
+        team_recovered, team_still_failed = retry_failed_teams(
+            team_failed, start_year, end_year, entity_type="Team"
+        )
+        team_game_logs.update(team_recovered)
+        log_final_failures("Team", team_still_failed)
 
         for team_id_str, games_df in team_game_logs.items():
             if not games_df.empty:
@@ -296,10 +420,24 @@ if __name__ == "__main__":
                         file_path = f"{year_dir}/{team_id_str}.csv"
                         team_df.to_csv(file_path, index=False)
                         logging.info(f"Updated file: {file_path}")
+    else:
+        logging.info("No teams need a Team log update.")
 
+    if teams_needing_opp:
+        # --- OPPONENT LOGS ---
         logging.info("Fetching Opponent logs for updated teams...")
         team_dict = get_team_abbreviations()
-        opp_game_logs = fetch_all_teams_game_logs(teams_to_scrape_str, start_year, end_year, entity_type="Opponent")
+
+        opp_teams_str = [str(t) for t in teams_needing_opp]
+        opp_game_logs, opp_failed = fetch_all_teams_game_logs(
+            opp_teams_str, start_year, end_year, entity_type="Opponent"
+        )
+
+        opp_recovered, opp_still_failed = retry_failed_teams(
+            opp_failed, start_year, end_year, entity_type="Opponent"
+        )
+        opp_game_logs.update(opp_recovered)
+        log_final_failures("Opponent", opp_still_failed)
 
         for team_id_str, games_df in opp_game_logs.items():
             if not games_df.empty:
@@ -309,12 +447,11 @@ if __name__ == "__main__":
                         team_df['team_id'] = team_id_str
                         if str(team_id_str) in team_dict:
                             team_df['team'] = team_dict[str(team_id_str)]
-
                         file_path = f"{year_dir}/{team_id_str}vs.csv"
                         team_df.to_csv(file_path, index=False)
                         logging.info(f"Updated VS file: {file_path}")
     else:
-        logging.info("No teams need updating.")
+        logging.info("No teams need an Opponent log update.")
 
     logging.info("Re-aggregating all files...")
 
