@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -373,7 +373,24 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 directory = "../totals"
 
+salaries=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/year_salaries.csv')
+salaries.rename(columns={'nba_id':'PLAYER_ID'},inplace=True)
 
+cap = pd.read_csv(
+    "https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/cap.csv"
+)
+
+# Keep only what you need
+cap = cap[["year", "Salary Cap"]]
+
+# Rename for sanity
+cap.rename(columns={"Salary Cap": "SALARY_CAP"}, inplace=True)
+
+# Match types
+cap["year"] = cap["year"].astype(int)
+
+# Optional safety
+cap = cap.drop_duplicates(subset=["year"])
 totals=pd.read_csv(total_path)
 totals.columns = totals.columns.str.replace(' ', '_')
 totals.rename(columns={'3SecondViolations':'ThreeSecondViolations'},inplace=True)
@@ -412,6 +429,24 @@ for year in range(start_year,end_year+1):
 
         yearframe['on-ball-time%'] = 100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['MIN'])
         yearframe['ON_BALL_TIME_PCT'] =  100 * 2 * (yearframe['TIME_OF_POSS']) / (yearframe['MIN'])
+    if year >= 2014 and trail == '':
+        salary_year = salaries[salaries.year == year][["PLAYER_ID", "year", "salary"]]
+        yearframe = yearframe.merge(
+        salary_year,
+        on=["PLAYER_ID", "year"],
+        how="left"
+                )
+        # Merge cap
+        yearframe = yearframe.merge(
+            cap,
+            on="year",
+            how="left"
+        )
+
+        # Compute salary % of cap
+        yearframe["SALARY_PCT_CAP"] = yearframe["salary"] / yearframe["SALARY_CAP"]
+
+
     if year>=2001:
 
         yearframe['Stops'] = (
@@ -474,7 +509,7 @@ modern = pd.concat(modern_years)
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 
 
-# In[4]:
+# In[ ]:
 
 
 modern['adjusted_trueshooting_pct'].value_counts()

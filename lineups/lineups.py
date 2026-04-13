@@ -203,8 +203,8 @@ df = pull_onoff(years,opp=False,ps=ps)
 df = pull_onoff(years,opp=True,ps=ps) 
 time.sleep(5)
 
-df = pull_onoff(years,opp=False,ps=ps) 
-df = pull_onoff(years,opp=True,ps=ps) 
+#df = pull_onoff(years,opp=False,ps=ps) 
+#df = pull_onoff(years,opp=True,ps=ps) 
 end_time = time.time()
 elapsed_time = end_time - start_time
 print(f"Time taken: {elapsed_time} seconds")
