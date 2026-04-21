@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
+# In[ ]:
 
 
 import pandas as pd
@@ -12,7 +12,7 @@ import glob
 import os
 import numpy as np
 
-ps=False
+ps=True
 
 SEASON_YEAR=2026
 avg = pd.read_csv('../team_totals/team_averages.csv')

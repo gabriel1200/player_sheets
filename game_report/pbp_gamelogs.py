@@ -21,10 +21,25 @@ from typing import List, Dict, Tuple
 import logging
 import os
 
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36 Edg/115.0.1901.183',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'DNT': '1',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'none',
+    'Sec-Fetch-User': '?1',
+    'Cache-Control': 'max-age=0',
+}
+
 class PBPStatsAPI:
     def __init__(self, start_year: int = 2013, end_year: int = 2024):
         self.base_url = "https://api.pbpstats.com/get-game-logs/nba?"
-        self.season_types = ["Regular Season"]
+        self.season_types = ["Playoffs"]
         self.start_year = start_year
         self.end_year = end_year    
 
@@ -49,7 +64,9 @@ class PBPStatsAPI:
                 max_retries = 3
                 for attempt in range(max_retries):
                     try:
-                        response = requests.get(self.base_url, params=params, timeout=10)
+                        print(self.base_url)
+                        print(params)
+                        response = requests.get(self.base_url, params=params, timeout=10,headers=headers)
                         response.raise_for_status()
                         data_response = response.json()
 

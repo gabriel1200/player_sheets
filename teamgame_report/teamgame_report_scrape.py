@@ -301,7 +301,7 @@ def get_dates(start_year,end_year,ps=False):
                 df['year']=year
                 dates.append(df)
     return pd.concat(dates)
-ps=False
+ps=True
 dateframe=get_dates(start_year,end_year,ps=ps)
 
 dates=dateframe['GAME_DATE'].unique().tolist()

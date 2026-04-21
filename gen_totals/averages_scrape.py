@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 from nba_api.stats.static import players,teams
@@ -387,7 +387,7 @@ def get_dates(start_year,end_year):
     return pd.concat(dates)
 start_year=2026
 end_year=start_year+1
-ps=False
+ps=True
 #dateframe=get_dates(start_year,end_year)
 #dates=dateframe['GAME_DATE'].unique().tolist()
 dates=[]

@@ -419,7 +419,7 @@ START_SEASON=2026
 start_year=START_SEASON
 end_year=start_year+1
 
-ps=False
+ps=True
 
 df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 #df= pull_game_avg(start_year,end_year,ps=True,unit='Team')
@@ -428,7 +428,7 @@ df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 df
 
 
-# In[9]:
+# In[ ]:
 
 
 import requests
@@ -633,7 +633,7 @@ scrape_teams_vs(ps=ps)
 scrape_teams(ps=ps)
 
 
-# In[10]:
+# In[ ]:
 
 
 import pandas as pd
@@ -667,7 +667,7 @@ playtype_test=get_playtype_summary()
 playtype_test.columns
 
 
-# In[11]:
+# In[ ]:
 
 
 trail = ''

@@ -384,7 +384,7 @@ def get_dates(start_year, end_year, ps=False):
                 print(f"Skipping {path}: {e}")
 
     return pd.concat(dates, ignore_index=True) if dates else pd.DataFrame()
-ps=False
+ps=True
 dateframe=get_dates(start_year,end_year,ps=ps)
 
 dates=dateframe['GAME_DATE'].unique().tolist()
