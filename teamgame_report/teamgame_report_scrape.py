@@ -301,7 +301,7 @@ def get_dates(start_year,end_year,ps=False):
                 df['year']=year
                 dates.append(df)
     return pd.concat(dates)
-ps=True
+ps=False
 dateframe=get_dates(start_year,end_year,ps=ps)
 
 dates=dateframe['GAME_DATE'].unique().tolist()
@@ -420,8 +420,8 @@ end_year=SEASON_YEAR+1
 
 for year in range(start_year, end_year):
     # Read CSV files for each year
-    pbp = pd.read_csv(f"../game_report/team/{year}all_logs.csv")
-    pbp_vs = pd.read_csv(f"../game_report/team/{year}vs_all_logs.csv")
+    pbp = pd.read_csv(f"../game_report/team/{year}/all_logs.csv")
+    pbp_vs = pd.read_csv(f"../game_report/team/{year}/vs_all_logs.csv")
     if ps ==False:
         pbp=pbp[pbp.SeasonType!='Playoffs']
 
