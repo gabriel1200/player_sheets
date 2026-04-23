@@ -39,7 +39,7 @@ headers = {
 class PBPStatsAPI:
     def __init__(self, start_year: int = 2013, end_year: int = 2024):
         self.base_url = "https://api.pbpstats.com/get-game-logs/nba?"
-        self.season_types = ["Regular Season"]
+        self.season_types = ["Playoffs"]
         self.start_year = start_year
         self.end_year = end_year    
 
