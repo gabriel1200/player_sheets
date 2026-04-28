@@ -53,6 +53,8 @@ cd ..
 
 cd teamgame_report
 python teamgame_report_scrape.py
+jupyter nbconvert --to script teamseries.ipynb
+python teamseries.py
 cd ..
 
 cd lineups

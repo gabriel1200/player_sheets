@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 from nba_api.stats.static import players,teams
@@ -428,7 +428,7 @@ df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 df
 
 
-# In[ ]:
+# In[2]:
 
 
 import requests
@@ -633,7 +633,7 @@ scrape_teams_vs(ps=ps)
 scrape_teams(ps=ps)
 
 
-# In[ ]:
+# In[3]:
 
 
 import pandas as pd
@@ -667,7 +667,7 @@ playtype_test=get_playtype_summary()
 playtype_test.columns
 
 
-# In[ ]:
+# In[4]:
 
 
 trail = ''
@@ -842,7 +842,7 @@ testdf.to_csv('team_averages_ps.csv', index=False)
 
 end_year=START_SEASON+1
 for year in range(2001, end_year):    
-    trail = ''
+    trail = 'ps'
     ps = True if trail == 'ps' else False
 
     pbp = pd.read_csv(str(year) + trail + '.csv')
@@ -905,7 +905,7 @@ for year in range(2001, end_year):
 
 
 
-# In[ ]:
+# In[6]:
 
 
 shooting_columns = [
@@ -972,7 +972,7 @@ shooting.to_csv('../../web_app/data/team_threes.csv',index=False)
 
 trail='ps'
 frames=[]
-for year in range(2001,end_year-1):
+for year in range(2001,end_year):
     df= pd.read_csv(str(year)+trail+'_team_totals.csv')
     df['year']=year
 
