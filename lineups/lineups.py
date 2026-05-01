@@ -92,12 +92,14 @@ def pull_onoff(years, opp=False, ps=False, force_refresh=False):
     if ps == False:
         player_index = pd.read_csv('index_master.csv')
     else:
-        player_index = pd.read_csv('index_master_ps.csv')
+        player_index=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/index_master_ps.csv')    
+
 
     player_index = player_index[player_index.team != 'TOT']
     player_index = player_index[player_index.year > 2000]
     # print(player_index[player_index.team_id.isna()]) # Optional debug
     player_index = player_index.drop_duplicates()
+    print(player_index[player_index.team_id.isna()])
     player_index['team_id'] = player_index['team_id'].astype(int)
     all_frames = []
 
@@ -644,7 +646,7 @@ def get_year(year,ps=False,vs=False):
     if ps == False:
         index=pd.read_csv('index_master.csv')
     else:
-        index=pd.read_csv('index_master_ps.csv')    
+        index=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/index_master_ps.csv')    
     index=index[index.year==year]
     index.dropna(subset='team_id',inplace=True)
     rows=[]
