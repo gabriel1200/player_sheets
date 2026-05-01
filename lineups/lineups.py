@@ -22,7 +22,7 @@ import glob
 start_time = time.time()
 SEASONYEAR=2026
 directory = "data/2026"
-ps = False
+ps = True
 
 # Use glob to find all CSV files in the directory
 csv_files = glob.glob(os.path.join(directory, "*.csv"))
