@@ -396,14 +396,14 @@ df
 df.drop_duplicates(subset=['PLAYER_ID','TEAM_ID','date'])
 
 
-# In[22]:
+# In[ ]:
 
 
 dates.sort()
 dates
 
 
-# In[23]:
+# In[ ]:
 
 
 '''
@@ -426,20 +426,23 @@ merge[merge.GAME_ID.isna()]
 '''
 
 
-# In[24]:
+# In[ ]:
 
 
 if ps==False:
     trail=''
+    url ='https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/index_master.csv'
 else:
     trail='ps'
+    url='https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/index_master_ps.csv'
 print(trail)
 frames= []
 count=0
-index_master=pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/index_master.csv')
+index_master=pd.read_csv(url)
 index_master=index_master[index_master.team!='TOT']
 index_master['team_id']=index_master['team_id'].astype(int)
 index_master['nba_id']=index_master['nba_id'].astype(int)
+
 
 
 game_dates= pd.read_csv('https://raw.githubusercontent.com/gabriel1200/shot_data/refs/heads/master/game_dates.csv')
@@ -525,8 +528,12 @@ for year in range(start_year,end_year):
             for missed_player in missing['PLAYER_ID'].unique().tolist():
                 missing_frame=missing[missing.PLAYER_ID==missed_player].reset_index(drop=True)
                 temp_index=year_index[year_index.nba_id==missed_player].reset_index(drop=True)
-                team_id=temp_index.iloc[1]['team_id']
-                team=temp_index.iloc[1]['team']
+                if len(temp_index) < 2:  # Guard: player doesn't have a 2nd team entry
+                    missed.append(missing_frame)  # Leave GAME_ID unresolved, let next block handle
+                    continue
+
+                team_id = temp_index.iloc[1]['team_id']
+                team = temp_index.iloc[1]['team']
                 missing_frame['TEAM_ID']=int(team_id)
                 missing_frame['TEAM_ABBREVIATION']=team
                 missing_frame= missing_frame.merge(to_merge,on=['TEAM_ID','date','year'],how='left')
@@ -542,11 +549,18 @@ for year in range(start_year,end_year):
             save_frame.dropna(subset='GAME_ID',inplace=True)
             missed=[]
 
+
             for missed_player in missing['PLAYER_ID'].unique().tolist():
-                missing_frame=missing[missing.PLAYER_ID==missed_player].reset_index(drop=True)
-                temp_index=year_index[year_index.nba_id==missed_player].reset_index(drop=True)
-                team_id=temp_index.iloc[2]['team_id']
-                team=temp_index.iloc[2]['team']
+                missing_frame = missing[missing.PLAYER_ID == missed_player].reset_index(drop=True)
+                temp_index = year_index[year_index.nba_id == missed_player].reset_index(drop=True)
+
+                if len(temp_index) < 3:  # Guard: player doesn't have a 3rd team entry
+                    missed.append(missing_frame)
+                    continue
+
+                team_id = temp_index.iloc[2]['team_id']
+                team = temp_index.iloc[2]['team']
+
                 missing_frame['TEAM_ID']=int(team_id)
                 missing_frame['TEAM_ABBREVIATION']=team
                 missing_frame= missing_frame.merge(to_merge,on=['TEAM_ID','date','year'],how='left')
@@ -559,6 +573,8 @@ for year in range(start_year,end_year):
             missing=save_frame[save_frame['GAME_ID'].isna()]
             print('test point')
             print(missing)
+            save_frame.dropna(subset='GAME_ID', inplace=True)  # <-- add this
+
 
         # Remove any duplicate entries after the merge.
         save_frame.drop_duplicates(inplace=True)
