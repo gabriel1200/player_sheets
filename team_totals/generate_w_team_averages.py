@@ -80,7 +80,7 @@ def generate_wteam_averages(start_year, end_year, ps=False):
             ft_oreb = df_t['FTOffRebounds'].sum()
 
             all_summary_stats.append({
-                'year': year + 1,
+                'year': year,
                 'season': season_str,
                 'ortg': points / poss,
                 'oreb%': oreb / (opp_dreb + oreb),
@@ -94,8 +94,8 @@ def generate_wteam_averages(start_year, end_year, ps=False):
             })
 
             # Save raw files with 'w' prefix to avoid NBA collisions
-            df_t.to_csv(f"{year+1}w{trail}.csv", index=False)
-            df_o.to_csv(f"{year+1}vsw{trail}.csv", index=False)
+            df_t.to_csv(f"{year}w{trail}.csv", index=False)
+            df_o.to_csv(f"{year}vsw{trail}.csv", index=False)
 
         except Exception as e:
             print(f"Error processing {season_str}: {e}")
@@ -112,4 +112,4 @@ def generate_wteam_averages(start_year, end_year, ps=False):
 
 # Example run
 generate_wteam_averages(2020, 2026, ps=False)
-generate_wteam_averages(2020, 2025, ps=True)
+generate_wteam_averages(2020, 2026, ps=True)
