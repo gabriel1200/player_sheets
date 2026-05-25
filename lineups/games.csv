@@ -9304,7 +9304,7 @@ nba_id,Player,year,G
 1630217.0,Desmond Bane,2026,7
 1630625.0,Dalano Banton,2026,2
 1631230.0,Dominick Barlow,2026,9
-203084.0,Harrison Barnes,2026,14
+203084.0,Harrison Barnes,2026,15
 1630567.0,Scottie Barnes,2026,7
 1629628.0,RJ Barrett,2026,7
 1642419.0,Jamison Battle,2026,6
@@ -9323,16 +9323,16 @@ nba_id,Player,year,G
 1628971.0,Bruce Brown,2026,6
 1627759.0,Jaylen Brown,2026,7
 1628973.0,Jalen Brunson,2026,13
-1642868.0,Carter Bryant,2026,13
+1642868.0,Carter Bryant,2026,14
 1628418.0,Thomas Bryant,2026,8
 1631288.0,Jamal Cain,2026,7
 1641739.0,Toumani Camara,2026,5
 203991.0,Clint Capela,2026,4
 1628975.0,Jevon Carter,2026,3
 1628976.0,Wendell Carter Jr.,2026,7
-1627936.0,Alex Caruso,2026,11
-1642264.0,Stephon Castle,2026,14
-1630577.0,Julian Champagnie,2026,14
+1627936.0,Alex Caruso,2026,12
+1642264.0,Stephon Castle,2026,15
+1630577.0,Julian Champagnie,2026,15
 1631321.0,Sidy Cissoko,2026,4
 1641740.0,Jaylen Clark,2026,6
 203903.0,Jordan Clarkson,2026,13
@@ -9347,7 +9347,7 @@ nba_id,Player,year,G
 1642885.0,Mohamed Diawara,2026,5
 1641711.0,Gradey Dick,2026,3
 1628978.0,Donte DiVincenzo,2026,4
-1629652.0,Luguentz Dort,2026,11
+1629652.0,Luguentz Dort,2026,12
 1630245.0,Ayo Dosunmu,2026,10
 203083.0,Andre Drummond,2026,11
 1642346.0,Ryan Dunn,2026,4
@@ -9361,10 +9361,10 @@ nba_id,Player,year,G
 203954.0,Joel Embiid,2026,7
 1627827.0,Dorian Finney-Smith,2026,4
 1642853.0,Rasheer Fleming,2026,4
-1628368.0,De'Aaron Fox,2026,12
+1628368.0,De'Aaron Fox,2026,13
 1630568.0,Luka Garza,2026,7
 202331.0,Paul George,2026,11
-1628983.0,Shai Gilgeous-Alexander,2026,11
+1628983.0,Shai Gilgeous-Alexander,2026,12
 1631221.0,Collin Gillespie,2026,4
 203497.0,Rudy Gobert,2026,12
 1642864.0,Hugo González,2026,4
@@ -9380,11 +9380,11 @@ nba_id,Player,year,G
 1642905.0,Yang Hansen,2026,4
 203501.0,Tim Hardaway Jr.,2026,6
 201935.0,James Harden,2026,17
-1642844.0,Dylan Harper,2026,14
+1642844.0,Dylan Harper,2026,15
 1631199.0,Ron Harper Jr.,2026,6
 202699.0,Tobias Harris,2026,14
 1628404.0,Josh Hart,2026,13
-1628392.0,Isaiah Hartenstein,2026,11
+1628392.0,Isaiah Hartenstein,2026,12
 1630573.0,Sam Hauser,2026,7
 1629637.0,Jaxson Hayes,2026,10
 1630703.0,Scoot Henderson,2026,5
@@ -9394,7 +9394,7 @@ nba_id,Player,year,G
 201950.0,Jrue Holiday,2026,5
 1641842.0,Ron Holland,2026,9
 1641747.0,DaRon Holmes,2026,2
-1631096.0,Chet Holmgren,2026,11
+1631096.0,Chet Holmgren,2026,12
 1641724.0,Jett Howard,2026,1
 1628989.0,Kevin Huerter,2026,5
 1630574.0,Ariel Hukporti,2026,7
@@ -9406,10 +9406,10 @@ nba_id,Player,year,G
 1642355.0,Bronny James,2026,8
 2544.0,LeBron James,2026,10
 1642450.0,Daniss Jenkins,2026,14
-1630198.0,Isaiah Joe,2026,10
+1630198.0,Isaiah Joe,2026,11
 1629661.0,Cameron Johnson,2026,6
 1630552.0,Jalen Johnson,2026,6
-1629640.0,Keldon Johnson,2026,14
+1629640.0,Keldon Johnson,2026,15
 203999.0,Nikola Jokić,2026,6
 1642461.0,Spencer Jones,2026,6
 1626145.0,Tyus Jones,2026,3
@@ -9418,7 +9418,7 @@ nba_id,Player,year,G
 1628467.0,Maxi Kleber,2026,3
 1642261.0,Dalton Knecht,2026,5
 1642278.0,Tyler Kolek,2026,7
-1628436.0,Luke Kornet,2026,14
+1628436.0,Luke Kornet,2026,15
 1630249.0,Vít Krejčí,2026,4
 1630228.0,Jonathan Kuminga,2026,6
 1642404.0,Chaz Lanier,2026,3
@@ -9430,10 +9430,10 @@ nba_id,Player,year,G
 1630572.0,Sandro Mamukelashvili,2026,7
 1630178.0,Tyrese Maxey,2026,11
 1630540.0,Miles McBride,2026,13
-1642272.0,Jared McCain,2026,11
+1642272.0,Jared McCain,2026,12
 203468.0,CJ McCollum,2026,6
 1630183.0,Jaden McDaniels,2026,12
-1629162.0,Jordan McLaughlin,2026,7
+1629162.0,Jordan McLaughlin,2026,8
 1630241.0,Sam Merrill,2026,16
 1642349.0,Ajay Mitchell,2026,11
 1628378.0,Donovan Mitchell,2026,17
@@ -9448,7 +9448,7 @@ nba_id,Player,year,G
 1626220.0,Royce O'Neale,2026,4
 1629006.0,Josh Okogie,2026,6
 1630168.0,Onyeka Okongwu,2026,6
-203482.0,Kelly Olynyk,2026,6
+203482.0,Kelly Olynyk,2026,7
 1626162.0,Kelly Oubre Jr.,2026,11
 1642869.0,Noah Penda,2026,1
 1641763.0,Julian Phillips,2026,5
@@ -9495,30 +9495,30 @@ nba_id,Player,year,G
 1641709.0,Ausar Thompson,2026,14
 1629680.0,Matisse Thybulle,2026,4
 1641772.0,Nae'Qwan Tomlin,2026,6
-1642260.0,Nikola Topić,2026,6
+1642260.0,Nikola Topić,2026,7
 1626157.0,Karl-Anthony Towns,2026,13
 1642281.0,Jaylon Tyson,2026,16
 202685.0,Jonas Valančiūnas,2026,4
 1629020.0,Jarred Vanderbilt,2026,7
-1630170.0,Devin Vassell,2026,14
+1630170.0,Devin Vassell,2026,15
 1629216.0,Gabe Vincent,2026,6
 202696.0,Nikola Vučević,2026,6
 1629731.0,Dean Wade,2026,17
 1630532.0,Franz Wagner,2026,4
 1629021.0,Moritz Wagner,2026,2
 1631133.0,Jabari Walker,2026,6
-1641717.0,Cason Wallace,2026,11
+1641717.0,Cason Wallace,2026,12
 1630811.0,Keaton Wallace,2026,3
 1641775.0,Jordan Walsh,2026,7
 1642266.0,Ja'Kobe Walter,2026,7
-1630322.0,Lindy Waters III,2026,7
+1630322.0,Lindy Waters III,2026,8
 1630570.0,Trendon Watford,2026,7
-1641705.0,Victor Wembanyama,2026,13
+1641705.0,Victor Wembanyama,2026,14
 1631104.0,Blake Wesley,2026,4
 1628401.0,Derrick White,2026,7
-1630598.0,Aaron Wiggins,2026,10
+1630598.0,Aaron Wiggins,2026,11
 1642873.0,Amari Williams,2026,1
 1631114.0,Jalen Williams,2026,4
-1631119.0,Jaylin Williams,2026,11
-1629026.0,Kenrich Williams,2026,7
+1631119.0,Jaylin Williams,2026,12
+1629026.0,Kenrich Williams,2026,8
 1629057.0,Robert Williams,2026,5
