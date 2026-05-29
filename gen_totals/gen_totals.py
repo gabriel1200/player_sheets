@@ -368,7 +368,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[6]:
+# In[ ]:
 
 
 directory = "../totals"
@@ -495,6 +495,27 @@ for year in range(start_year,end_year+1):
 
         yearframe=player_factors(yearframe,year)
 
+        if trail == '_ps':
+            reg_season_path = f'../year_totals/{year}.csv'
+            try:
+                # Load the regular season file for the current year
+                reg_season_df = pd.read_csv(reg_season_path)
+
+                # Verify 'Pos' exists, then extract and merge
+                if 'Pos' in reg_season_df.columns:
+                    # Keep only the ID and Position, drop any duplicates just in case
+                    player_positions = reg_season_df[['PLAYER_ID', 'Pos']].drop_duplicates()
+
+                    # Merge 'Pos' into the postseason yearframe
+                    yearframe = yearframe.merge(player_positions, on='PLAYER_ID', how='left')
+            except FileNotFoundError:
+                print(f"Warning: {reg_season_path} not found. 'Pos' could not be appended.")
+        # ======================================================
+
+        # Sort and save
+        yearframe.sort_values(by=['Points', 'Minutes'], inplace=True)
+        print('Saving to ' + '../year_totals/' + str(year) + trail + '.csv')
+        # ... (rest of your save logic)
         # Sort and save
     yearframe.sort_values(by=['Points', 'Minutes'], inplace=True)
     print('Saving to ' + '../year_totals/' + str(year) + trail + '.csv')
