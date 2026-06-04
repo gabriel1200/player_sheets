@@ -12,7 +12,7 @@ import glob
 import os
 import numpy as np
 
-ps=True
+ps=False
 
 SEASON_YEAR=2026
 avg = pd.read_csv('../team_totals/team_averages.csv')
@@ -355,7 +355,7 @@ perc_save(data,ps=ps)
 total_save(data,ps=ps)
 
 
-# In[5]:
+# In[2]:
 
 
 data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
@@ -368,7 +368,7 @@ data[data.PLAYER_NAME.str.upper()=='KEVIN DURANT']
 
 
 
-# In[ ]:
+# In[3]:
 
 
 directory = "../totals"
@@ -405,6 +405,7 @@ for year in range(start_year,end_year+1):
     print(year)
 
     yearframe=totals[totals.year==year].reset_index(drop=True)
+    yearframe['FT_RATE']=100*yearframe['FTA']/yearframe['FGA']
     if trail =='' and year>=2010:
         lebronyear=lebron[lebron.year==year].reset_index(drop=True)
 
@@ -530,7 +531,7 @@ modern = pd.concat(modern_years)
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 
 
-# In[7]:
+# In[4]:
 
 
 modern['adjusted_trueshooting_pct'].value_counts()
