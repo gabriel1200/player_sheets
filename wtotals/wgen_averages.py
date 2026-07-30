@@ -456,9 +456,9 @@ def get_dates(start_year,end_year):
             df.drop_duplicates(inplace=True)
             dates.append(df)
     return pd.concat(dates)
-start_year=2009
-end_year=2026
-ps=True
+start_year=2026
+end_year=2027
+ps=False
 #dateframe=get_dates(start_year,end_year)
 #dates=dateframe['GAME_DATE'].unique().tolist()
 dates=[]
