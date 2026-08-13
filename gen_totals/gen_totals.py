@@ -3,8 +3,6 @@
 
 # In[ ]:
 
-
-import pandas as pd
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -12,9 +10,9 @@ import glob
 import os
 import numpy as np
 
-ps=False
+ps = False
 
-SEASON_YEAR=2026
+SEASON_YEAR = 2026
 avg = pd.read_csv('../team_totals/team_averages.csv')
 
 # Convert necessary columns to integers
@@ -38,39 +36,38 @@ missing_data = pd.DataFrame({
 AVERAGE = pd.concat([avg, missing_data], ignore_index=True)
 
 
-
-
 def collect_yeardata(ps=False):
     frames = []
-    trail=''
-    if ps ==True:
-        trail='_ps'
+    trail = ''
+    if ps == True:
+        trail = '_ps'
     end_year = SEASON_YEAR
-    for year in range(1997,end_year+1):
-        file= str(year)+trail+'_avg.csv'
+    for year in range(1997, end_year + 1):
+        file = str(year) + trail + '_avg.csv'
 
         df = pd.read_csv(file)
-        df['PLAYER_ID']=df['PLAYER_ID'].astype(str)
+        df['PLAYER_ID'] = df['PLAYER_ID'].astype(str)
 
-        if year >2000:
-            df2=pd.read_csv(str(year)+trail+'_pbp'+'.csv')
+        if year > 2000:
+            df2 = pd.read_csv(str(year) + trail + '_pbp' + '.csv')
 
-            df2.rename(columns={'EntityId':'PLAYER_ID'},inplace=True)
+            df2.rename(columns={'EntityId': 'PLAYER_ID'}, inplace=True)
 
-            curcol =[col.lower() for col in df.columns]
-            keepcol =[col for col in df2.columns if col.lower() not in curcol]
+            curcol = [col.lower() for col in df.columns]
+            keepcol = [col for col in df2.columns if col.lower() not in curcol]
             keepcol.append('PLAYER_ID')
             keepcol.append('year')
-            df2=df2[keepcol]
-            df2['PLAYER_ID']=df2['PLAYER_ID'].astype(str)
+            df2 = df2[keepcol]
+            df2['PLAYER_ID'] = df2['PLAYER_ID'].astype(str)
             if ps:
-                df2['year']=df2['year'].str.split('_').str[0].astype(int)
+                df2['year'] = df2['year'].str.split('_').str[0].astype(int)
 
-            df=df.merge(df2,on=['PLAYER_ID','year'],how='left')
-        df['year']=year
+            df = df.merge(df2, on=['PLAYER_ID', 'year'], how='left')
+        df['year'] = year
         frames.append(df)
 
     return pd.concat(frames)
+
 sum_metrics = [
     "MIN", "FGM", "FGA", "FG3M", "FG3A", "FTM", "FTA", "OREB", "DREB", "REB",
     "AST", "TOV", "STL", "BLK", "BLKA", "PF", "PFD", "PTS", "PLUS_MINUS", 
@@ -114,20 +111,20 @@ sum_metrics = [
     "PULL_UP_FG3M", "PAINT_TOUCH_PTS", "ELBOW_TOUCH_PTS", "POST_TOUCH_PTS", 
     "CATCH_SHOOT_PTS", "FGM_LT_06", "FGA_LT_06", "PLUSMINUS", "CATCH_SHOOT_FG3M", "CATCH_SHOOT_FG3A", 
     "CATCH_SHOOT_FGA", "CATCH_SHOOT_FGM", "NBA_FANTASY_PTS",
-
-    'more_15ft_def_REB_CHANCE_DEFER', 'less_10ft_def_PLUSMINUS', 'two_pt_def_FG2A', 'hustle_LOOSE_BALLS_RECOVERED', 'DIST_FEET', 
+    'less_10ft_def_PLUSMINUS', 'two_pt_def_FG2A', 'hustle_LOOSE_BALLS_RECOVERED', 'DIST_FEET', 
     'less_6ft_def_PLUSMINUS', 'DIST_MILES_DEF', 'post_touch_POST_TOUCH_FOULS', 'two_pt_def_FG2M', 'three_pt_def_FG3M', 'post_touch_POST_TOUCH_FGM', 
-    'hustle_BOX_OUTS', 'hustle_DEF_BOXOUTS', 'post_touch_POST_TOUCH_TOV', 'DIST_MILES', 'more_15ft_def_AVG_OREB_DIST', 'more_15ft_def_DREB_UNCONTEST', 
-    'AVG_SPEED_DEF', 'more_15ft_def_AVG_DREB_DIST', 'more_15ft_def_AVG_REB_DIST', 'post_touch_POST_TOUCH_PASSES', 'hustle_OFF_BOXOUTS', 'hustle_SCREEN_ASSISTS', 
-    'less_6ft_def_FGM_LT_06', 'more_15ft_def_OREB', 'hustle_CONTESTED_SHOTS_2PT', 'hustle_BOX_OUT_PLAYER_REBS', 'D_FGA', 'more_15ft_def_DREB', 'post_touch_POST_TOUCH_FGA', 
-    'post_touch_TOUCHES', 'hustle_OFF_LOOSE_BALLS_RECOVERED', 'less_10ft_def_FGM_LT_10', 'more_15ft_def_DREB_CHANCES', 'more_15ft_def_OREB_CONTEST', 'AVG_SPEED', 'team_poss',
-      'D_FGM', 'post_touch_POST_TOUCH_FTM', 'three_pt_def_PLUSMINUS', 'more_15ft_def_OREB_UNCONTEST', 'AVG_SPEED_OFF', 'more_15ft_def_REB', 'more_15ft_def_DREB_CONTEST', 
-      'hustle_CHARGES_DRAWN', 'less_6ft_def_FGA_LT_06',  'more_15ft_def_OREB_CHANCES', 'hustle_BOX_OUT_PLAYER_TEAM_REBS', 'hustle_CONTESTED_SHOTS_3PT',
-        'more_15ft_def_REB_CONTEST', 'post_touch_POST_TOUCHES', 'three_pt_def_FG3A',  'hustle_CONTESTED_SHOTS',
-      'hustle_DEFLECTIONS', 'more_15ft_def_DREB_CHANCE_DEFER','post_touch_POST_TOUCH_AST', 
-'hustle_SCREEN_AST_PTS', 'post_touch_POST_TOUCH_FTA', 'more_15ft_def_OREB_CHANCE_DEFER', 'less_10ft_def_FGA_LT_10',
- 'post_touch_POST_TOUCH_PTS', 'hustle_DEF_LOOSE_BALLS_RECOVERED', 'DIST_MILES_OFF', 'more_15ft_def_REB_UNCONTEST', 'more_15ft_def_REB_CHANCES'
+    'hustle_BOX_OUTS', 'hustle_DEF_BOXOUTS', 'post_touch_POST_TOUCH_TOV', 'DIST_MILES', 
+    'AVG_SPEED_DEF', 'post_touch_POST_TOUCH_PASSES', 'hustle_OFF_BOXOUTS', 'hustle_SCREEN_ASSISTS', 
+    'less_6ft_def_FGM_LT_06', 'hustle_CONTESTED_SHOTS_2PT', 'hustle_BOX_OUT_PLAYER_REBS', 'D_FGA', 'post_touch_POST_TOUCH_FGA', 
+    'post_touch_TOUCHES', 'hustle_OFF_LOOSE_BALLS_RECOVERED', 'less_10ft_def_FGM_LT_10', 'AVG_SPEED', 'team_poss',
+    'D_FGM', 'post_touch_POST_TOUCH_FTM', 'three_pt_def_PLUSMINUS', 'AVG_SPEED_OFF', 
+    'hustle_CHARGES_DRAWN', 'less_6ft_def_FGA_LT_06', 'hustle_BOX_OUT_PLAYER_TEAM_REBS', 'hustle_CONTESTED_SHOTS_3PT',
+    'post_touch_POST_TOUCHES', 'three_pt_def_FG3A', 'hustle_CONTESTED_SHOTS',
+    'hustle_DEFLECTIONS', 'post_touch_POST_TOUCH_AST', 
+    'hustle_SCREEN_AST_PTS', 'post_touch_POST_TOUCH_FTA', 'less_10ft_def_FGA_LT_10',
+    'post_touch_POST_TOUCH_PTS', 'hustle_DEF_LOOSE_BALLS_RECOVERED', 'DIST_MILES_OFF'
 ]
+
 pct_metrics = [
     "W_PCT",                "FG_PCT",             "FG3_PCT",            "FT_PCT",
     "TM_TOV_PCT",          "REB_PCT",           "AST_PCT",           "DREB_PCT",
@@ -147,14 +144,15 @@ pct_metrics = [
     "CATCH_SHOOT_FG_PCT",  "PAINT_TOUCH_FG_PCT", "POST_TOUCH_FG_PCT",  "EFF_FG_PCT",
     "LT_06_PCT",           "NS_LT_06_PCT",      "CATCH_SHOOT_FG3_PCT","CATCH_SHOOT_EFG_PCT",
     'hustle_PCT_BOX_OUTS_TEAM_REB', 'post_touch_POST_TOUCH_AST_PCT', 'post_touch_POST_TOUCH_FG_PCT', 'D_FG_PCT',
-      'post_touch_POST_TOUCH_PTS_PCT', 'more_15ft_def_OREB_CHANCE_PCT_ADJ', 'PCT_PLUSMINUS', 'post_touch_POST_TOUCH_TOV_PCT',
-        'less_6ft_def_LT_06_PCT', 'more_15ft_def_REB_CHANCE_PCT_ADJ', 'hustle_PCT_LOOSE_BALLS_RECOVERED_OFF', 'post_touch_POST_TOUCH_FOULS_PCT', 
-        'three_pt_def_FREQ', 'more_15ft_def_DREB_CHANCE_PCT_ADJ', 'less_6ft_def_NS_LT_06_PCT', 'three_pt_def_FG3_PCT', 'more_15ft_def_REB_CHANCE_PCT', 
-        'post_touch_POST_TOUCH_PASSES_PCT', 'three_pt_def_NS_FG3_PCT', 'more_15ft_def_OREB_CONTEST_PCT', 'two_pt_def_FG2_PCT', 'less_10ft_def_FREQ',
-          'less_10ft_def_NS_LT_10_PCT', 'NORMAL_FG_PCT', 'less_6ft_def_FREQ', 'more_15ft_def_DREB_CONTEST_PCT', 'more_15ft_def_REB_CONTEST_PCT', 
-          'two_pt_def_FREQ', 'hustle_PCT_LOOSE_BALLS_RECOVERED_DEF', 'post_touch_POST_TOUCH_FT_PCT', 'hustle_PCT_BOX_OUTS_REB', 'hustle_PCT_BOX_OUTS_DEF',
-            'more_15ft_def_OREB_CHANCE_PCT', 'hustle_PCT_BOX_OUTS_OFF', 'two_pt_def_NS_FG2_PCT', 'more_15ft_def_DREB_CHANCE_PCT', 'less_10ft_def_LT_10_PCT'
+    'post_touch_POST_TOUCH_PTS_PCT', 'PCT_PLUSMINUS', 'post_touch_POST_TOUCH_TOV_PCT',
+    'less_6ft_def_LT_06_PCT', 'hustle_PCT_LOOSE_BALLS_RECOVERED_OFF', 'post_touch_POST_TOUCH_FOULS_PCT', 
+    'three_pt_def_FREQ', 'less_6ft_def_NS_LT_06_PCT', 'three_pt_def_FG3_PCT', 
+    'post_touch_POST_TOUCH_PASSES_PCT', 'three_pt_def_NS_FG3_PCT', 'two_pt_def_FG2_PCT', 'less_10ft_def_FREQ',
+    'less_10ft_def_NS_LT_10_PCT', 'NORMAL_FG_PCT', 'less_6ft_def_FREQ', 
+    'two_pt_def_FREQ', 'hustle_PCT_LOOSE_BALLS_RECOVERED_DEF', 'post_touch_POST_TOUCH_FT_PCT', 'hustle_PCT_BOX_OUTS_REB', 'hustle_PCT_BOX_OUTS_DEF',
+    'hustle_PCT_BOX_OUTS_OFF', 'two_pt_def_NS_FG2_PCT', 'less_10ft_def_LT_10_PCT'
 ]
+
 pbp_columns = [
     "TeamId", "Name", "ShortName", "RowId",  "SecondsPlayed",
     "GamesPlayed", "Minutes", "PlusMinus", "OffPoss", "DefPoss", "PenaltyOffPoss", "PenaltyDefPoss",
@@ -212,8 +210,6 @@ pbp_columns = [
     "Clear Path Fouls", "HeaveMakes", "3SecondViolations", "Period1Fouls3Minutes", "Period3Fouls5Minutes",
     "Period2Fouls4Minutes"
 ]
-
-
 index_col=["PLAYER_ID","PLAYER_NAME","W","GP","year","POSS","TEAM_ABBREVIATION","TEAM_ID","AGE",'PLAYER_HEIGHT_INCHES', 'PLAYER_WEIGHT', 'COLLEGE',
        'COUNTRY', 'DRAFT_YEAR', 'DRAFT_ROUND', 'DRAFT_NUMBER']
 other_col = index_col+sum_metrics+pct_metrics
@@ -528,6 +524,7 @@ for year in range(start_year,end_year+1):
     if year>=2014:
         modern_years.append(yearframe)
 modern = pd.concat(modern_years)
+
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
 
 

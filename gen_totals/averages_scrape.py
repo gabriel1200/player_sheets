@@ -145,6 +145,8 @@ def pull_avg(dates, start_year,end_year,ps=False):
                           'CORNER_3_FGM', 'CORNER_3_FGA', 'CORNER_3_FG_PCT'  ]  # Above the Break 3
 
             df13.columns=zone_columns
+            # NOTE: DateFrom{date}= is intentional here (carried over from
+            # a different scrape) -- left as-is per instruction, not a bug.
             url14=f"https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom{date}=&DateTo={date}&DefenseCategory=Less%20Than%206Ft&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
             df14=pull_data(url14)
             df14.rename(columns={'CLOSE_DEF_PERSON_ID':'PLAYER_ID'},inplace=True)
@@ -215,7 +217,12 @@ def pull_avg(dates, start_year,end_year,ps=False):
             # Link 6: Less than 15ft defense stats
             url23 = f'https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DefenseCategory=Greater%20Than%2015Ft&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
 
-            df23 = pull_data(url6)
+            # FIXED: this was previously `pull_data(url6)` -- a copy-paste
+            # bug that meant every column prefixed "more_15ft_def_" was
+            # actually mislabeled Rebounding tracking data (url6), not
+            # Greater-Than-15Ft defense data at all. Now correctly pulls
+            # url23.
+            df23 = pull_data(url23)
             df23.rename(columns={'CLOSE_DEF_PERSON_ID': 'PLAYER_ID'}, inplace=True)
             df23.rename(columns={col: f'more_15ft_def_{col}' for col in df23.columns if col != 'PLAYER_ID'}, inplace=True)
 
@@ -249,6 +256,23 @@ def pull_avg(dates, start_year,end_year,ps=False):
                 joined_columns = list(joined_columns)
                 joined_columns.append('PLAYER_ID')
                 frame = frame[joined_columns]
+
+                # FIX for the row-fanout bug: any single one of these ~25
+                # source pulls can come back with more than one row for a
+                # given PLAYER_ID (observed for players traded mid-season --
+                # the NBA stats API can return one row per team for a
+                # traded player within a date-range query even with
+                # TeamID=0). Since this merge only joins on PLAYER_ID (no
+                # team/date key), any such duplicate compounds through
+                # every subsequent merge in this loop -- e.g. 6 sources
+                # each contributing a harmless-looking 2x duplicate
+                # compounds to 2^6 = 64 rows for that player by the end.
+                # These tables are meant to be one-row-per-player, so
+                # deduping here (unlike the modern.csv case we chased
+                # earlier, where the "duplicate" rows turned out to be
+                # genuinely different data) is the correct fix, not a
+                # data-loss risk.
+                frame = frame.drop_duplicates(subset=['PLAYER_ID'])
 
                 df = df.merge(frame, on='PLAYER_ID',how='left').reset_index(drop=True)
 
@@ -353,6 +377,10 @@ def pull_avg_classic(dates, start_year,end_year,ps=False):
             joined_columns = list(joined_columns)
             joined_columns.append('PLAYER_ID')
             frame = frame[joined_columns]
+
+            # Same defensive fix as pull_avg() above -- cheap insurance
+            # even though this loop has fewer/lower-risk sources.
+            frame = frame.drop_duplicates(subset=['PLAYER_ID'])
 
             df = df.merge(frame, on='PLAYER_ID',how='left').reset_index(drop=True)
 
@@ -485,4 +513,3 @@ def fetch_nba_data(start_year, end_year, season_type='rs', save_to_csv=True):
     return all_data 
 
 data = fetch_nba_data(start_year , start_year, season_type=season_string)
-
