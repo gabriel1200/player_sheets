@@ -68,15 +68,14 @@ def run_repair_2023(file_path=TARGET_FILE, year=2023, ps=False):
         return
 
     os.makedirs(CACHE_DIR, exist_ok=True)
-    print(f"--- Launching Isolated Checkpoint Repair for {file_path} ---")
+    print(f"--- Launching Standardized Repair for {file_path} ---")
     df_main = pd.read_csv(file_path, low_memory=False)
     df_main['date'] = df_main['date'].astype(int)
 
-    # 1. Clean out stale/broken column names
+    # 1. Clean out any stale/broken column names
     drop_candidates = [c for c in df_main.columns if 
                        c.startswith('overall_def_') or 
                        c.startswith('pullup_') or 
-                       c.startswith('PULL_UP_') or 
                        c.startswith('lt6ft_') or
                        c.startswith('D_FGM') or c.startswith('D_FGA') or c.startswith('D_FG_PCT') or
                        c == 'team_poss']
@@ -104,18 +103,17 @@ def run_repair_2023(file_path=TARGET_FILE, year=2023, ps=False):
         date_str = format_date_to_url(date_num)
         print(f"[{idx}/{len(remaining_dates)}] Fetching Date {date_num}...")
 
-        # 1. Pullups (df11)
+        # 1. Pullups (Canonical PULL_UP_* naming)
         url_pullup = f"https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=Totals&PlayerExperience=&PlayerOrTeam=Player&PlayerPosition=&PtMeasureType=PullUpShot&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
         df_pullup = pull_data(url_pullup)
         if not df_pullup.empty and 'PLAYER_ID' in df_pullup.columns:
-            ignore = {'PLAYER_ID', 'PLAYER_NAME', 'TEAM_ID', 'TEAM_ABBREVIATION', 'GP', 'W', 'L', 'MIN'}
-            cols = [c for c in df_pullup.columns if c not in ignore]
-            df_pullup.rename(columns={c: f'pullup_{c}' for c in cols}, inplace=True)
-            df_pullup = df_pullup[['PLAYER_ID'] + [f'pullup_{c}' for c in cols]]
+            ignore = {'PLAYER_NAME', 'TEAM_ID', 'TEAM_ABBREVIATION', 'GP', 'W', 'L', 'MIN', 'AGE'}
+            cols = [c for c in df_pullup.columns if c not in ignore and c != 'PLAYER_ID']
+            df_pullup = df_pullup[['PLAYER_ID'] + cols]
         else:
             df_pullup = pd.DataFrame(columns=['PLAYER_ID'])
 
-        # 2. Overall Defense (df18)
+        # 2. Overall Defense
         url_def_overall = f"https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}&DefenseCategory=Overall&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
         df_def = pull_data(url_def_overall)
         if not df_def.empty and 'CLOSE_DEF_PERSON_ID' in df_def.columns:
@@ -127,7 +125,7 @@ def run_repair_2023(file_path=TARGET_FILE, year=2023, ps=False):
         else:
             df_def = pd.DataFrame(columns=['PLAYER_ID'])
 
-        # 3. Less Than 6Ft Defense (df14)
+        # 3. Less Than 6Ft Defense
         url_def_6ft = f"https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}&DefenseCategory=Less%20Than%206Ft&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
         df_6ft = pull_data(url_def_6ft)
         if not df_6ft.empty and 'CLOSE_DEF_PERSON_ID' in df_6ft.columns:
@@ -139,7 +137,7 @@ def run_repair_2023(file_path=TARGET_FILE, year=2023, ps=False):
         else:
             df_6ft = pd.DataFrame(columns=['PLAYER_ID'])
 
-        # 4. Team Possessions (df17)
+        # 4. Team Possessions
         url_poss = f"https://stats.nba.com/stats/leaguedashteamstats?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&MeasureType=Advanced&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
         df_poss = pull_data(url_poss)
 
@@ -154,7 +152,7 @@ def run_repair_2023(file_path=TARGET_FILE, year=2023, ps=False):
         day_patch = day_patch.merge(df_def, on='PLAYER_ID', how='left')
         day_patch = day_patch.merge(df_6ft, on='PLAYER_ID', how='left')
 
-        # 5. Hustle Stats (df24)
+        # 5. Hustle Stats
         url_hustle = f"https://stats.nba.com/stats/leaguehustlestatsplayer?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=PerGame&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&TeamID=0&VsConference=&VsDivision=&Weight="
         df_hustle = pull_data(url_hustle)
         if not df_hustle.empty and 'PLAYER_ID' in df_hustle.columns:
@@ -163,20 +161,20 @@ def run_repair_2023(file_path=TARGET_FILE, year=2023, ps=False):
             df_hustle.rename(columns={c: f'hustle_{c}' for c in cols}, inplace=True)
             day_patch = day_patch.merge(df_hustle[['PLAYER_ID'] + [f'hustle_{c}' for c in cols]], on='PLAYER_ID', how='left')
 
-        # 6. Post Touches (df25)
+        # 6. Post Touches
         url_post = f"https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&PlayerExperience=&PlayerOrTeam=Player&PlayerPosition=&PtMeasureType=PostTouch&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
         df_post = pull_data(url_post)
         if not df_post.empty and 'PLAYER_ID' in df_post.columns:
-            ignore = {'PLAYER_ID', 'PLAYER_NAME', 'TEAM_ID', 'TEAM_ABBREVIATION', 'GP', 'W', 'L', 'MIN'}
+            ignore = {'PLAYER_ID', 'PLAYER_NAME', 'TEAM_ID', 'TEAM_ABBREVIATION', 'GP', 'W', 'L', 'MIN', 'AGE'}
             cols = [c for c in df_post.columns if c not in ignore]
             df_post.rename(columns={c: f'post_touch_{c}' for c in cols}, inplace=True)
             day_patch = day_patch.merge(df_post[['PLAYER_ID'] + [f'post_touch_{c}' for c in cols]], on='PLAYER_ID', how='left')
 
-        # 7. Speed & Distance (df26)
+        # 7. Speed & Distance
         url_speed = f"https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&PlayerExperience=&PlayerOrTeam=Player&PlayerPosition=&PtMeasureType=SpeedDistance&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
         df_speed = pull_data(url_speed)
         if not df_speed.empty and 'PLAYER_ID' in df_speed.columns:
-            ignore = {'PLAYER_ID', 'PLAYER_NAME', 'TEAM_ID', 'TEAM_ABBREVIATION', 'GP', 'W', 'L', 'MIN'}
+            ignore = {'PLAYER_ID', 'PLAYER_NAME', 'TEAM_ID', 'TEAM_ABBREVIATION', 'GP', 'W', 'L', 'MIN', 'AGE'}
             cols = [c for c in df_speed.columns if c not in ignore]
             day_patch = day_patch.merge(df_speed[['PLAYER_ID'] + cols], on='PLAYER_ID', how='left')
 
@@ -185,7 +183,7 @@ def run_repair_2023(file_path=TARGET_FILE, year=2023, ps=False):
         # Save date to its own isolated file
         date_cache_file = os.path.join(CACHE_DIR, f"{date_num}.csv")
         day_patch.to_csv(date_cache_file, index=False)
-        print(f"  [✓] Isolated save for {date_num} ({len(day_patch)} rows)")
+        print(f"  [✓] Checkpointed {date_num} ({len(day_patch)} rows)")
 
     # 4. Assemble All Cached Files
     print(f"\nAll dates processed! Combining cached files from {CACHE_DIR}...")
