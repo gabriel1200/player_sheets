@@ -4,6 +4,7 @@ import sys
 import pandas as pd
 from nba_api.stats.static import teams
 
+# Standardized sentinel map
 SENTINEL_MAP = {
     'Base Stats': 'PTS',
     'Advanced': 'OFF_RATING',
@@ -12,10 +13,10 @@ SENTINEL_MAP = {
     'Possessions Tracking': 'TOUCHES',
     'Rebounding Tracking': 'REB_CHANCES',
     'Shot Splits (Open)': 'open_FGA',
-    'Pullups': 'pullup_PULL_UP_FGA',
-    'Overall Defense': 'overall_def_D_FGA',
+    'Pullups': ['PULL_UP_FGA', 'pullup_PULL_UP_FGA', 'pullup_FGA'],  # Flexible matching
+    'Overall Defense': ['overall_def_D_FGA', 'overall_def_FREQ'],
     'Hustle Stats': 'hustle_CONTESTED_SHOTS',
-    'Post Touches': 'post_touch_POST_TOUCHES',
+    'Post Touches': ['post_touch_POST_TOUCHES', 'POST_TOUCHES'],
     'Speed & Dist': 'DIST_FEET',
     'Team Possessions': 'team_poss'
 }
@@ -56,13 +57,27 @@ def assess_file(year_file, year=None, ps=None):
     print(f" Target:    Year {year} | {season_type_label}")
     print(f"=======================================================")
 
-    # 1. Read header and available sentinels
+    # 1. Read header and map sentinels dynamically
     header = pd.read_csv(year_file, nrows=0).columns.tolist()
-    available_sentinels = {label: col for label, col in SENTINEL_MAP.items() if col in header}
-    missing_sentinel_cols = {label: col for label, col in SENTINEL_MAP.items() if col not in header}
+    
+    resolved_sentinels = {}
+    missing_sentinels = {}
 
-    use_cols = ['date', 'PLAYER_ID'] + list(available_sentinels.values())
-    df = pd.read_csv(year_file, usecols=use_cols, low_memory=True)
+    for label, candidates in SENTINEL_MAP.items():
+        if isinstance(candidates, list):
+            found_col = next((col for col in candidates if col in header), None)
+            if found_col:
+                resolved_sentinels[label] = found_col
+            else:
+                missing_sentinels[label] = candidates[0]
+        else:
+            if candidates in header:
+                resolved_sentinels[label] = candidates
+            else:
+                missing_sentinels[label] = candidates
+
+    use_cols = ['date', 'PLAYER_ID'] + list(resolved_sentinels.values())
+    df = pd.read_csv(year_file, usecols=use_cols, low_memory=False)
     df['date'] = df['date'].astype(int)
     scraped_dates = set(df['date'].unique())
 
@@ -82,22 +97,31 @@ def assess_file(year_file, year=None, ps=None):
     print(f"\n2. Endpoint Health Check ({len(scraped_dates)} dates scraped):")
     
     # Missing columns warning
-    for label, col in missing_sentinel_cols.items():
-        print(f"   [x] Column '{col}' ({label}) is COMPLETELY MISSING from CSV header")
+    for label, col in missing_sentinels.items():
+        print(f"   [x] Metric '{label}' (target: '{col}') is COMPLETELY MISSING from CSV header")
 
-    # Null rate checks for existing columns
-    for label, col in available_sentinels.items():
+    # Null rate checks for detected columns
+    for label, col in resolved_sentinels.items():
         date_nulls = df.groupby('date')[col].apply(lambda s: s.isna().all())
         bad_dates = date_nulls[date_nulls].index.tolist()
         if bad_dates:
-            print(f"   [!] {label} ('{col}') missing on {len(bad_dates)} dates: {bad_dates}")
+            print(f"   [!] {label} ('{col}') missing entirely on {len(bad_dates)} dates: {bad_dates}")
         else:
             print(f"   [✓] {label} ('{col}') 100% complete")
+
+    # 4. Check for Corrupted Rebounding Fields or Redundant Metadata
+    corrupted_defense = [c for c in header if c.startswith('more_15ft_def_') and any(k in c for k in ['REB', 'DIST'])]
+    if corrupted_defense:
+        print(f"\n[!] Warning: Found {len(corrupted_defense)} corrupted more_15ft_def_ rebounding columns in header (run normalize_year_files.py to drop).")
+
+    redundant_meta = [c for c in header if c.endswith('_TEAM_ID') and c != 'TEAM_ID']
+    if redundant_meta:
+        print(f"[!] Notice: Found {len(redundant_meta)} redundant *_TEAM_ID merge suffix columns.")
 
 def main():
     args = sys.argv[1:]
 
-    # Mode 1: No arguments passed -> scan all files in year_files/
+    # Mode 1: No arguments -> scan all valid year files
     if not args:
         year_dir = 'year_files'
         if not os.path.exists(year_dir):
@@ -106,7 +130,7 @@ def main():
         
         target_files = sorted([
             os.path.join(year_dir, f) for f in os.listdir(year_dir) 
-            if f.endswith('_games.csv') and not f.startswith('patch_cache_')
+            if f.endswith('_games.csv') and not f.startswith('patch_cache_') and 'backup' not in f and 'broken' not in f
         ])
 
         if not target_files:
@@ -118,7 +142,7 @@ def main():
             assess_file(f)
         return
 
-    # Mode 2: Specific year passed via CLI (e.g. `python assess_season.py 2025` or `python assess_season.py 2025 ps`)
+    # Mode 2: Specific year / ps via CLI
     year = int(args[0])
     ps = len(args) > 1 and 'ps' in args[1].lower()
     trail = 'ps' if ps else ''
