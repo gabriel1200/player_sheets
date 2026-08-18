@@ -129,21 +129,26 @@ def build_all_games(year=2026, ps=False):
 
 if __name__ == '__main__':
     # Run for 2026 Regular Season
-    build_all_games(2023, ps=False)
+    for year in range(2024,2025):
+        build_all_games(year,ps=False)
+        build_all_games(year,ps=True)
+        
+
+    #build_all_games(2023, ps=False)
     
     # Run for 2026 Playoffs
-    build_all_games(2023, ps=True)
+    #build_all_games(2023, ps=True)
 
-    build_all_games(2022, ps=False)
+    #build_all_games(2022, ps=False)
     
     # Run for 2026 Playoffs
-    build_all_games(2022, ps=True)
+    #build_all_games(2022, ps=True)
 
-    build_all_games(2021, ps=False)
+    #build_all_games(2021, ps=False)
     
     # Run for 2026 Playoffs
-    build_all_games(2021, ps=True)
+    #build_all_games(2021, ps=True)
 
-    build_all_games(2020, ps=True)
+    #build_all_games(2020, ps=True)
 
-    build_all_games(2020, ps=True)
+    #build_all_games(2020, ps=True)
