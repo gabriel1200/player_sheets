@@ -1,10 +1,10 @@
+# assess_season.py
 import os
 import re
 import sys
 import pandas as pd
 from nba_api.stats.static import teams
 
-# Standardized sentinel map
 SENTINEL_MAP = {
     'Base Stats': 'PTS',
     'Advanced': 'OFF_RATING',
@@ -13,12 +13,19 @@ SENTINEL_MAP = {
     'Possessions Tracking': 'TOUCHES',
     'Rebounding Tracking': 'REB_CHANCES',
     'Shot Splits (Open)': 'open_FGA',
-    'Pullups': ['PULL_UP_FGA', 'pullup_PULL_UP_FGA', 'pullup_FGA'],  # Flexible matching
+    'Pullups': ['PULL_UP_FGA', 'pullup_PULL_UP_FGA', 'pullup_FGA'],
     'Overall Defense': ['overall_def_D_FGA', 'overall_def_FREQ'],
     'Hustle Stats': 'hustle_CONTESTED_SHOTS',
-    'Post Touches': ['post_touch_POST_TOUCHES', 'POST_TOUCHES'],
+    'Post Touches': ['POST_TOUCHES', 'post_touch_POST_TOUCHES'],
     'Speed & Dist': 'DIST_FEET',
     'Team Possessions': 'team_poss'
+}
+
+# Known dates where tracking was offline upstream on stats.nba.com
+KNOWN_TRACKING_OUTAGES = {
+    2024: [20240309],
+    2022: [20220106],
+    2018: [20171215, 20171216, 20171217, 20171218],
 }
 
 def resolve_expected_dates(year, ps=False):
@@ -39,7 +46,6 @@ def assess_file(year_file, year=None, ps=None):
         print(f"[!] File not found: {year_file}")
         return
 
-    # Parse metadata dynamically from filename if not explicitly provided
     file_stem = os.path.splitext(os.path.basename(year_file))[0]
     if ps is None:
         ps = 'ps' in file_stem.lower()
@@ -57,13 +63,17 @@ def assess_file(year_file, year=None, ps=None):
     print(f" Target:    Year {year} | {season_type_label}")
     print(f"=======================================================")
 
-    # 1. Read header and map sentinels dynamically
     header = pd.read_csv(year_file, nrows=0).columns.tolist()
-    
     resolved_sentinels = {}
     missing_sentinels = {}
 
     for label, candidates in SENTINEL_MAP.items():
+        # Handle historical API availability cutoffs
+        if label == 'Hustle Stats' and year < 2017:
+            continue
+        if label == 'Post Touches' and year < 2018:
+            continue
+
         if isinstance(candidates, list):
             found_col = next((col for col in candidates if col in header), None)
             if found_col:
@@ -81,7 +91,7 @@ def assess_file(year_file, year=None, ps=None):
     df['date'] = df['date'].astype(int)
     scraped_dates = set(df['date'].unique())
 
-    # 2. Check Schedule Coverage
+    # 1. Check Schedule Coverage
     expected_dates = resolve_expected_dates(year, ps=ps)
     missing_schedule_dates = sorted(list(expected_dates - scraped_dates)) if expected_dates else []
 
@@ -93,26 +103,30 @@ def assess_file(year_file, year=None, ps=None):
     else:
         print(f"   [✓] 100% Scheduled Dates Present")
 
-    # 3. Check Endpoint Health
+    # 2. Check Endpoint Health
     print(f"\n2. Endpoint Health Check ({len(scraped_dates)} dates scraped):")
     
-    # Missing columns warning
     for label, col in missing_sentinels.items():
         print(f"   [x] Metric '{label}' (target: '{col}') is COMPLETELY MISSING from CSV header")
 
-    # Null rate checks for detected columns
+    known_outages = KNOWN_TRACKING_OUTAGES.get(year, [])
+
     for label, col in resolved_sentinels.items():
         date_nulls = df.groupby('date')[col].apply(lambda s: s.isna().all())
         bad_dates = date_nulls[date_nulls].index.tolist()
-        if bad_dates:
-            print(f"   [!] {label} ('{col}') missing entirely on {len(bad_dates)} dates: {bad_dates}")
+        actual_failures = [d for d in bad_dates if d not in known_outages]
+
+        if actual_failures:
+            print(f"   [!] {label} ('{col}') missing entirely on {len(actual_failures)} dates: {actual_failures}")
+        elif bad_dates:
+            print(f"   [✓] {label} ('{col}') 100% complete (whitelisted {len(bad_dates)} upstream NBA outage dates: {bad_dates})")
         else:
             print(f"   [✓] {label} ('{col}') 100% complete")
 
-    # 4. Check for Corrupted Rebounding Fields or Redundant Metadata
+    # 3. Check for Corrupted Rebounding Fields or Redundant Metadata
     corrupted_defense = [c for c in header if c.startswith('more_15ft_def_') and any(k in c for k in ['REB', 'DIST'])]
     if corrupted_defense:
-        print(f"\n[!] Warning: Found {len(corrupted_defense)} corrupted more_15ft_def_ rebounding columns in header (run normalize_year_files.py to drop).")
+        print(f"\n[!] Warning: Found {len(corrupted_defense)} corrupted more_15ft_def_ rebounding columns in header.")
 
     redundant_meta = [c for c in header if c.endswith('_TEAM_ID') and c != 'TEAM_ID']
     if redundant_meta:
@@ -120,8 +134,6 @@ def assess_file(year_file, year=None, ps=None):
 
 def main():
     args = sys.argv[1:]
-
-    # Mode 1: No arguments -> scan all valid year files
     if not args:
         year_dir = 'year_files'
         if not os.path.exists(year_dir):
@@ -137,12 +149,10 @@ def main():
             print(f"[!] No valid *_games.csv files found in {year_dir}.")
             return
 
-        print(f"Discovered {len(target_files)} game file(s) in {year_dir}/...")
         for f in target_files:
             assess_file(f)
         return
 
-    # Mode 2: Specific year / ps via CLI
     year = int(args[0])
     ps = len(args) > 1 and 'ps' in args[1].lower()
     trail = 'ps' if ps else ''

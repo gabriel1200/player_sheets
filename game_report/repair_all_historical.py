@@ -1,3 +1,4 @@
+# repair_all_historical.py
 import os
 import sys
 import glob
@@ -6,12 +7,6 @@ import pandas as pd
 import requests
 from datetime import datetime
 from requests.exceptions import RequestException
-
-# Known dates where Second Spectrum cameras were down upstream on stats.nba.com
-KNOWN_TRACKING_OUTAGES = {
-    2024: [20240309],
-    2022: [20220106]
-}
 
 def format_date_to_url(date):
     date_obj = datetime.strptime(str(date), '%Y%m%d')
@@ -85,7 +80,7 @@ def repair_season(year: int, ps: bool = False):
     df_main = pd.read_csv(file_path, low_memory=False)
     df_main['date'] = df_main['date'].astype(int)
 
-    # 1. Purge stale / broken column names
+    # Purge stale/leaked columns from previous bad merges
     drop_candidates = [c for c in df_main.columns if 
                        c.startswith('overall_def_') or 
                        c.startswith('pullup_') or 
@@ -97,19 +92,29 @@ def repair_season(year: int, ps: bool = False):
     df_main.drop(columns=drop_candidates, inplace=True, errors='ignore')
 
     all_dates = sorted(df_main['date'].unique().tolist())
+    
+    # Check valid cached files (>0 bytes)
     cached_files = glob.glob(os.path.join(cache_dir, "*.csv"))
-    completed_dates = {int(os.path.splitext(os.path.basename(f))[0]) for f in cached_files if os.path.splitext(os.path.basename(f))[0].isdigit()}
+    completed_dates = {
+        int(os.path.splitext(os.path.basename(f))[0]) 
+        for f in cached_files 
+        if os.path.splitext(os.path.basename(f))[0].isdigit() and os.path.getsize(f) > 0
+    }
 
     remaining_dates = [d for d in all_dates if d not in completed_dates]
     print(f"Total dates: {len(all_dates)} | Cached: {len(completed_dates)} | Remaining: {len(remaining_dates)}")
 
-    # 2. Targeted Scrape Loop
     for idx, date_num in enumerate(remaining_dates, 1):
         date_str = format_date_to_url(date_num)
         print(f"  [{idx}/{len(remaining_dates)}] Fetching Date {date_num}...")
 
-        # 1. Overall Defense (df18)
-        url_def_overall = f"https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}&DefenseCategory=Overall&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
+        # 1. Overall Defense
+        url_def_overall = (
+            f"https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}"
+            f"&DefenseCategory=Overall&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00"
+            f"&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition="
+            f"&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
+        )
         df_def = pull_data(url_def_overall)
         if not df_def.empty and 'CLOSE_DEF_PERSON_ID' in df_def.columns:
             df_def.rename(columns={'CLOSE_DEF_PERSON_ID': 'PLAYER_ID'}, inplace=True)
@@ -120,8 +125,14 @@ def repair_season(year: int, ps: bool = False):
         else:
             df_def = pd.DataFrame(columns=['PLAYER_ID'])
 
-        # 2. Team Possessions (df17)
-        url_poss = f"https://stats.nba.com/stats/leaguedashteamstats?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&MeasureType=Advanced&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
+        # 2. Team Possessions
+        url_poss = (
+            f"https://stats.nba.com/stats/leaguedashteamstats?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}"
+            f"&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location="
+            f"&MeasureType=Advanced&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0"
+            f"&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}"
+            f"&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
+        )
         df_poss = pull_data(url_poss)
 
         day_patch = df_main[df_main['date'] == date_num][['PLAYER_ID', 'TEAM_ID', 'date']].copy()
@@ -133,9 +144,14 @@ def repair_season(year: int, ps: bool = False):
 
         day_patch = day_patch.merge(df_def, on='PLAYER_ID', how='left')
 
-        # 3. Hustle Stats (Available starting from 2016)
-        if year >= 2016:
-            url_hustle = f"https://stats.nba.com/stats/leaguehustlestatsplayer?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=PerGame&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&TeamID=0&VsConference=&VsDivision=&Weight="
+        # 3. Hustle Stats (tracking introduced in 2016-17 / Year 2017)
+        if year >= 2017:
+            url_hustle = (
+                f"https://stats.nba.com/stats/leaguehustlestatsplayer?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}"
+                f"&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0"
+                f"&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=PerGame&PlayerExperience=&PlayerPosition="
+                f"&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&TeamID=0&VsConference=&VsDivision=&Weight="
+            )
             df_hustle = pull_data(url_hustle)
             if not df_hustle.empty and 'PLAYER_ID' in df_hustle.columns:
                 ignore = {'PLAYER_ID', 'PLAYER_NAME', 'TEAM_ID', 'TEAM_ABBREVIATION', 'AGE', 'G'}
@@ -143,8 +159,14 @@ def repair_season(year: int, ps: bool = False):
                 df_hustle.rename(columns={c: f'hustle_{c}' for c in cols}, inplace=True)
                 day_patch = day_patch.merge(df_hustle[['PLAYER_ID'] + [f'hustle_{c}' for c in cols]], on='PLAYER_ID', how='left')
 
-        # 4. Speed & Distance (df26)
-        url_speed = f"https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&PlayerExperience=&PlayerOrTeam=Player&PlayerPosition=&PtMeasureType=SpeedDistance&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
+        # 4. Speed & Distance
+        url_speed = (
+            f"https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date_str}&DateTo={date_str}"
+            f"&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0"
+            f"&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&PlayerExperience=&PlayerOrTeam=Player&PlayerPosition="
+            f"&PtMeasureType=SpeedDistance&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0"
+            f"&VsConference=&VsDivision=&Weight="
+        )
         df_speed = pull_data(url_speed)
         if not df_speed.empty and 'PLAYER_ID' in df_speed.columns:
             ignore = {'PLAYER_ID', 'PLAYER_NAME', 'TEAM_ID', 'TEAM_ABBREVIATION', 'GP', 'W', 'L', 'MIN', 'AGE'}
@@ -153,14 +175,32 @@ def repair_season(year: int, ps: bool = False):
 
         day_patch.drop(columns=['TEAM_ID'], inplace=True, errors='ignore')
 
-        # Save to date cache
         date_cache_file = os.path.join(cache_dir, f"{date_num}.csv")
         day_patch.to_csv(date_cache_file, index=False)
 
-    # 3. Assemble and Overwrite Master File
+    # Assemble validated cache files
     print(f"Combining cached files from {cache_dir}...")
     all_cache_files = glob.glob(os.path.join(cache_dir, "*.csv"))
-    cached_df_list = [pd.read_csv(f, low_memory=False) for f in all_cache_files]
+    
+    cached_df_list = []
+    for f in all_cache_files:
+        try:
+            if os.path.getsize(f) > 0:
+                temp_df = pd.read_csv(f, low_memory=False)
+                if not temp_df.empty and 'PLAYER_ID' in temp_df.columns:
+                    cached_df_list.append(temp_df)
+                else:
+                    os.remove(f)
+            else:
+                os.remove(f)
+        except Exception:
+            if os.path.exists(f):
+                os.remove(f)
+
+    if not cached_df_list:
+        print(f"[!] No valid cached data found in {cache_dir}.")
+        return
+
     full_cache_df = pd.concat(cached_df_list, ignore_index=True, sort=False)
     full_cache_df.drop_duplicates(subset=['PLAYER_ID', 'date'], inplace=True)
 
@@ -182,20 +222,15 @@ def repair_season(year: int, ps: bool = False):
 
 def main():
     args = sys.argv[1:]
-
-    # Default batch: Run 2022 down through 2020 (both Regular Season and Playoffs)
     if not args:
-        target_years = [2022, 2021, 2020]
+        target_years = [2016, 2015, 2014]
     else:
         target_years = [int(y) for y in args if y.isdigit()]
 
     print(f"Queued Seasons for Repair: {target_years}")
 
     for year in target_years:
-        # 1. Regular Season
         repair_season(year, ps=False)
-        
-        # 2. Playoffs
         repair_season(year, ps=True)
 
     print("\n[✓] All queued historical seasons repaired successfully!")
