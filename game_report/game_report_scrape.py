@@ -37,18 +37,23 @@ def pull_data(url, max_retries=3, delay_seconds=5):
     """
     headers = {
         "Host": "stats.nba.com",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept-Encoding": "gzip, deflate, br",
         "Connection": "keep-alive",
-        "Referer": "https://stats.nba.com/",
-        "Origin": "https://stats.nba.com",
-        "Sec-Fetch-Dest": "empty",
+        "Pragma": "no-cache",
+        "Cache-Control": "no-cache",
+        "Dnt": "1",
+        "Sec-Ch-Ua": '"Not=A?Brand";v="99", "Google Chrome";v="151", "Chromium";v="151"',
+        "Sec-Ch-Ua-Mobile": "?1",
+        "Sec-Ch-Ua-Platform": '"Android"',
+        "User-Agent": "Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36",
+        "Accept": "*/*",
+        "Origin": "https://www.nba.com",
+        "Sec-Fetch-Site": "same-site",
         "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Dest": "empty",
+        "Referer": "https://www.nba.com/",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en-US,en;q=0.9",
     }
-
     for attempt in range(max_retries):
         try:
             # --- API Request Attempt ---
