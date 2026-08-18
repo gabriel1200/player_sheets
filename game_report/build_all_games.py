@@ -129,7 +129,7 @@ def build_all_games(year=2026, ps=False):
 
 if __name__ == '__main__':
     # Run for 2026 Regular Season
-    build_all_games(2026, ps=False)
+    build_all_games(2025, ps=False)
     
     # Run for 2026 Playoffs
-    build_all_games(2026, ps=True)
+    build_all_games(2025, ps=True)
