@@ -207,7 +207,7 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
                               'CORNER_3_FGM', 'CORNER_3_FGA', 'CORNER_3_FG_PCT'  ]  # Above the Break 3
     
                 df13.columns=zone_columns
-                url14=f"https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DefenseCategory=Less%20Than%206Ft..."
+                url14=f"https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DefenseCategory=Less%20Than%206Ft"
                 df14=pull_data(url14)
                 df14.rename(columns={'CLOSE_DEF_PERSON_ID':'PLAYER_ID'},inplace=True)
     
@@ -359,8 +359,8 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
     total = pd.concat(dframes)
     return total
 
-start_year=2026
-end_year=2027
+start_year=2017
+end_year=2019
 
 
 
@@ -387,7 +387,7 @@ def get_dates(start_year, end_year, ps=False):
                 print(f"Skipping {path}: {e}")
     
     return pd.concat(dates, ignore_index=True) if dates else pd.DataFrame()
-ps=True
+ps=False
 dateframe=get_dates(start_year,end_year,ps=ps)
 
 dates=dateframe['GAME_DATE'].unique().tolist()
