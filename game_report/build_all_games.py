@@ -129,7 +129,7 @@ def build_all_games(year=2026, ps=False):
 
 if __name__ == '__main__':
     # Run for 2026 Regular Season
-    for year in range(2024,2025):
+    for year in range(2017,2020):
         build_all_games(year,ps=False)
         build_all_games(year,ps=True)
         
