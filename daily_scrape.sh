@@ -57,6 +57,13 @@ jupyter nbconvert --to script teamseries.ipynb
 python teamseries.py
 cd ..
 
+# Refresh this season's SRS/HCA sheet (web_app/data/srs_generated.csv) now
+# that this season's teamgame_report parquet is current. Reads that parquet
+# from the local file above (not the GitHub raw URL), so this doesn't need
+# to wait for quick_commit.sh's push. Also depends on game_dates.csv, which
+# shot_data/daily_scrape.sh already refreshes earlier in all_scrapes.sh.
+python ../web_app/srs_by_season.py --current
+
 cd lineups
 python lineups.py
 cd ..
