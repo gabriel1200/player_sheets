@@ -670,9 +670,10 @@ playtype_test.columns
 # In[4]:
 
 
+# Regular-season section: always the regular-season files, whatever ps is set
+# to for the scrape above. (With ps=True this used to rebuild team_averages.csv
+# from the playoff files for every year.)
 trail = ''
-if ps==True:
-    trail='ps'
 print(trail)
 ortg = []
 orebperc = []
