@@ -96,6 +96,28 @@ class PBPStatsAPI:
 
         return pd.concat(all_games, ignore_index=True) if all_games else pd.DataFrame()
 
+def keep_other_season_types(file_path: str, new_df: pd.DataFrame) -> pd.DataFrame:
+    """Merge new logs over an existing team file without dropping other season types.
+
+    self.season_types is toggled by hand (e.g. only "Playoffs" in May), and
+    writing the fetch result straight to disk used to wipe the team's
+    regular-season rows. Rows for the season types just fetched are replaced;
+    everything else in the file is kept.
+    """
+    if not os.path.exists(file_path) or 'SeasonType' not in new_df.columns:
+        return new_df
+    try:
+        old = pd.read_csv(file_path)
+    except Exception as e:
+        logging.warning(f"Could not read {file_path} to merge season types: {e}")
+        return new_df
+    if 'SeasonType' not in old.columns:
+        return new_df
+    kept = old[~old['SeasonType'].isin(new_df['SeasonType'].unique())]
+    if kept.empty:
+        return new_df
+    return pd.concat([kept, new_df], ignore_index=True)
+
 def get_team_abbreviations():
     """Returns a dictionary mapping team IDs to team abbreviations."""
     return {
@@ -435,6 +457,7 @@ if __name__ == "__main__":
                     if not team_df.empty:
                         team_df['team_id'] = team_id_str
                         file_path = f"{year_dir}/{team_id_str}.csv"
+                        team_df = keep_other_season_types(file_path, team_df)
                         team_df.to_csv(file_path, index=False)
                         logging.info(f"Updated file: {file_path}")
     else:
@@ -465,6 +488,7 @@ if __name__ == "__main__":
                         if str(team_id_str) in team_dict:
                             team_df['team'] = team_dict[str(team_id_str)]
                         file_path = f"{year_dir}/{team_id_str}vs.csv"
+                        team_df = keep_other_season_types(file_path, team_df)
                         team_df.to_csv(file_path, index=False)
                         logging.info(f"Updated VS file: {file_path}")
     else:

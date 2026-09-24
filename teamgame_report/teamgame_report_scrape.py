@@ -7,11 +7,13 @@
 from nba_api.stats.static import players,teams
 import pandas as pd
 import requests
+import json as json_lib
 import sys
 import os
 import time
 from datetime import datetime
 from fourfactors import four_factors_data
+from teamgame_checks import incomplete_dates
 import numpy as np
 def format_date_to_url(date):
     # Convert date from YYYYMMDD to datetime object
@@ -26,20 +28,26 @@ def format_date_to_url(date):
 SEASON_YEAR=2026
 
 def pull_data(url, max_retries=3, sleep_seconds=1):
+    # Same fingerprint as game_report/game_report_scrape.py; the older
+    # stats.nba.com Origin/Referer set now hangs until timeout.
     headers = {
         "Host": "stats.nba.com",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                      "AppleWebKit/537.36 (KHTML, like Gecko) "
-                      "Chrome/116.0.0.0 Safari/537.36",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept-Encoding": "gzip, deflate, br",
         "Connection": "keep-alive",
-        "Referer": "https://stats.nba.com/",
-        "Origin": "https://stats.nba.com",
-        "Sec-Fetch-Dest": "empty",
+        "Pragma": "no-cache",
+        "Cache-Control": "no-cache",
+        "Dnt": "1",
+        "Sec-Ch-Ua": '"Not=A?Brand";v="99", "Google Chrome";v="151", "Chromium";v="151"',
+        "Sec-Ch-Ua-Mobile": "?1",
+        "Sec-Ch-Ua-Platform": '"Android"',
+        "User-Agent": "Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36",
+        "Accept": "*/*",
+        "Origin": "https://www.nba.com",
+        "Sec-Fetch-Site": "same-site",
         "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Dest": "empty",
+        "Referer": "https://www.nba.com/",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en-US,en;q=0.9",
     }
 
     for attempt in range(1, max_retries + 1):
@@ -80,6 +88,12 @@ def pull_data(url, max_retries=3, sleep_seconds=1):
             time.sleep(sleep_seconds * attempt)  # light backoff
 
 
+# Saved dates are never refetched, so recent incomplete dates (see
+# teamgame_checks.py) are dropped and pulled again on the next run. Older gaps
+# are usually permanent on the NBA side; repair_teamgames.py handles those.
+RECHECK_DAYS = 21
+
+
 def pull_game_level_team(dateframe, start_year,end_year,ps=False):
     stype = 'Regular%20Season'
     trail=''
@@ -110,6 +124,18 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
 
             if test != False:
                 df=df[df.date<game_date]
+
+            stale = incomplete_dates(df, countframe)
+            if stale:
+                latest = datetime.strptime(str(int(countframe['GAME_DATE'].max())), '%Y%m%d')
+                recent = [d for d in stale
+                          if (latest - datetime.strptime(str(d), '%Y%m%d')).days <= RECHECK_DAYS]
+                older = [d for d in stale if d not in recent]
+                if older:
+                    print(f'Incomplete dates older than {RECHECK_DAYS} days, left as-is: {older}')
+                if recent:
+                    print(f'Re-fetching incomplete dates: {recent}')
+                    df = df[~df['date'].isin(recent)]
 
             year_frame.append(df)
 
@@ -196,7 +222,7 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
                               'CORNER_3_FGM', 'CORNER_3_FGA', 'CORNER_3_FG_PCT'  ]  # Above the Break 3
 
                 df13.columns=zone_columns
-                url14=f"https://stats.nba.com/stats/leaguedashptteamdefend?College=&Conference=&Country=&DateFrom{date}=&DateTo={date}&DefenseCategory=Less%20Than%206Ft&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
+                url14=f"https://stats.nba.com/stats/leaguedashptteamdefend?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DefenseCategory=Less%20Than%206Ft&Division=&DraftPick=&DraftYear=&GameSegment=&Height=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
                 df14=pull_data(url14)
                 #print(df14.columns)
                 df14.rename(columns={'CLOSE_DEF_PERSON_ID':'PLAYER_ID'},inplace=True)
@@ -219,7 +245,7 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
                 df16=pull_data(url16)
 
 
-                url17 = f'https://stats.nba.com/stats/leaguedashteamstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&MeasureType=Advanced&Month=0&OpponentTeamID=0&Outcome=&PORound=&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType=Playoffs&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+                url17 = f'https://stats.nba.com/stats/leaguedashteamstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&MeasureType=Advanced&Month=0&OpponentTeamID=0&Outcome=&PORound=&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
                 df17 = pull_data(url17)
                 df17=df17[['TEAM_ID','POSS']]
                 df17.columns=['TEAM_ID','team_poss']
