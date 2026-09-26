@@ -448,6 +448,13 @@ def create_retry_session(retries=5, backoff_factor=1, status_forcelist=[429, 500
         status_forcelist: HTTP status codes that trigger a retry.
     """
     session = requests.Session()
+    # pbpstats returns 500 for some requests without browser-like headers
+    # (same set as game_report/pbp_gamelogs.py).
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36 Edg/115.0.1901.183',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'Accept-Language': 'en-US,en;q=0.9',
+    })
     retry = Retry(
         total=retries,
         read=retries,
@@ -516,6 +523,13 @@ def scrape_teams(ps=False):
                 # Save intermediate file
                 df.to_csv(str(year) + carry + '.csv', index=False)
                 all_data.append(df)
+
+                # League-wide row: web_app's /api/league_average reads {year}_league{carry}.csv
+                if 'single_row_table_data' in data:
+                    league_df = pd.DataFrame([data['single_row_table_data']])
+                    league_df['season'] = season
+                    league_df['year'] = year
+                    league_df.to_csv(f"{year}_league{carry}.csv", index=False)
             else:
                 print(f"No data found for {season}")
 
