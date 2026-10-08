@@ -100,6 +100,8 @@ def build_all_games(year=2026, ps=False):
     team_id_map = game_dates[['team', 'TEAM_ID']].drop_duplicates().set_index('team')['TEAM_ID'].to_dict()
     game_dates['year'] = game_dates['season'].apply(lambda x: int(x.split('-')[0]) + 1)
     game_dates['OPP_TEAM_ID'] = game_dates['opp_team'].map(team_id_map)
+    # Home / visitor abbreviations of each game, stamped on every row by its (corrected) GAME_ID. Both team rows of a game carry the same HTM/VTM in game_dates.
+    home_away = game_dates.drop_duplicates('GAME_ID').set_index('GAME_ID')[['HTM', 'VTM']]
 
     # 2. Process Dates & Align Game IDs
     print(f"Loading corrected year file: {year_file}")
@@ -168,6 +170,9 @@ def build_all_games(year=2026, ps=False):
         save_frame.dropna(subset=['GAME_ID'], inplace=True)
         save_frame.drop_duplicates(inplace=True)
         save_frame['GAME_ID'] = save_frame['GAME_ID'].astype(int)
+        for col in ('HTM', 'VTM'):
+            known = save_frame['GAME_ID'].map(home_away[col])
+            save_frame[col] = known.fillna(save_frame[col]) if col in save_frame.columns else known
 
         # Save individual game CSVs
         for game_id in save_frame['GAME_ID'].unique():
