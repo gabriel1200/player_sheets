@@ -9,17 +9,24 @@ NBA_HEADERS = {
 }
 
 
-def load_player_game_spine(year, ps=False, cache_dir='year_files', refresh=False):
-    """One row per player per game the player actually played, with that game's own GAME_ID and TEAM_ID (NBA 'leaguegamelog', PlayerOrTeam=P).
+def load_player_game_spine(year, ps=False, cache_dir='year_files'):
+    """Internal player-game spine: one row per player per game the player actually played, with that game's own GAME_ID and TEAM_ID.
 
     The per-date player dashboards report a traded player under his LATER team, so merging on (TEAM_ID, date) attaches his pre-trade games to the later team's
-    game whenever that team also played that night (e.g. Terrence Ross, 2016-10-26: TOR game, filed under ORL's). This table says which team he played for
-    in which game, so TEAM_ID can be corrected before that merge. One request per season type; cached in year_files/<year>[ps]_spine.csv (pass refresh=True
-    for the current season so new games are picked up)."""
+    game whenever that team also played that night (e.g. Terrence Ross, 2016-10-26: a TOR game, filed under ORL's). The spine says which team he played for in
+    which game. It is read from year_files/<year>[ps]_spine.csv, exported from nba-pipeline's player_game (shared/export_player_game_spine.py), so no NBA API call
+    is made. A missing file gives an empty spine; the shot-data lookup in build_all_games and the old fallbacks then apply."""
     trail = 'ps' if ps else ''
     path = os.path.join(cache_dir, f'{year}{trail}_spine.csv')
-    if os.path.exists(path) and not refresh:
-        return pd.read_csv(path)
+    cols = ['PLAYER_ID', 'date', 'SPINE_GAME_ID', 'SPINE_TEAM_ID', 'SPINE_TEAM_ABBR']
+    if not os.path.exists(path):
+        print(f"[spine] {path} not found; labels fall back to the shot-data lookup and the old fallbacks")
+        return pd.DataFrame(columns=cols)
+    return pd.read_csv(path)
+
+
+def fetch_spine_from_nba_api(year, ps=False, cache_dir='year_files'):
+    """Optional: build the same spine from the NBA's 'leaguegamelog' (PlayerOrTeam=P). Not used by default; stats.nba.com times out from some networks."""
     params = {'Counter': 0, 'Direction': 'ASC', 'LeagueID': '00', 'PlayerOrTeam': 'P', 'Season': f'{year - 1}-{str(year)[2:]}',
               'SeasonType': 'Playoffs' if ps else 'Regular Season', 'Sorter': 'DATE', 'DateFrom': '', 'DateTo': ''}
     r = requests.get('https://stats.nba.com/stats/leaguegamelog', headers=NBA_HEADERS, params=params, timeout=60)
@@ -29,12 +36,12 @@ def load_player_game_spine(year, ps=False, cache_dir='year_files', refresh=False
     spine = pd.DataFrame({'PLAYER_ID': raw.PLAYER_ID.astype(int), 'date': pd.to_datetime(raw.GAME_DATE).dt.strftime('%Y%m%d').astype(int),
                           'SPINE_GAME_ID': raw.GAME_ID.astype(int), 'SPINE_TEAM_ID': raw.TEAM_ID.astype(int), 'SPINE_TEAM_ABBR': raw.TEAM_ABBREVIATION})
     os.makedirs(cache_dir, exist_ok=True)
-    spine.to_csv(path, index=False)
+    spine.to_csv(os.path.join(cache_dir, f'{year}{"ps" if ps else ""}_spine.csv'), index=False)
     return spine
 
 
-def relabel_from_spine(datedf, spine_day):
-    """Set TEAM_ID / TEAM_ABBREVIATION from the player's own game on that date. Rows whose player is not in the spine are left as they were
+def relabel_from_spine(datedf, spine_day, abbr_map=None):
+    """Set TEAM_ID / TEAM_ABBREVIATION from the player's own game on that date. Rows whose player is not in spine_day are left as they were
     (the existing fallbacks handle them). Returns (frame, number of rows whose TEAM_ID changed)."""
     if spine_day.empty:
         return datedf, 0
@@ -43,8 +50,10 @@ def relabel_from_spine(datedf, spine_day):
     has = out['SPINE_TEAM_ID'].notna()
     changed = int((has & (out['TEAM_ID'] != out['SPINE_TEAM_ID'])).sum())
     out.loc[has, 'TEAM_ID'] = out.loc[has, 'SPINE_TEAM_ID'].astype(int)
-    out.loc[has, 'TEAM_ABBREVIATION'] = out.loc[has, 'SPINE_TEAM_ABBR']
+    abbr = out.loc[has, 'TEAM_ID'].map(abbr_map or {}).fillna(out.loc[has, 'SPINE_TEAM_ABBR'])
+    out.loc[has, 'TEAM_ABBREVIATION'] = abbr
     return out.drop(columns=['SPINE_TEAM_ID', 'SPINE_TEAM_ABBR']), changed
+
 
 def get_dates(start_year, end_year, ps=False):
     trail = 'ps' if ps else ''
@@ -97,18 +106,25 @@ def build_all_games(year=2026, ps=False):
     df = pd.read_csv(year_file)
     team_map = dict(zip(df['TEAM_ID'], df['TEAM_ABBREVIATION']))
 
-    spine = load_player_game_spine(year, ps=ps, refresh=(year == pd.Timestamp.today().year + (1 if pd.Timestamp.today().month >= 9 else 0)))
+    spine = load_player_game_spine(year, ps=ps)
+    abbr_map = {**{v: k for k, v in team_id_map.items()}, **team_map}
     relabeled_total = 0
     games_collected = []
 
     for date in df['date'].unique().tolist():
         datedf = df[df.date == date].reset_index(drop=True)
         datedf = datedf.drop_duplicates(subset=['PLAYER_ID', 'date'])
-        datedf, n_relabeled = relabel_from_spine(datedf, spine[spine['date'] == date])
-        relabeled_total += n_relabeled
 
         gameframe = dateframe[dateframe['GAME_DATE'] == date].reset_index(drop=True)
         gameframe.rename(columns={'GAME_DATE': 'date'}, inplace=True)
+
+        # Correct TEAM_ID from the player's own game that date: internal spine first, then the shot-data frame (players with at least one shot) for anyone it lacks.
+        spine_day = spine[spine['date'] == date]
+        shot_day = gameframe[['PLAYER_ID', 'TEAM_ID']].drop_duplicates('PLAYER_ID').rename(columns={'TEAM_ID': 'SPINE_TEAM_ID'})
+        shot_day = shot_day[~shot_day['PLAYER_ID'].isin(spine_day['PLAYER_ID'])].assign(SPINE_TEAM_ABBR=None)
+        day_source = pd.concat([spine_day[['PLAYER_ID', 'SPINE_TEAM_ID', 'SPINE_TEAM_ABBR']], shot_day], ignore_index=True)
+        datedf, n_relabeled = relabel_from_spine(datedf, day_source, abbr_map)
+        relabeled_total += n_relabeled
 
         to_merge = gameframe[['TEAM_ID', 'GAME_ID', 'date', 'year']].drop_duplicates().reset_index(drop=True)
         save_frame = datedf.merge(to_merge, on=['TEAM_ID', 'date', 'year'], how='left')
@@ -160,7 +176,7 @@ def build_all_games(year=2026, ps=False):
             games_collected.append(gameid_frame)
 
     # 3. Add Opponent Data & Final Export
-    print(f"Corrected TEAM_ID from the player game log on {relabeled_total} rows (traded players).")
+    print(f"Corrected TEAM_ID from the player-game spine / shot data on {relabeled_total} rows (traded players).")
     print("Finalizing master tables...")
     all_games = pd.concat(games_collected, ignore_index=True)
 
