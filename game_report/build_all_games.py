@@ -166,6 +166,13 @@ def build_all_games(year=2026, ps=False):
             if missed:
                 save_frame = pd.concat([save_frame] + missed, ignore_index=True)
 
+        # Rows still without a GAME_ID (the shot-data schedule lacks that team's game that date, e.g. 2014-15 Raptors Jan-Apr 2015): take it from the spine.
+        if save_frame['GAME_ID'].isna().any() and not spine_day.empty:
+            by_player = spine_day.drop_duplicates('PLAYER_ID').set_index('PLAYER_ID')
+            miss = save_frame['GAME_ID'].isna()
+            save_frame.loc[miss, 'GAME_ID'] = save_frame.loc[miss, 'PLAYER_ID'].map(by_player['SPINE_GAME_ID'])
+            save_frame.loc[miss, 'TEAM_ID'] = save_frame.loc[miss, 'PLAYER_ID'].map(by_player['SPINE_TEAM_ID']).fillna(save_frame.loc[miss, 'TEAM_ID'])
+
         # Drop any remaining unmapped rows
         save_frame.dropna(subset=['GAME_ID'], inplace=True)
         save_frame.drop_duplicates(inplace=True)
