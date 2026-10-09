@@ -227,7 +227,7 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
                 url16 = f'https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=&PerMode=Totals&PlayerExperience=&PlayerOrTeam={unit}&PlayerPosition=&PtMeasureType=CatchShoot&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
                 df16=pull_data(url16)
     
-                url17 = f"https://stats.nba.com/stats/leaguedashteamstats?...&SeasonSegment=&SeasonType={stype}&ShotClockRange=..."
+                url17 = f"https://stats.nba.com/stats/leaguedashteamstats?Conference=&DateFrom={date}&DateTo={date}&Division=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&MeasureType=Advanced&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision="
                 df17 = pull_data(url17)
                 df17=df17[['TEAM_ID','POSS']]
                 df17.columns=['TEAM_ID','team_poss']
