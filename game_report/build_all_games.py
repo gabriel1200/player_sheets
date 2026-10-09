@@ -132,6 +132,14 @@ def build_all_games(year=2026, ps=False):
         save_frame = datedf.merge(to_merge, on=['TEAM_ID', 'date', 'year'], how='left')
         save_frame.drop_duplicates(inplace=True)
 
+        # Rows still without a GAME_ID (the shot-data schedule lacks that team's game that date, e.g. 2014-15 Raptors Jan-Apr 2015): take it from the spine. This runs BEFORE
+        # the index_master fallbacks below, which would otherwise hand the player to an earlier team of his season and attach that team's game (2026-04-10 Sexton/McClung).
+        if save_frame['GAME_ID'].isna().any() and not spine_day.empty:
+            by_player = spine_day.drop_duplicates('PLAYER_ID').set_index('PLAYER_ID')
+            miss = save_frame['GAME_ID'].isna()
+            save_frame.loc[miss, 'GAME_ID'] = save_frame.loc[miss, 'PLAYER_ID'].map(by_player['SPINE_GAME_ID'])
+            save_frame.loc[miss, 'TEAM_ID'] = save_frame.loc[miss, 'PLAYER_ID'].map(by_player['SPINE_TEAM_ID']).fillna(save_frame.loc[miss, 'TEAM_ID'])
+
         # Fallback Level 1: Match by player/date directly in gameframe
         if save_frame['GAME_ID'].isna().any():
             missing = save_frame[save_frame['GAME_ID'].isna()].reset_index(drop=True)
@@ -165,13 +173,6 @@ def build_all_games(year=2026, ps=False):
 
             if missed:
                 save_frame = pd.concat([save_frame] + missed, ignore_index=True)
-
-        # Rows still without a GAME_ID (the shot-data schedule lacks that team's game that date, e.g. 2014-15 Raptors Jan-Apr 2015): take it from the spine.
-        if save_frame['GAME_ID'].isna().any() and not spine_day.empty:
-            by_player = spine_day.drop_duplicates('PLAYER_ID').set_index('PLAYER_ID')
-            miss = save_frame['GAME_ID'].isna()
-            save_frame.loc[miss, 'GAME_ID'] = save_frame.loc[miss, 'PLAYER_ID'].map(by_player['SPINE_GAME_ID'])
-            save_frame.loc[miss, 'TEAM_ID'] = save_frame.loc[miss, 'PLAYER_ID'].map(by_player['SPINE_TEAM_ID']).fillna(save_frame.loc[miss, 'TEAM_ID'])
 
         # Drop any remaining unmapped rows
         save_frame.dropna(subset=['GAME_ID'], inplace=True)
