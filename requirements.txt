@@ -5,6 +5,7 @@ beautifulsoup4==4.12.3
 blessed==1.20.0
 blinker==1.8.2
 botocore==1.35.37
+curl_cffi==0.16.3
 bs4==0.0.2
 
 nba_api==1.6.1

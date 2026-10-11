@@ -1,0 +1,25 @@
+{
+  "season": 2026,
+  "season_type": "Playoffs",
+  "updated_at_utc": "2026-10-11T00:05:13.754021+00:00",
+  "player_rows": 91,
+  "sources": [
+    "https://stats.wnba.com/stats/",
+    "https://api.pbpstats.com/get-totals/wnba"
+  ],
+  "populated_endpoints": [
+    "base_stats",
+    "advanced_stats",
+    "team_advanced_poss",
+    "bio_stats"
+  ],
+  "empty_endpoints": [
+    "defend_overall",
+    "defend_3pt",
+    "defend_2pt",
+    "defend_lt_6ft_v2",
+    "defend_lt_10ft",
+    "defend_gt_15ft"
+  ],
+  "note": "WNBA defensive tracking endpoints returned no rows on both stats hosts for 2026 playoffs; the 2025 playoff control returned 89 rows. Other official stats and PBP totals were merged."
+}

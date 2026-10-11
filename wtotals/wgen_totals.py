@@ -34,6 +34,7 @@ import pandas as pd
 import glob
 import os
 import re
+import argparse
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -310,35 +311,49 @@ def total_save(df, ps=False, out_dir=None):
 # Run: for regular season AND postseason, merge each year, save a per-year file, then
 # concatenate into one totals file for that trail.
 # ---------------------------------------------------------------------------
-for ps in (False, True):
-    trail = '_ps' if ps else ''
-    label = 'postseason' if ps else 'regular season'
-
-    years = discover_years(ps=ps)
-    if not years:
-        print(f"No {label} _avg.csv files found - skipping {label}.")
-        continue
-
-    frames = []
-    for year in years:
-        df_year = merge_single_year(year, ps=ps)
-        if df_year is None:
-            print(f"Skipping {year}{trail}: no data (missing or empty avg file).")
+def build_totals(season_type='both', year=None):
+    season_types = (False, True) if season_type == 'both' else (season_type == 'ps',)
+    for ps in season_types:
+        trail = '_ps' if ps else ''
+        label = 'postseason' if ps else 'regular season'
+        years = [year] if year is not None else discover_years(ps=ps)
+        if not years:
+            print(f"No {label} _avg.csv files found - skipping {label}.")
             continue
-        df_year = finalize(df_year)
 
-        year_path = os.path.join(BASE_DIR, f'{year}{trail}_totals.csv')
-        df_year.to_csv(year_path, index=False)
-        print(f"Saved {year_path} ({df_year.shape[0]} rows, {df_year.shape[1]} cols)")
-        frames.append(df_year)
+        frames = []
+        for season_year in years:
+            df_year = merge_single_year(season_year, ps=ps)
+            if df_year is None:
+                print(f"Skipping {season_year}{trail}: no data (missing or empty avg file).")
+                continue
+            df_year = finalize(df_year)
 
-    if not frames:
-        print(f"No usable {label} data - skipping combined all_totals{trail}.csv.")
-        continue
+            year_path = os.path.join(BASE_DIR, f'{season_year}{trail}_totals.csv')
+            df_year.to_csv(year_path, index=False)
+            print(f"Saved {year_path} ({df_year.shape[0]} rows, {df_year.shape[1]} cols)")
+            frames.append(df_year)
 
-    all_data = pd.concat(frames, ignore_index=True)
-    all_data.sort_values(by=[c for c in ['PTS', 'MIN'] if c in all_data.columns], inplace=True)
+        if not frames:
+            print(f"No usable {label} data - skipping combined all_totals{trail}.csv.")
+            continue
 
-    total_path = os.path.join(BASE_DIR, f'all_totals{trail}.csv')
-    all_data.to_csv(total_path, index=False)
-    print(f"Saved {total_path} ({all_data.shape[0]} rows, {all_data.shape[1]} cols)")
+        total_path = os.path.join(BASE_DIR, f'all_totals{trail}.csv')
+        if year is not None and os.path.exists(total_path):
+            previous = pd.read_csv(total_path)
+            previous = previous[previous['year'] != year]
+            frames.insert(0, previous)
+
+        all_data = pd.concat(frames, ignore_index=True)
+        all_data.sort_values(by=[c for c in ['PTS', 'MIN'] if c in all_data.columns],
+                             kind='stable', inplace=True)
+        all_data.to_csv(total_path, index=False)
+        print(f"Saved {total_path} ({all_data.shape[0]} rows, {all_data.shape[1]} cols)")
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Build merged WNBA player totals.')
+    parser.add_argument('--season-type', choices=('rs', 'ps', 'both'), default='both')
+    parser.add_argument('--year', type=int, help='Update one year in the combined file')
+    args = parser.parse_args()
+    build_totals(args.season_type, args.year)

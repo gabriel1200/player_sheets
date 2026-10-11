@@ -3,8 +3,8 @@
 
 # WNBA port of averages_scrape.py
 # Changes from the NBA version:
-#   - LeagueID=00 -> LeagueID=10 on all 28 stats.nba.com endpoint calls (stats.nba.com
-#     serves WNBA data too, gated by LeagueID; no host change needed)
+#   - LeagueID=00 -> LeagueID=10 on the stats endpoints. pull_data routes
+#     WNBA requests to stats.wnba.com with the live-game browser headers/TLS setup.
 #   - Season string format changed from NBA's "YYYY-YY" (e.g. "2025-26") to WNBA's
 #     single calendar year (e.g. "2026"), in both pull_wnba_avg and pull_wnba_avg_classic,
 #     and in fetch_wnba_data's pbpstats.com call
@@ -34,31 +34,17 @@
 from nba_api.stats.static import players,teams
 import pandas as pd
 import requests
+from curl_cffi import requests as browser_requests
 import sys
 import os
 import time
+import argparse
 from datetime import datetime
 headers = {
     "Accept": "application/json, text/plain, */*",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Cache-Control": "no-cache",
-    "Connection": "keep-alive",
-    "Host": "stats.nba.com",
-    "Origin": "https://www.nba.com",
-    "Pragma": "no-cache",
-    "Referer": "https://www.nba.com/",
-    "Sec-Ch-Ua": '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-    "Sec-Ch-Ua-Mobile": "?0",
-    "Sec-Ch-Ua-Platform": '"Windows"',
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-site",
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/131.0.0.0 Safari/537.36"
-    )
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0 Safari/537.36",
+    "Referer": "https://www.wnba.com/",
+    "Origin": "https://www.wnba.com",
 }
 
 def format_date_to_url(date):
@@ -86,14 +72,14 @@ _ID_LIKE_COLS = {
 ENDPOINT_DIAGNOSTICS = []
 
 def pull_data(url, label='unlabeled'):
-
-
-
+    url = url.replace('https://stats.nba.com/stats/', 'https://stats.wnba.com/stats/')
     record = {'label': label, 'url': url, 'status': 'OK', 'rows': 0, 'cols': 0,
               'mostly_null_cols': [], 'error': ''}
 
     try:
-        resp = requests.get(url, headers=headers)
+        # Match the browser-TLS request used by web_app's WNBA live-game tool.
+        # Plain requests/curl times out against the stats host in this environment.
+        resp = browser_requests.get(url, headers=headers, impersonate='chrome', timeout=25)
         resp.raise_for_status()
         json = resp.json()
 
@@ -203,7 +189,7 @@ def pull_wnba_avg(dates, start_year,end_year,ps=False):
     if ps == True:
         stype='Playoffs'
         trail='_ps'
-    frames = []
+    all_years = []
     shotcolumns = ['FGA_FREQUENCY', 'FGM', 'FGA', 'FG_PCT', 'EFG_PCT', 'FG2A_FREQUENCY', 'FG2M', 'FG2A', 'FG2_PCT', 
                    'FG3A_FREQUENCY', 'FG3M', 'FG3A', 'FG3_PCT']
     unit='Player'
@@ -304,8 +290,8 @@ def pull_wnba_avg(dates, start_year,end_year,ps=False):
             df27 = pull_data(url27, label='bio_stats')
             df27=df27[['PLAYER_ID','AGE','PLAYER_HEIGHT_INCHES', 'PLAYER_WEIGHT', 'COLLEGE', 'COUNTRY', 'DRAFT_YEAR', 'DRAFT_ROUND', 'DRAFT_NUMBER']]
 
-            frames = [df2, df18, df19, df20, df21, df22, df23, df27]
-            for frame in frames:
+            merge_frames = [df2, df18, df19, df20, df21, df22, df23, df27]
+            for frame in merge_frames:
 
                 joined_columns = set(frame.columns) - set(df.columns)
                 joined_columns = list(joined_columns)
@@ -341,11 +327,11 @@ def pull_wnba_avg(dates, start_year,end_year,ps=False):
 
         yeardata=pd.concat(year_frame)
         yeardata.to_csv(str(year)+trail+'_avg.csv',index=False)
-        frames.append(yeardata)
+        all_years.append(yeardata)
         print(f"Year: {year}")
         print_diagnostics_report(year=year, trail=trail)
 
-    total = pd.concat(frames)
+    total = pd.concat(all_years)
     return total
 
 
@@ -455,43 +441,6 @@ def get_dates(start_year,end_year):
             df.drop_duplicates(inplace=True)
             dates.append(df)
     return pd.concat(dates)
-start_year=2026
-end_year=2027
-ps=False
-#dateframe=get_dates(start_year,end_year)
-#dates=dateframe['GAME_DATE'].unique().tolist()
-dates=[]
-df= pull_wnba_avg(dates,start_year,end_year,ps=ps)
-# NOTE: 1630169 is Luka Doncic's NBA player_id - swap this in for a WNBA player_id
-# (or just use df.head()) to sanity-check the pull.
-print(df.head()[['PLAYER_NAME','PLAYER_ID','GP','MIN']])
-#data=pull_game_level(dates)
-season_string='ps' if ps else 'rs'
-
-
-
-
-# In[ ]:
-
-
-#start_year=2014
-#end_year=2026
-#df= pull_wnba_avg(dates,start_year,end_year,ps=True)
-
-#start_year=1997
-#end_year=2014
-#df= pull_wnba_avg_classic(dates,start_year,end_year,ps=True)
-
-
-
-# Define the API URL
-url = "https://api.pbpstats.com/get-totals/wnba"
-
-# Get the current year
-current_year = datetime.now().year
-
-# Iterate over seasons from 2001 to current year
-
 def fetch_wnba_data(start_year, end_year, season_type='rs', save_to_csv=True):
     """
     Fetch WNBA player stats from the PBP Stats API for a given range of seasons and season type.
@@ -573,8 +522,13 @@ def fetch_wnba_data(start_year, end_year, season_type='rs', save_to_csv=True):
 
     return all_data 
 
-# NOTE: pull_wnba_avg's loop is range(start_year, end_year) - end-EXCLUSIVE, so it covers
-# start_year..end_year-1. fetch_wnba_data's loop is range(start_year, end_year+1) - end-
-# INCLUSIVE. Passing end_year-1 here makes the two cover the same years. If you ever change
-# how pull_wnba_avg or fetch_wnba_data loop internally, re-check this line.
-data = fetch_wnba_data(start_year , end_year - 1, season_type=season_string)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Fetch WNBA player season totals.')
+    parser.add_argument('--year', type=int, default=datetime.now().year)
+    parser.add_argument('--season-type', choices=('rs', 'ps'), default='rs')
+    args = parser.parse_args()
+    is_playoffs = args.season_type == 'ps'
+    # pull_wnba_avg has an exclusive end year; fetch_wnba_data is inclusive.
+    df = pull_wnba_avg([], args.year, args.year + 1, ps=is_playoffs)
+    print(df.head()[['PLAYER_NAME', 'PLAYER_ID', 'GP', 'MIN']])
+    fetch_wnba_data(args.year, args.year, season_type=args.season_type)
