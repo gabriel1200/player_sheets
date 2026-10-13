@@ -11,6 +11,9 @@ import sys
 import os
 import time
 from datetime import datetime
+from pathlib import Path
+
+from complete_pbp_totals import complete as complete_pbp_totals
 
 def format_date_to_url(date):
     # Convert date from YYYYMMDD to datetime object
@@ -504,8 +507,20 @@ def fetch_nba_data(start_year, end_year, season_type='rs', save_to_csv=True):
             # Save to CSV if enabled
             if save_to_csv:
                 filename = f"{year_label}_pbp.csv"
-                df.to_csv(filename, index=False)
-                print(f"Saved: {filename}")
+                raw_file = Path(filename).with_suffix('.raw.tmp.csv')
+                df.to_csv(raw_file, index=False)
+                try:
+                    # The unfiltered API response stops at 500 players. Only
+                    # replace the saved file after the full set validates.
+                    complete_pbp_totals(
+                        year, season_type == 'ps',
+                        Path('/tmp/pbpstats-complete') / str(year), True,
+                        source_path=raw_file, destination_path=Path(filename),
+                    )
+                finally:
+                    raw_file.unlink(missing_ok=True)
+                print(f"Saved complete: {filename}")
+                all_data[-1] = pd.read_csv(filename, low_memory=False)
 
         except Exception as e:
             print(f"Error fetching data for {season} {season_type_label}: {e}")
