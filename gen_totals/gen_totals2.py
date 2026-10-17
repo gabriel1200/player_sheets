@@ -96,8 +96,10 @@ def collect_yeardata(ps=False):
             if year == TARGET_YEAR or TARGET_YEAR is None:
                 check_fanout(df2, f"raw {year}{trail}_pbp.csv (pre-merge)")
 
-            curcol =[col.lower() for col in df.columns]
-            keepcol =[col for col in df2.columns if col.lower() not in curcol]
+            # Compare names case-sensitively: PBP Points/PlusMinus are different stats from the
+            # tracking POINTS/PLUSMINUS columns and were being dropped as duplicates.
+            curcol = set(df.columns)
+            keepcol =[col for col in df2.columns if col not in curcol]
             keepcol.append('PLAYER_ID')
             keepcol.append('year')
             df2=df2[keepcol]
