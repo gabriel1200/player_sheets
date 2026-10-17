@@ -118,11 +118,11 @@ def patch_parquet(parquet, repaired, sort_years):
 
 
 def targets():
-    # gen_totals names these backwards: ps=False writes all_totals_ps.csv / modern_totals_ps.csv.
-    yield HERE / 'all_totals_ps.csv', False, False
-    yield HERE / 'modern_totals_ps.csv', False, False
-    yield HERE / 'all_totals.csv', True, False
-    yield HERE / 'modern_totals.csv', True, False
+    # Names corrected 2026-10-17 (before that, ps=False wrote all_totals_ps.csv).
+    yield HERE / 'all_totals.csv', False, False
+    yield HERE / 'modern_totals.csv', False, False
+    yield HERE / 'all_totals_ps.csv', True, False
+    yield HERE / 'modern_totals_ps.csv', True, False
     for path in sorted(YEAR_TOTALS.glob('*.csv')):
         stem = path.stem
         playoffs = stem.endswith('_ps')

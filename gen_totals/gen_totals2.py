@@ -284,12 +284,12 @@ data = data[columns_to_front + [col for col in data.columns if col not in column
 
 check_fanout(data, "after column selection/reorder (pre-save)")
 
-total_path = 'all_totals.csv' if ps else 'all_totals_ps.csv'
+total_path = 'all_totals_ps.csv' if ps else 'all_totals.csv'
 data.to_csv(total_path,index=False)
 modern = data[data.year>=2014]
 
-modern_path='modern_totals.csv' if ps else 'modern_totals_ps.csv'
-data.to_csv(modern_path,index=False)
+modern_path = 'modern_totals_ps.csv' if ps else 'modern_totals.csv'
+modern.to_csv(modern_path,index=False)
 def perc_save(df, ps=True):
     trail = '_ps' if ps else ''
     player_ids = df['PLAYER_ID'].unique().tolist()
