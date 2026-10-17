@@ -39,7 +39,7 @@ headers = {
 class PBPStatsAPI:
     def __init__(self, start_year: int = 2013, end_year: int = 2024):
         self.base_url = "https://api.pbpstats.com/get-game-logs/nba?"
-        self.season_types = ["Playoffs"]
+        self.season_types = ["Regular Season"]
         self.start_year = start_year
         self.end_year = end_year    
 
@@ -398,7 +398,7 @@ def get_teams_needing_update(
         return all_team_ids, all_team_ids
 
 if __name__ == "__main__":
-    start_year = 2026
+    start_year = 2027
     end_year = start_year
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
@@ -408,7 +408,8 @@ if __name__ == "__main__":
 
     try:
         df_index = pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/index_master.csv')
-        df_index = df_index[df_index.year >= start_year]
+        # index_master gets the new season's rows only after it starts; last season lists the same teams.
+        df_index = df_index[df_index.year >= start_year - 1]
         df_index = df_index[df_index.team != 'TOT']
         # Ensure correct type for the list
         all_team_ids = df_index['team_id'].astype(int).unique().tolist()

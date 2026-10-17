@@ -409,17 +409,18 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
 
 
 
-    yeardata=pd.concat(year_frames)
+    # Empty before the season's first game.
+    yeardata=pd.concat(year_frames) if year_frames else pd.DataFrame()
 
 
 
     return yeardata
 
-START_SEASON=2026
+START_SEASON=2027
 start_year=START_SEASON
 end_year=start_year+1
 
-ps=True
+ps=False
 
 df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 #df= pull_game_avg(start_year,end_year,ps=True,unit='Team')
@@ -704,7 +705,9 @@ total_fgoreb=[]
 total_opp_fgdreb=[]
 total_opp_ftdreb=[]
 # Loop through each year for regular season
-end_year= START_SEASON+1
+# Before the season's first game pbpstats returns no rows for START_SEASON (header-only file); leave it out until it does.
+has_current = os.path.exists(f"{START_SEASON}.csv") and not pd.read_csv(f"{START_SEASON}.csv").empty
+end_year = START_SEASON + 1 if has_current else START_SEASON
 for year in range(2001, end_year):
     # Read the CSV file for the year
     df = pd.read_csv(f"{year}{trail}.csv")
@@ -787,7 +790,7 @@ total_opp_fgdreb=[]
 total_opp_ftdreb=[]
 
 # Loop through each year for playoffs
-for year in range(2001, end_year-1):
+for year in range(2001, START_SEASON):
     # Read the CSV file for the year
     # Read the CSV file for the year
     df = pd.read_csv(f"{year}{trail}.csv")
@@ -827,7 +830,7 @@ for year in range(2001, end_year-1):
     total_ftoreb.append(df['FTOffRebounds'].sum())
 # Create a DataFrame with the results for playoffs
 
-years = list(range(2001, end_year-1))
+years = list(range(2001, START_SEASON))
 seasons=[str(year-1)+'-'+str(year)[-2:] for year in years]
 testdf = pd.DataFrame({
     'year': years,
@@ -855,9 +858,9 @@ testdf.to_csv('team_averages_ps.csv', index=False)
 # In[ ]:
 
 
-end_year=START_SEASON+1
+end_year = START_SEASON + 1 if has_current else START_SEASON
 for year in range(2001, end_year):    
-    trail = 'ps'
+    trail = ''  # '' in the regular season, 'ps' once the playoffs start
     ps = True if trail == 'ps' else False
 
     pbp = pd.read_csv(str(year) + trail + '.csv')
@@ -988,6 +991,8 @@ shooting.to_csv('../../web_app/data/team_threes.csv',index=False)
 trail='ps'
 frames=[]
 for year in range(2001,end_year):
+    if not os.path.exists(str(year)+trail+'_team_totals.csv'):
+        continue  # no playoff totals until that season's playoffs
     df= pd.read_csv(str(year)+trail+'_team_totals.csv')
     df['year']=year
 

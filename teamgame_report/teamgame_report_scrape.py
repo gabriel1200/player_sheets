@@ -25,7 +25,7 @@ def format_date_to_url(date):
     return formatted_date
 
 # Example usage
-SEASON_YEAR=2026
+SEASON_YEAR=2027
 
 def pull_data(url, max_retries=3, sleep_seconds=1):
     # Same fingerprint as game_report/game_report_scrape.py; the older
@@ -326,8 +326,12 @@ def get_dates(start_year,end_year,ps=False):
                 df.drop_duplicates(inplace=True)
                 df['year']=year
                 dates.append(df)
+    if not dates:
+        # Before the season's first game shot_data has no team files for it yet.
+        print(f"No {start_year}{trail} games in shot_data yet; nothing to scrape.")
+        sys.exit(0)
     return pd.concat(dates)
-ps=True
+ps=False
 dateframe=get_dates(start_year,end_year,ps=ps)
 
 dates=dateframe['GAME_DATE'].unique().tolist()
@@ -441,7 +445,7 @@ all_pbp = []
 all_pbp_vs = []
 all_nba = []
 trail='ps' if ps else ''
-start_year=2026
+start_year=SEASON_YEAR
 end_year=SEASON_YEAR+1
 
 for year in range(start_year, end_year):
