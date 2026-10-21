@@ -490,6 +490,10 @@ for year in range(start_year,end_year):
                 missing_frame=missing[missing.PLAYER_ID==missed_player].reset_index(drop=True)
                 print(missing_frame)
                 temp_index=year_index[year_index.nba_id==missed_player].reset_index(drop=True)
+                if temp_index.empty:
+                    # e.g. a rookie the player index doesn't have yet; picked up once it does
+                    print(f'Skipping player {missed_player}: not in the player index yet')
+                    continue
                 team_id=temp_index.iloc[0]['team_id']
                 team=temp_index.iloc[0]['team']
                 missing_frame['TEAM_ID']=int(team_id)
@@ -497,8 +501,9 @@ for year in range(start_year,end_year):
                 missing_frame= missing_frame.merge(to_merge,on=['TEAM_ID','date','year'],how='left')
                 missed.append(missing_frame)
 
-            missing=pd.concat(missed)
-            save_frame=pd.concat([save_frame,missing])
+            if missed:
+                missing=pd.concat(missed)
+                save_frame=pd.concat([save_frame,missing])
         if save_frame['GAME_ID'].isna().any():
         
             missing=save_frame[save_frame['GAME_ID'].isna()].reset_index(drop=True)
