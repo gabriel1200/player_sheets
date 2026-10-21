@@ -1,9 +1,11 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
+# Generated from pbp_gamelogs.ipynb by nb2py.py; edit the notebook.
 
 
+import os, datetime as _dt
+_today = _dt.date.today()
+SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
+PLAYOFFS = os.environ.get("NBA_PLAYOFFS") == "1"
 #!/usr/bin/env python
 # coding: utf-8
 
@@ -398,7 +400,7 @@ def get_teams_needing_update(
         return all_team_ids, all_team_ids
 
 if __name__ == "__main__":
-    start_year = 2027
+    start_year = SEASON_YEAR
     end_year = start_year
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
@@ -532,4 +534,3 @@ if __name__ == "__main__":
             logging.info(f"Saved {year_dir}/vs_all_logs.csv")
 
     logging.info("Done.")
-

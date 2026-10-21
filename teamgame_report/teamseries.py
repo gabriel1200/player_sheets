@@ -1,16 +1,18 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
+# Generated from teamseries.ipynb by nb2py.py; edit the notebook.
 
 
+import os, datetime as _dt
+_today = _dt.date.today()
+SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
+PLAYOFFS = os.environ.get("NBA_PLAYOFFS") == "1"
 import pandas as pd
 import requests
 import os
 from nba_api.stats.static import teams
 import io
 
-def get_dates(start_year=2025, end_year=2026):
+def get_dates(start_year=SEASON_YEAR, end_year=SEASON_YEAR + 1):
     dates = []
     for year in range(start_year, end_year):
         for team in teams.get_teams():
@@ -103,7 +105,7 @@ def process_and_save_team_series_data(df):
         group.to_csv(os.path.join(series_dir, f'{safe_key}.csv'), index=False)
     return df
 
-def run_team_series_pipeline(start_year=2024, end_year=2025):
+def run_team_series_pipeline(start_year=SEASON_YEAR, end_year=SEASON_YEAR + 1):
     dates = get_dates(start_year, end_year)
     print(dates)
     if dates.empty:
@@ -114,12 +116,8 @@ def run_team_series_pipeline(start_year=2024, end_year=2025):
     return process_and_save_team_series_data(raw_df)
 
 if __name__ == "__main__":
-    for year in range(2026, 2027):
+    for year in range(SEASON_YEAR, SEASON_YEAR + 1):
         run_team_series_pipeline(year, year + 1)
-
-
-# In[ ]:
-
 
 
 

@@ -1,9 +1,11 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
+# Generated from team_average_scrape.ipynb by nb2py.py; edit the notebook.
 
 
+import os, datetime as _dt
+_today = _dt.date.today()
+SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
+PLAYOFFS = os.environ.get("NBA_PLAYOFFS") == "1"
 from nba_api.stats.static import players,teams
 import pandas as pd
 import requests
@@ -416,20 +418,17 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
 
     return yeardata
 
-START_SEASON=2027
+START_SEASON=SEASON_YEAR
 start_year=START_SEASON
 end_year=start_year+1
 
-ps=False
+ps=PLAYOFFS
 
 df= pull_game_avg(start_year,end_year,unit='Team',ps=ps)
 #df= pull_game_avg(start_year,end_year,ps=True,unit='Team')
 
 #data=pull_game_level(dates)
 df
-
-
-# In[2]:
 
 
 import requests
@@ -648,9 +647,6 @@ scrape_teams_vs(ps=ps)
 scrape_teams(ps=ps)
 
 
-# In[3]:
-
-
 import pandas as pd
 
 import pandas as pd
@@ -680,9 +676,6 @@ def get_playtype_summary(ps=False):
     return pivoted
 playtype_test=get_playtype_summary()
 playtype_test.columns
-
-
-# In[4]:
 
 
 # Regular-season section: always the regular-season files, whatever ps is set
@@ -855,17 +848,14 @@ testdf.to_csv('team_averages_ps.csv', index=False)
 
 
 
-# In[ ]:
-
-
 end_year = START_SEASON + 1 if has_current else START_SEASON
 for year in range(2001, end_year):    
-    trail = ''  # '' in the regular season, 'ps' once the playoffs start
+    trail = 'ps' if PLAYOFFS else ''
     ps = True if trail == 'ps' else False
 
     pbp = pd.read_csv(str(year) + trail + '.csv')
     pbpvs = pd.read_csv(str(year) + 'vs' + trail + '.csv')
-    if year==2026:
+    if year==SEASON_YEAR:
         print(pbp)
         print(pbpvs)
     pbp = four_factors_data(pbp, pbpvs, year, ps=False)
@@ -917,13 +907,7 @@ for year in range(2001, end_year):
     total.to_csv(str(year) + trail + '_team_totals.csv', index=False)
 
 
-# In[ ]:
 
-
-
-
-
-# In[6]:
 
 
 shooting_columns = [
@@ -1005,14 +989,7 @@ shooting.to_csv('team_threes_ps.csv',index=False)
 shooting.to_csv('../../web_app/data/team_threes_ps.csv',index=False)
 
 
-# In[ ]:
-
-
 shooting.columns
-
-
-# In[ ]:
-
 
 
 

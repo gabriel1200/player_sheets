@@ -2,30 +2,28 @@
 
 # Convert Jupyter notebooks to Python scripts in their respective directories
 cd game_report
-jupyter nbconvert --to script game_report_scrape.ipynb
-jupyter nbconvert --to script pbp_gamelogs.ipynb
+python ~/basketball/nb2py.py game_report_scrape.ipynb
+python ~/basketball/nb2py.py pbp_gamelogs.ipynb
 cd ..
 
 
 cd game_report/all_games
-jupyter nbconvert --to script master_record.ipynb
+python ~/basketball/nb2py.py master_record.ipynb
 cd ../..
 cd teamgame_report
-jupyter nbconvert --to script teamgame_report_scrape.ipynb
+python ~/basketball/nb2py.py teamgame_report_scrape.ipynb
 cd ..
 
 cd team_totals
-jupyter nbconvert --to script team_average_scrape.ipynb
+python ~/basketball/nb2py.py team_average_scrape.ipynb
 cd ..
 
 cd gen_totals
 
-jupyter nbconvert --to script averages_scrape.ipynb
-jupyter nbconvert --to script gen_totals.ipynb
+python ~/basketball/nb2py.py gen_totals.ipynb
 cd ..
 
 cd lineups
-jupyter nbconvert --to script lineups.ipynb
 cd ..
 
 # Run the Python scripts in their respective directories
@@ -53,7 +51,7 @@ cd ..
 
 cd teamgame_report
 python teamgame_report_scrape.py
-jupyter nbconvert --to script teamseries.ipynb
+python ~/basketball/nb2py.py teamseries.ipynb
 python teamseries.py
 cd ..
 

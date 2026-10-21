@@ -1,9 +1,11 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
+# Generated from game_report_scrape.ipynb by nb2py.py; edit the notebook.
 
 
+import os, datetime as _dt
+_today = _dt.date.today()
+SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
+PLAYOFFS = os.environ.get("NBA_PLAYOFFS") == "1"
 from nba_api.stats.static import players,teams
 import pandas as pd
 import requests
@@ -359,8 +361,8 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
     total = pd.concat(dframes)
     return total
 
-start_year=2017
-end_year=2019
+start_year=SEASON_YEAR
+end_year=SEASON_YEAR+1
 
 
 
@@ -387,7 +389,7 @@ def get_dates(start_year, end_year, ps=False):
                 print(f"Skipping {path}: {e}")
     
     return pd.concat(dates, ignore_index=True) if dates else pd.DataFrame()
-ps=False
+ps=PLAYOFFS
 dateframe=get_dates(start_year,end_year,ps=ps)
 
 dates=dateframe['GAME_DATE'].unique().tolist()
@@ -398,13 +400,9 @@ df= pull_game_level(dateframe,start_year,end_year,ps=ps)
 df
 df.drop_duplicates(subset=['PLAYER_ID','TEAM_ID','date'])
 
-# In[ ]:
-
 
 dates.sort()
 dates
-
-# In[ ]:
 
 
 '''
@@ -425,8 +423,6 @@ merge
 
 merge[merge.GAME_ID.isna()]
 '''
-
-# In[ ]:
 
 
 
@@ -603,12 +599,8 @@ for year in range(start_year,end_year):
             # Exit early for testing if more than 8 files are saved.
         
 
-# In[ ]:
 
 
-
-
-# In[ ]:
 
 
 

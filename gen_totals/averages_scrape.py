@@ -4,6 +4,10 @@
 # In[ ]:
 
 
+import os, datetime as _dt
+_today = _dt.date.today()
+SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
+PLAYOFFS = os.environ.get("NBA_PLAYOFFS") == "1"
 from nba_api.stats.static import players,teams
 import pandas as pd
 import requests
@@ -416,9 +420,9 @@ def get_dates(start_year,end_year):
             df.drop_duplicates(inplace=True)
             dates.append(df)
     return pd.concat(dates)
-start_year=2026
+start_year=SEASON_YEAR
 end_year=start_year+1
-ps=True
+ps=PLAYOFFS
 #dateframe=get_dates(start_year,end_year)
 #dates=dateframe['GAME_DATE'].unique().tolist()
 dates=[]

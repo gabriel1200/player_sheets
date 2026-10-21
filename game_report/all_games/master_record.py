@@ -1,9 +1,11 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
+# Generated from master_record.ipynb by nb2py.py; edit the notebook.
 
 
+import os, datetime as _dt
+_today = _dt.date.today()
+SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
+PLAYOFFS = os.environ.get("NBA_PLAYOFFS") == "1"
 import os
 import pandas as pd
 
@@ -11,9 +13,9 @@ import pandas as pd
 csv_dir = '.'  # or provide a full path like '/Users/yourname/data/'
 
 # Get all CSV file names in the directory
-csv_files = ['all_'+str(year)+'.csv' for year in range (2014,2027)]
+csv_files = ['all_'+str(year)+'.csv' for year in range (2014,SEASON_YEAR+1)]
 
-csv_files_ps=['all_'+str(year)+'ps.csv' for year in range (2014,2027)]
+csv_files_ps=['all_'+str(year)+'ps.csv' for year in range (2014,SEASON_YEAR+1)]
 csv_files=csv_files+csv_files_ps
 # Initialize a list to hold DataFrames
 dfs = []
@@ -35,9 +37,6 @@ else:
     print("No CSV files were loaded.")
 
 
-# In[7]:
-
-
 index_col=['PLAYER_ID', 'PLAYER_NAME','TEAM_ABBREVIATION','TEAM_ID','GAME_ID','year','MIN','date']
 
 game_record=combined_df[index_col]
@@ -46,21 +45,11 @@ game_record.to_csv('master_record.csv',index=False)
 game_record
 
 
-# In[3]:
-
-
 game_record
-
-
-# In[ ]:
 
 
 game_record.sort_values(by='date',inplace=True)
 game_record
-
-
-# In[ ]:
-
 
 
 

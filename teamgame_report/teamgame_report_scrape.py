@@ -1,9 +1,11 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
+# Generated from teamgame_report_scrape.ipynb by nb2py.py; edit the notebook.
 
 
+import os, datetime as _dt
+_today = _dt.date.today()
+SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
+PLAYOFFS = os.environ.get("NBA_PLAYOFFS") == "1"
 from nba_api.stats.static import players,teams
 import pandas as pd
 import requests
@@ -25,7 +27,6 @@ def format_date_to_url(date):
     return formatted_date
 
 # Example usage
-SEASON_YEAR=2027
 
 def pull_data(url, max_retries=3, sleep_seconds=1):
     # Same fingerprint as game_report/game_report_scrape.py; the older
@@ -331,7 +332,7 @@ def get_dates(start_year,end_year,ps=False):
         print(f"No {start_year}{trail} games in shot_data yet; nothing to scrape.")
         sys.exit(0)
     return pd.concat(dates)
-ps=False
+ps=PLAYOFFS
 dateframe=get_dates(start_year,end_year,ps=ps)
 
 dates=dateframe['GAME_DATE'].unique().tolist()
@@ -373,10 +374,9 @@ inverted_team_dict = {
 }
 
 
-# In[2]:
 
 
-for year in range(2026,2026):    
+for year in range(SEASON_YEAR, SEASON_YEAR):  # intentionally empty; widen to rebuild    
     trail='ps' if ps else ''
     pbp=pd.read_csv(str(year)+trail+('.csv'))
     pbpvs=pd.read_csv(str(year)+'vs'+trail+('.csv'))
@@ -434,9 +434,6 @@ for year in range(2026,2026):
         total=pbp.reset_index()
     total.rename({'3SecondViolations':'ThreeSecondViolations'},inplace=True)
     total.to_csv(str(year)+trail+'_team_totals.csv',index=False)
-
-
-# In[ ]:
 
 
 import pandas as pd
@@ -634,10 +631,6 @@ for year in range(start_year, end_year):
 
 
 
-
-
-
-# In[ ]:
 
 
 
