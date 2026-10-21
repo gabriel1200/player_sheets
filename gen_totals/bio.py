@@ -1,7 +1,11 @@
+import os, datetime as _dt
+_today = _dt.date.today()
+SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
+PLAYOFFS = os.environ.get("NBA_PLAYOFFS") == "1"
 import pandas as pd
 import requests 
 import time
-url='https://stats.nba.com/stats/leaguedashplayerbiostats?College=&Conference=&Country=&DateFrom=&DateTo=&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=F&Season=2025-26&SeasonSegment=&SeasonType=Regular%20Season&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
+url=f'https://stats.nba.com/stats/leaguedashplayerbiostats?College=&Conference=&Country=&DateFrom=&DateTo=&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PerMode=PerGame&Period=0&PlayerExperience=&PlayerPosition=F&Season={SEASON_YEAR - 1}-{str(SEASON_YEAR)[-2:]}&SeasonSegment=&SeasonType={'Playoffs' if PLAYOFFS else 'Regular%20Season'}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
 
 def pull_data(url):
 
@@ -62,12 +66,12 @@ class Config:
     Central configuration class for the scraper.
     """
     # Set to True for playoffs data, False for regular season
-    PLAYOFFS_MODE = False 
+    PLAYOFFS_MODE = PLAYOFFS
     
     # Current year to scrape (e.g., 2026 for 2025-26 season)
-    CURRENT_YEAR = 2026
+    CURRENT_YEAR = SEASON_YEAR
     # Current season in NBA API format
-    CURRENT_SEASON = "2025-26"
+    CURRENT_SEASON = f"{SEASON_YEAR - 1}-{str(SEASON_YEAR)[-2:]}"
     
     # File paths with dynamic playoff suffix
     @property
@@ -241,7 +245,7 @@ if __name__ == "__main__":
     print(totals_data_with_pos.head())
     totals_data_with_pos=totals_data_with_pos[['Pos','bref_id']]
     index_master= pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/index_master.csv')
-    index_master=index_master[index_master.year==2026]
+    index_master=index_master[index_master.year==SEASON_YEAR]
 
     player_index=index_master.merge(totals_data_with_pos,on='bref_id')
     player_index.to_csv('modern_index.csv',index=False)

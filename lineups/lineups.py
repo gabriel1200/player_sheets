@@ -4,6 +4,10 @@
 # In[ ]:
 
 
+import os, datetime as _dt
+_today = _dt.date.today()
+SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
+PLAYOFFS = os.environ.get("NBA_PLAYOFFS") == "1"
 import pandas as pd
 import requests
 import plotly.graph_objects as go
@@ -20,9 +24,9 @@ import glob
 
 
 start_time = time.time()
-SEASONYEAR=2026
-directory = "data/2026"
-ps = True
+SEASONYEAR=SEASON_YEAR
+directory = f"data/{SEASONYEAR}"
+ps = PLAYOFFS
 
 # Use glob to find all CSV files in the directory
 csv_files = glob.glob(os.path.join(directory, "*.csv"))
