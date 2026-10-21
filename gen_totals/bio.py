@@ -190,7 +190,7 @@ def pull_bref_data(totals=False):
         # --- ADDED: Extract Player Position ('Pos') ---
         position = get_stat_from_row(row, 'pos', "N/A")
         
-        gp = get_stat_from_row(row, 'g', "0")
+        gp = get_stat_from_row(row, 'games', "0")
         mp = get_stat_from_row(row, 'mp', "0")
 
         # Get shooting stats with dynamic suffixes
