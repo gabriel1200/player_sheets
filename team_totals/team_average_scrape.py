@@ -6,6 +6,9 @@ import os, datetime as _dt
 _today = _dt.date.today()
 SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
 PLAYOFFS = os.environ.get("NBA_PLAYOFFS") == "1"
+import sys
+sys.path.insert(0, os.path.expanduser("~/basketball"))
+from nba_headers import NBA_HEADERS, NBA_TIMEOUT  # shared stats.nba.com headers; refresh there when requests hang
 from nba_api.stats.static import players,teams
 import pandas as pd
 import requests
@@ -27,21 +30,9 @@ def format_date_to_url(date):
 from fourfactors import four_factors_data
 
 def pull_data(url):
-    headers = {
-        "Host": "stats.nba.com",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
-        "Accept": "application/json, text/plain, */*",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "keep-alive",
-        "Referer": "https://stats.nba.com/",
-        "Origin": "https://stats.nba.com",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
-    }
+    headers = NBA_HEADERS
 
-    json = requests.get(url,headers = headers).json()
+    json = requests.get(url, headers=headers, timeout=NBA_TIMEOUT).json()
 
     if len(json["resultSets"])== 1:
 

@@ -6,6 +6,9 @@ import os, datetime as _dt
 _today = _dt.date.today()
 SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
 PLAYOFFS = os.environ.get("NBA_PLAYOFFS") == "1"
+import sys
+sys.path.insert(0, os.path.expanduser("~/basketball"))
+from nba_headers import NBA_HEADERS, NBA_TIMEOUT  # shared stats.nba.com headers; refresh there when requests hang
 from nba_api.stats.static import players,teams
 import pandas as pd
 import requests
@@ -37,30 +40,12 @@ def pull_data(url, max_retries=3, delay_seconds=5):
     Returns:
         pandas.DataFrame or None: The parsed data as a DataFrame, or None if all retries fail.
     """
-    headers = {
-        "Host": "stats.nba.com",
-        "Connection": "keep-alive",
-        "Pragma": "no-cache",
-        "Cache-Control": "no-cache",
-        "Dnt": "1",
-        "Sec-Ch-Ua": '"Not=A?Brand";v="99", "Google Chrome";v="151", "Chromium";v="151"',
-        "Sec-Ch-Ua-Mobile": "?1",
-        "Sec-Ch-Ua-Platform": '"Android"',
-        "User-Agent": "Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36",
-        "Accept": "*/*",
-        "Origin": "https://www.nba.com",
-        "Sec-Fetch-Site": "same-site",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Dest": "empty",
-        "Referer": "https://www.nba.com/",
-        "Accept-Encoding": "gzip, deflate, br, zstd",
-        "Accept-Language": "en-US,en;q=0.9",
-    }
+    headers = NBA_HEADERS
     for attempt in range(max_retries):
         try:
             # --- API Request Attempt ---
             print(f"Attempt {attempt + 1} of {max_retries} to pull data")
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, timeout=NBA_TIMEOUT)
             response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx)
             json_data = response.json()
 
