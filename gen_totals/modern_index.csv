@@ -1,26 +1,33 @@
 player,url,year,team,bref_id,nba_id,team_id,Pos
+Tyrese Maxey,https://www.basketball-reference.com/players/m/maxeyty01.html,2027,PHI,maxeyty01,1630178,1610612755.0,PG
+Shai Gilgeous-Alexander,https://www.basketball-reference.com/players/g/gilgesh01.html,2027,OKC,gilgesh01,1628983,1610612760.0,PG
 Anthony Edwards,https://www.basketball-reference.com/players/e/edwaran01.html,2027,MIN,edwaran01,1630162,1610612750.0,SG
 Ty Jerome,https://www.basketball-reference.com/players/j/jeromty01.html,2027,MEM,jeromty01,1629660,1610612763.0,SG
+Jaylen Brown,https://www.basketball-reference.com/players/b/brownja02.html,2027,PHI,brownja02,1627759,1610612755.0,SF
 Paul George,https://www.basketball-reference.com/players/g/georgpa01.html,2027,BOS,georgpa01,202331,1610612738.0,PF
+Joel Embiid,https://www.basketball-reference.com/players/e/embiijo01.html,2027,PHI,embiijo01,203954,1610612755.0,C
 Giannis Antetokounmpo,https://www.basketball-reference.com/players/a/antetgi01.html,2027,MIA,antetgi01,203507,1610612748.0,PF
 Paolo Banchero,https://www.basketball-reference.com/players/b/banchpa01.html,2027,ORL,banchpa01,1631094,1610612753.0,PF
 Anthony Davis,https://www.basketball-reference.com/players/d/davisan02.html,2027,WAS,davisan02,203076,1610612764.0,PF
 Julius Randle,https://www.basketball-reference.com/players/r/randlju01.html,2027,BRK,randlju01,203944,1610612751.0,PF
+Jalen Williams,https://www.basketball-reference.com/players/w/willija06.html,2027,OKC,willija06,1631114,1610612760.0,SG
 Cooper Flagg,https://www.basketball-reference.com/players/f/flaggco01.html,2027,DAL,flaggco01,1642843,1610612742.0,SF
-Shai Gilgeous-Alexander,https://www.basketball-reference.com/players/g/gilgesh01.html,2027,OKC,gilgesh01,1628983,1610612760.0,PG
+Donovan Mitchell,https://www.basketball-reference.com/players/m/mitchdo01.html,2027,CLE,mitchdo01,1628378,1610612739.0,SG
 Nickeil Alexander-Walker,https://www.basketball-reference.com/players/a/alexani01.html,2027,ATL,alexani01,1629638,1610612737.0,SG
+LeBron James,https://www.basketball-reference.com/players/j/jamesle01.html,2027,PHI,jamesle01,2544,1610612755.0,SF
 Kevin Durant,https://www.basketball-reference.com/players/d/duranke01.html,2027,HOU,duranke01,201142,1610612745.0,PF
 Darius Garland,https://www.basketball-reference.com/players/g/garlada01.html,2027,LAC,garlada01,1629636,1610612746.0,PG
 Pascal Siakam,https://www.basketball-reference.com/players/s/siakapa01.html,2027,IND,siakapa01,1627783,1610612754.0,PF
 Jabari Smith Jr.,https://www.basketball-reference.com/players/s/smithja05.html,2027,HOU,smithja05,1631095,1610612745.0,PF
 Luka Dončić,https://www.basketball-reference.com/players/d/doncilu01.html,2027,LAL,doncilu01,1629029,1610612747.0,PG
 Zach LaVine,https://www.basketball-reference.com/players/l/lavinza01.html,2027,SAC,lavinza01,203897,1610612758.0,SG
-Tyrese Maxey,https://www.basketball-reference.com/players/m/maxeyty01.html,2027,PHI,maxeyty01,1630178,1610612755.0,PG
+Chet Holmgren,https://www.basketball-reference.com/players/h/holmgch01.html,2027,OKC,holmgch01,1631096,1610612760.0,C
 Walker Kessler,https://www.basketball-reference.com/players/k/kesslwa01.html,2027,LAL,kesslwa01,1631117,1610612747.0,C
 Michael Porter Jr.,https://www.basketball-reference.com/players/p/portemi01.html,2027,BRK,portemi01,1629008,1610612751.0,SF
 Damian Lillard,https://www.basketball-reference.com/players/l/lillada01.html,2027,POR,lillada01,203081,1610612757.0,PG
 Stephon Castle,https://www.basketball-reference.com/players/c/castlst01.html,2027,SAS,castlst01,1642264,1610612759.0,PG
 Tyler Herro,https://www.basketball-reference.com/players/h/herroty01.html,2027,MIL,herroty01,1629639,1610612749.0,SG
+Jared McCain,https://www.basketball-reference.com/players/m/mccaija01.html,2027,OKC,mccaija01,1642272,1610612760.0,SG
 Scottie Barnes,https://www.basketball-reference.com/players/b/barnesc01.html,2027,TOR,barnesc01,1630567,1610612761.0,PF
 Devin Booker,https://www.basketball-reference.com/players/b/bookede01.html,2027,PHO,bookede01,1626164,1610612756.0,SG
 Stephen Curry,https://www.basketball-reference.com/players/c/curryst01.html,2027,GSW,curryst01,201939,1610612744.0,PG
@@ -43,12 +50,12 @@ Jalen Brunson,https://www.basketball-reference.com/players/b/brunsja01.html,2027
 Duncan Robinson,https://www.basketball-reference.com/players/r/robindu01.html,2027,DET,robindu01,1629130,1610612765.0,SF
 RJ Barrett,https://www.basketball-reference.com/players/b/barrerj01.html,2027,TOR,barrerj01,1629628,1610612761.0,SF
 Dyson Daniels,https://www.basketball-reference.com/players/d/daniedy01.html,2027,ATL,daniedy01,1630700,1610612737.0,SG
+VJ Edgecombe,https://www.basketball-reference.com/players/e/edgecvj01.html,2027,PHI,edgecvj01,1642845,1610612755.0,SG
+Aaron Gordon,https://www.basketball-reference.com/players/g/gordoaa01.html,2027,DEN,gordoaa01,203932,1610612743.0,PF
 Jalen Johnson,https://www.basketball-reference.com/players/j/johnsja05.html,2027,ATL,johnsja05,1630552,1610612737.0,SF
-Jared McCain,https://www.basketball-reference.com/players/m/mccaija01.html,2027,OKC,mccaija01,1642272,1610612760.0,SG
 Naz Reid,https://www.basketball-reference.com/players/r/reidna01.html,2027,CHO,reidna01,1629675,1610612766.0,C
 Obi Toppin,https://www.basketball-reference.com/players/t/toppiob01.html,2027,IND,toppiob01,1630167,1610612754.0,PF
 Trae Young,https://www.basketball-reference.com/players/y/youngtr01.html,2027,WAS,youngtr01,1629027,1610612764.0,PG
-Jaylen Brown,https://www.basketball-reference.com/players/b/brownja02.html,2027,PHI,brownja02,1627759,1610612755.0,SF
 Javonte Green,https://www.basketball-reference.com/players/g/greenja02.html,2027,DET,greenja02,1629750,1610612765.0,SG
 CJ McCollum,https://www.basketball-reference.com/players/m/mccolcj01.html,2027,ATL,mccolcj01,203468,1610612737.0,PG
 Dennis Schröder,https://www.basketball-reference.com/players/s/schrode01.html,2027,CHO,schrode01,203471,1610612766.0,PG
@@ -60,6 +67,7 @@ Kyshawn George,https://www.basketball-reference.com/players/g/georgky01.html,202
 Dylan Harper,https://www.basketball-reference.com/players/h/harpedy01.html,2027,SAS,harpedy01,1642844,1610612759.0,SG
 Lauri Markkanen,https://www.basketball-reference.com/players/m/markkla01.html,2027,UTA,markkla01,1628374,1610612762.0,PF
 Brandon Miller,https://www.basketball-reference.com/players/m/millebr02.html,2027,CHO,millebr02,1641706,1610612766.0,SF
+Evan Mobley,https://www.basketball-reference.com/players/m/mobleev01.html,2027,CLE,mobleev01,1630596,1610612739.0,PF
 Andrew Nembhard,https://www.basketball-reference.com/players/n/nembhan01.html,2027,IND,nembhan01,1629614,1610612754.0,SG
 Matas Buzelis,https://www.basketball-reference.com/players/b/buzelma01.html,2027,CHI,buzelma01,1641824,1610612741.0,SF
 Moussa Diabaté,https://www.basketball-reference.com/players/d/diabamo01.html,2027,CHO,diabamo01,1631217,1610612766.0,C
@@ -68,8 +76,11 @@ Jaden McDaniels,https://www.basketball-reference.com/players/m/mcdanja02.html,20
 Payton Pritchard,https://www.basketball-reference.com/players/p/pritcpa01.html,2027,BOS,pritcpa01,1630202,1610612738.0,PG
 Marcus Sasser,https://www.basketball-reference.com/players/s/sassema01.html,2027,DAL,sassema01,1631204,1610612742.0,PG
 Derrick White,https://www.basketball-reference.com/players/w/whitede01.html,2027,BOS,whitede01,1628401,1610612738.0,SG
+Alex Caruso,https://www.basketball-reference.com/players/c/carusal01.html,2027,OKC,carusal01,1627936,1610612760.0,SG
 Ayo Dosunmu,https://www.basketball-reference.com/players/d/dosunay01.html,2027,MIN,dosunay01,1630245,1610612750.0,SG
+James Harden,https://www.basketball-reference.com/players/h/hardeja01.html,2027,CLE,hardeja01,201935,1610612739.0,PG
 Naji Marshall,https://www.basketball-reference.com/players/m/marshna01.html,2027,DAL,marshna01,1630230,1610612742.0,SF
+Ajay Mitchell,https://www.basketball-reference.com/players/m/mitchaj01.html,2027,OKC,mitchaj01,1642349,1610612760.0,SG
 Amen Thompson,https://www.basketball-reference.com/players/t/thompam01.html,2027,HOU,thompam01,1641708,1610612745.0,SF
 Aaron Wiggins,https://www.basketball-reference.com/players/w/wiggiaa01.html,2027,ATL,wiggiaa01,1630598,1610612737.0,SG
 Caleb Wilson,https://www.basketball-reference.com/players/w/wilsoca01.html,2027,CHI,wilsoca01,1643410,1610612741.0,PF
@@ -82,22 +93,24 @@ Kyrie Irving,https://www.basketball-reference.com/players/i/irvinky01.html,2027,
 Jaren Jackson Jr.,https://www.basketball-reference.com/players/j/jacksja02.html,2027,UTA,jacksja02,1628991,1610612762.0,C
 Kasparas Jakučionis,https://www.basketball-reference.com/players/j/jakucka01.html,2027,MIL,jakucka01,1642857,1610612749.0,SG
 Norman Powell,https://www.basketball-reference.com/players/p/powelno01.html,2027,CHI,powelno01,1626181,1610612741.0,SG
+Anfernee Simons,https://www.basketball-reference.com/players/s/simonan01.html,2027,PHI,simonan01,1629014,1610612755.0,SG
 Jalen Smith,https://www.basketball-reference.com/players/s/smithja04.html,2027,CHI,smithja04,1630188,1610612741.0,C
 Keaton Wagler,https://www.basketball-reference.com/players/w/wagleke01.html,2027,LAC,wagleke01,1643413,1610612746.0,SG
+Cason Wallace,https://www.basketball-reference.com/players/w/wallaca01.html,2027,OKC,wallaca01,1641717,1610612760.0,SG
+Jarrett Allen,https://www.basketball-reference.com/players/a/allenja01.html,2027,CLE,allenja01,1628386,1610612739.0,C
 Tristan Da Silva,https://www.basketball-reference.com/players/d/dasiltr01.html,2027,ORL,dasiltr01,1641783,1610612753.0,SF
 De'Aaron Fox,https://www.basketball-reference.com/players/f/foxde01.html,2027,SAS,foxde01,1628368,1610612759.0,PG
 Josh Hart,https://www.basketball-reference.com/players/h/hartjo01.html,2027,NYK,hartjo01,1628404,1610612752.0,SG
-Chet Holmgren,https://www.basketball-reference.com/players/h/holmgch01.html,2027,OKC,holmgch01,1631096,1610612760.0,C
-LeBron James,https://www.basketball-reference.com/players/j/jamesle01.html,2027,PHI,jamesle01,2544,1610612755.0,SF
 Ja Morant,https://www.basketball-reference.com/players/m/moranja01.html,2027,POR,moranja01,1629630,1610612757.0,PG
 Domantas Sabonis,https://www.basketball-reference.com/players/s/sabondo01.html,2027,SAC,sabondo01,1627734,1610612758.0,C
 Brandon Williams,https://www.basketball-reference.com/players/w/willibr03.html,2027,GSW,willibr03,1630314,1610612744.0,PG
 Saddiq Bey,https://www.basketball-reference.com/players/b/beysa01.html,2027,NOP,beysa01,1630180,1610612740.0,SF
-Joel Embiid,https://www.basketball-reference.com/players/e/embiijo01.html,2027,PHI,embiijo01,203954,1610612755.0,C
+Kentavious Caldwell-Pope,https://www.basketball-reference.com/players/c/caldwke01.html,2027,PHI,caldwke01,203484,1610612755.0,SG
+DeMar DeRozan,https://www.basketball-reference.com/players/d/derozde01.html,2027,DEN,derozde01,201942,1610612743.0,SF
 Isaiah Jackson,https://www.basketball-reference.com/players/j/jacksis01.html,2027,LAC,jacksis01,1630543,1610612746.0,C
+Nikola Jokić,https://www.basketball-reference.com/players/j/jokicni01.html,2027,DEN,jokicni01,203999,1610612743.0,C
 Tre Jones,https://www.basketball-reference.com/players/j/jonestr01.html,2027,CHI,jonestr01,1630200,1610612741.0,PG
 Yves Missi,https://www.basketball-reference.com/players/m/missiyv01.html,2027,NOP,missiyv01,1642274,1610612740.0,C
-Anfernee Simons,https://www.basketball-reference.com/players/s/simonan01.html,2027,PHI,simonan01,1629014,1610612755.0,SG
 Jayson Tatum,https://www.basketball-reference.com/players/t/tatumja01.html,2027,BOS,tatumja01,1628369,1610612738.0,PF
 Darius Acuff Jr.,https://www.basketball-reference.com/players/a/acuffda01.html,2027,SAC,acuffda01,1643411,1610612758.0,PG
 Ace Bailey,https://www.basketball-reference.com/players/b/baileac01.html,2027,UTA,baileac01,1642846,1610612762.0,SF
@@ -110,7 +123,6 @@ Yaxel Lendeborg,https://www.basketball-reference.com/players/l/lendeya01.html,20
 Gui Santos,https://www.basketball-reference.com/players/s/santogu01.html,2027,GSW,santogu01,1630611,1610612744.0,PF
 Jaylen Wells,https://www.basketball-reference.com/players/w/wellsja01.html,2027,MEM,wellsja01,1642377,1610612763.0,SG
 Victor Wembanyama,https://www.basketball-reference.com/players/w/wembavi01.html,2027,SAS,wembavi01,1641705,1610612759.0,C
-Jalen Williams,https://www.basketball-reference.com/players/w/willija06.html,2027,OKC,willija06,1631114,1610612760.0,SG
 Deandre Ayton,https://www.basketball-reference.com/players/a/aytonde01.html,2027,WAS,aytonde01,1629028,1610612764.0,C
 Donovan Clingan,https://www.basketball-reference.com/players/c/clingdo01.html,2027,POR,clingdo01,1642270,1610612757.0,C
 Bilal Coulibaly,https://www.basketball-reference.com/players/c/coulibi01.html,2027,WAS,coulibi01,1641731,1610612764.0,SF
@@ -123,11 +135,12 @@ Myles Turner,https://www.basketball-reference.com/players/t/turnemy01.html,2027,
 Andrew Wiggins,https://www.basketball-reference.com/players/w/wiggian01.html,2027,MIA,wiggian01,203952,1610612748.0,SF
 OG Anunoby,https://www.basketball-reference.com/players/a/anunoog01.html,2027,NYK,anunoog01,1628384,1610612752.0,PF
 Dillon Brooks,https://www.basketball-reference.com/players/b/brookdi01.html,2027,PHO,brookdi01,1628415,1610612756.0,SF
-Kentavious Caldwell-Pope,https://www.basketball-reference.com/players/c/caldwke01.html,2027,PHI,caldwke01,203484,1610612755.0,SG
 Bub Carrington,https://www.basketball-reference.com/players/c/carrica01.html,2027,WAS,carrica01,1642267,1610612764.0,PG
 Jalen Green,https://www.basketball-reference.com/players/g/greenja05.html,2027,PHO,greenja05,1630224,1610612756.0,SG
 Quentin Grimes,https://www.basketball-reference.com/players/g/grimequ01.html,2027,LAL,grimequ01,1629656,1610612747.0,SG
 Rui Hachimura,https://www.basketball-reference.com/players/h/hachiru01.html,2027,LAC,hachiru01,1629060,1610612746.0,PF
+Isaiah Hartenstein,https://www.basketball-reference.com/players/h/harteis01.html,2027,OKC,harteis01,1628392,1610612760.0,C
+Mario Hezonja,https://www.basketball-reference.com/players/h/hezonma01.html,2027,CLE,hezonma01,1626209,1610612739.0,PF
 Keldon Johnson,https://www.basketball-reference.com/players/j/johnske04.html,2027,SAS,johnske04,1629640,1610612759.0,SF
 Jock Landale,https://www.basketball-reference.com/players/l/landajo01.html,2027,ATL,landajo01,1629111,1610612737.0,C
 Jake LaRavia,https://www.basketball-reference.com/players/l/laravja01.html,2027,LAL,laravja01,1631222,1610612747.0,PF
@@ -139,11 +152,10 @@ Marcus Smart,https://www.basketball-reference.com/players/s/smartma01.html,2027,
 Klay Thompson,https://www.basketball-reference.com/players/t/thompkl01.html,2027,MIA,thompkl01,202691,1610612748.0,SF
 Ja'Kobe Walter,https://www.basketball-reference.com/players/w/walteja01.html,2027,TOR,walteja01,1642266,1610612761.0,SG
 P.J. Washington,https://www.basketball-reference.com/players/w/washipj01.html,2027,DAL,washipj01,1629023,1610612742.0,PF
-Alex Caruso,https://www.basketball-reference.com/players/c/carusal01.html,2027,OKC,carusal01,1627936,1610612760.0,SG
 Noah Clowney,https://www.basketball-reference.com/players/c/clownno01.html,2027,BRK,clownno01,1641730,1610612751.0,PF
 LJ Cryer,https://www.basketball-reference.com/players/c/cryerlj01.html,2027,GSW,cryerlj01,1643018,1610612744.0,PG
-VJ Edgecombe,https://www.basketball-reference.com/players/e/edgecvj01.html,2027,PHI,edgecvj01,1642845,1610612755.0,SG
 Trayce Jackson-Davis,https://www.basketball-reference.com/players/j/jackstr02.html,2027,TOR,jackstr02,1631218,1610612761.0,C
+Aday Mara,https://www.basketball-reference.com/players/m/maraad01.html,2027,OKC,maraad01,1643530,1610612760.0,C
 Darryn Peterson,https://www.basketball-reference.com/players/p/peterda02.html,2027,UTA,peterda02,1643408,1610612762.0,SG
 Scotty Pippen Jr.,https://www.basketball-reference.com/players/p/pippesc02.html,2027,MEM,pippesc02,1630590,1610612763.0,PG
 Ryan Rollins,https://www.basketball-reference.com/players/r/rolliry01.html,2027,MIL,rolliry01,1631157,1610612749.0,PG
@@ -167,12 +179,14 @@ Will Richard,https://www.basketball-reference.com/players/r/richawi02.html,2027,
 Baylor Scheierman,https://www.basketball-reference.com/players/s/scheiba01.html,2027,BOS,scheiba01,1631248,1610612738.0,SG
 Emanuel Sharp,https://www.basketball-reference.com/players/s/sharpem01.html,2027,SAC,sharpem01,1643567,1610612758.0,SG
 Day'Ron Sharpe,https://www.basketball-reference.com/players/s/sharpda01.html,2027,BRK,sharpda01,1630549,1610612751.0,C
+Peyton Watson,https://www.basketball-reference.com/players/w/watsope01.html,2027,CLE,watsope01,1631212,1610612739.0,SF
+Jaylin Williams,https://www.basketball-reference.com/players/w/willija07.html,2027,OKC,willija07,1631119,1610612760.0,PF
 Cameron Boozer,https://www.basketball-reference.com/players/b/boozeca02.html,2027,MEM,boozeca02,1643409,1610612763.0,PF
+Christian Braun,https://www.basketball-reference.com/players/b/braunch01.html,2027,DEN,braunch01,1631128,1610612743.0,SG
 Isaiah Collier,https://www.basketball-reference.com/players/c/colliis01.html,2027,UTA,colliis01,1642268,1610612762.0,PG
 Cedric Coward,https://www.basketball-reference.com/players/c/cowarce01.html,2027,MEM,cowarce01,1642907,1610612763.0,SG
 Kris Dunn,https://www.basketball-reference.com/players/d/dunnkr01.html,2027,LAC,dunnkr01,1627739,1610612746.0,PG
 Keon Ellis,https://www.basketball-reference.com/players/e/elliske01.html,2027,BRK,elliske01,1631165,1610612751.0,SG
-Aday Mara,https://www.basketball-reference.com/players/m/maraad01.html,2027,OKC,maraad01,1643530,1610612760.0,C
 Georges Niang,https://www.basketball-reference.com/players/n/niangge01.html,2027,GSW,niangge01,1627777,1610612744.0,PF
 Bobby Portis,https://www.basketball-reference.com/players/p/portibo01.html,2027,MIA,portibo01,1626171,1610612748.0,PF
 Quinten Post,https://www.basketball-reference.com/players/p/postqu01.html,2027,MEM,postqu01,1642366,1610612763.0,C
@@ -189,12 +203,13 @@ De'Andre Hunter,https://www.basketball-reference.com/players/h/huntede01.html,20
 Quenton Jackson,https://www.basketball-reference.com/players/j/jacksqu01.html,2027,IND,jacksqu01,1631245,1610612754.0,PG
 Morez Johnson Jr.,https://www.basketball-reference.com/players/j/johnsmo01.html,2027,DAL,johnsmo01,1643516,1610612742.0,PF
 Kevon Looney,https://www.basketball-reference.com/players/l/looneke01.html,2027,LAL,looneke01,1626172,1610612747.0,C
+Jamal Murray,https://www.basketball-reference.com/players/m/murraja01.html,2027,DEN,murraja01,1627750,1610612743.0,PG
 Collin Murray-Boyles,https://www.basketball-reference.com/players/m/murraco01.html,2027,TOR,murraco01,1642867,1610612761.0,PF
 Paul Reed,https://www.basketball-reference.com/players/r/reedpa01.html,2027,DET,reedpa01,1630194,1610612765.0,C
 Alex Sarr,https://www.basketball-reference.com/players/s/sarral01.html,2027,WAS,sarral01,1642259,1610612764.0,C
 Jalen Suggs,https://www.basketball-reference.com/players/s/suggsja01.html,2027,ORL,suggsja01,1630591,1610612753.0,PG
 Fred VanVleet,https://www.basketball-reference.com/players/v/vanvlfr01.html,2027,HOU,vanvlfr01,1627832,1610612745.0,PG
-Cason Wallace,https://www.basketball-reference.com/players/w/wallaca01.html,2027,OKC,wallaca01,1641717,1610612760.0,SG
+Kenrich Williams,https://www.basketball-reference.com/players/w/willike04.html,2027,OKC,willike04,1629026,1610612760.0,PF
 Bogdan Bogdanović,https://www.basketball-reference.com/players/b/bogdabo01.html,2027,HOU,bogdabo01,203992,1610612745.0,SG
 Max Christie,https://www.basketball-reference.com/players/c/chrisma02.html,2027,DAL,chrisma02,1631108,1610612742.0,SG
 Ousmane Dieng,https://www.basketball-reference.com/players/d/diengou01.html,2027,MIL,diengou01,1631172,1610612749.0,C
@@ -202,23 +217,24 @@ Rudy Gobert,https://www.basketball-reference.com/players/g/goberru01.html,2027,M
 Allen Graves,https://www.basketball-reference.com/players/g/graveal01.html,2027,TOR,graveal01,1643512,1610612761.0,PF
 Yang Hansen,https://www.basketball-reference.com/players/y/yangha01.html,2027,POR,yangha01,1642905,1610612757.0,C
 Jaxson Hayes,https://www.basketball-reference.com/players/h/hayesja02.html,2027,UTA,hayesja02,1629637,1610612762.0,C
+Cameron Johnson,https://www.basketball-reference.com/players/j/johnsca02.html,2027,DEN,johnsca02,1629661,1610612743.0,PF
 Herbert Jones,https://www.basketball-reference.com/players/j/joneshe01.html,2027,NOP,joneshe01,1630529,1610612740.0,SF
 Kyle Kuzma,https://www.basketball-reference.com/players/k/kuzmaky01.html,2027,MIL,kuzmaky01,1628398,1610612749.0,PF
 Sandro Mamukelashvili,https://www.basketball-reference.com/players/m/mamuksa01.html,2027,LAL,mamuksa01,1630572,1610612747.0,PF
+Sam Merrill,https://www.basketball-reference.com/players/m/merrisa01.html,2027,CLE,merrisa01,1630241,1610612739.0,SG
+Ryan Nembhard,https://www.basketball-reference.com/players/n/nembhry01.html,2027,DEN,nembhry01,1642948,1610612743.0,PG
 Duop Reath,https://www.basketball-reference.com/players/r/reathdu01.html,2027,PHO,reathdu01,1641871,1610612756.0,C
 Landry Shamet,https://www.basketball-reference.com/players/s/shamela01.html,2027,NYK,shamela01,1629013,1610612752.0,SG
-Jaylin Williams,https://www.basketball-reference.com/players/w/willija07.html,2027,OKC,willija07,1631119,1610612760.0,PF
+Trevon Brazile,https://www.basketball-reference.com/players/b/brazitr01.html,2027,DEN,brazitr01,1642350,1610612743.0,PF
 Mikal Bridges,https://www.basketball-reference.com/players/b/bridgmi01.html,2027,NYK,bridgmi01,1628969,1610612752.0,SF
 Jordan Clarkson,https://www.basketball-reference.com/players/c/clarkjo01.html,2027,NYK,clarkjo01,203903,1610612752.0,SG
 Egor Dëmin,https://www.basketball-reference.com/players/d/demineg01.html,2027,BRK,demineg01,1642856,1610612751.0,PG
 Myron Gardner,https://www.basketball-reference.com/players/g/gardnmy01.html,2027,MIA,gardnmy01,1642066,1610612748.0,SF
-Isaiah Hartenstein,https://www.basketball-reference.com/players/h/harteis01.html,2027,OKC,harteis01,1628392,1610612760.0,C
 Nikola Jović,https://www.basketball-reference.com/players/j/jovicni01.html,2027,MIA,jovicni01,1631107,1610612748.0,PF
 Ryan Kalkbrenner,https://www.basketball-reference.com/players/k/kalkbry01.html,2027,CHO,kalkbry01,1641750,1610612766.0,C
 Luke Kornet,https://www.basketball-reference.com/players/k/kornelu01.html,2027,SAS,kornelu01,1628436,1610612759.0,C
 Baba Miller,https://www.basketball-reference.com/players/m/milleba01.html,2027,LAC,milleba01,1642394,1610612746.0,SF
 Leonard Miller,https://www.basketball-reference.com/players/m/millele01.html,2027,CHI,millele01,1631159,1610612741.0,SF
-Ajay Mitchell,https://www.basketball-reference.com/players/m/mitchaj01.html,2027,OKC,mitchaj01,1642349,1610612760.0,SG
 Isaac Okoro,https://www.basketball-reference.com/players/o/okorois01.html,2027,CHI,okorois01,1630171,1610612741.0,SG
 Kelly Oubre Jr.,https://www.basketball-reference.com/players/o/oubreke01.html,2027,IND,oubreke01,1626162,1610612754.0,SF
 Koa Peat,https://www.basketball-reference.com/players/p/peatko01.html,2027,PHO,peatko01,1643520,1610612756.0,PF
@@ -238,6 +254,7 @@ Kyle Filipowski,https://www.basketball-reference.com/players/f/filipky01.html,20
 Jordan Goodwin,https://www.basketball-reference.com/players/g/goodwjo01.html,2027,PHO,goodwjo01,1630692,1610612756.0,PG
 Tim Hardaway Jr.,https://www.basketball-reference.com/players/h/hardati02.html,2027,MIA,hardati02,203501,1610612748.0,SG
 Jaden Hardy,https://www.basketball-reference.com/players/h/hardyja02.html,2027,LAL,hardyja02,1630702,1610612747.0,SG
+DaRon Holmes,https://www.basketball-reference.com/players/h/holmeda01.html,2027,DEN,holmeda01,1641747,1610612743.0,PF
 Kevin Huerter,https://www.basketball-reference.com/players/h/huertke01.html,2027,DET,huertke01,1628989,1610612765.0,SG
 Bones Hyland,https://www.basketball-reference.com/players/h/hylanbo01.html,2027,MIN,hylanbo01,1630538,1610612750.0,PG
 Sion James,https://www.basketball-reference.com/players/j/jamessi01.html,2027,CHO,jamessi01,1642883,1610612766.0,SG
@@ -254,9 +271,11 @@ Cam Spencer,https://www.basketball-reference.com/players/s/spencca01.html,2027,M
 Pat Spencer,https://www.basketball-reference.com/players/s/spencpa01.html,2027,PHO,spencpa01,1630311,1610612756.0,PG
 Matisse Thybulle,https://www.basketball-reference.com/players/t/thybuma01.html,2027,LAL,thybuma01,1629680,1610612747.0,SG
 Nolan Traoré,https://www.basketball-reference.com/players/t/traorno01.html,2027,BRK,traorno01,1642849,1610612751.0,PG
+Jaylon Tyson,https://www.basketball-reference.com/players/t/tysonja01.html,2027,CLE,tysonja01,1642281,1610612739.0,SG
 Jarace Walker,https://www.basketball-reference.com/players/w/walkeja02.html,2027,IND,walkeja02,1641716,1610612754.0,PF
-Kenrich Williams,https://www.basketball-reference.com/players/w/willike04.html,2027,OKC,willike04,1629026,1610612760.0,PF
 Tobe Awaka,https://www.basketball-reference.com/players/a/awakato01.html,2027,CHI,awakato01,1643591,1610612741.0,PF
+Marvin Bagley III,https://www.basketball-reference.com/players/b/baglema01.html,2027,DEN,baglema01,1628963,1610612743.0,PF
+Adem Bona,https://www.basketball-reference.com/players/b/bonaad01.html,2027,PHI,bonaad01,1641737,1610612755.0,C
 Tari Eason,https://www.basketball-reference.com/players/e/easonta01.html,2027,HOU,easonta01,1631106,1610612745.0,PF
 Daniel Gafford,https://www.basketball-reference.com/players/g/gaffoda01.html,2027,DAL,gaffoda01,1629655,1610612742.0,C
 Luka Garza,https://www.basketball-reference.com/players/g/garzalu01.html,2027,BOS,garzalu01,1630568,1610612738.0,C
@@ -265,6 +284,7 @@ Ja'Kobi Gillespie,https://www.basketball-reference.com/players/g/gilleja02.html,
 Draymond Green,https://www.basketball-reference.com/players/g/greendr01.html,2027,GSW,greendr01,203110,1610612744.0,PF
 Bronny James,https://www.basketball-reference.com/players/j/jamesbr02.html,2027,LAL,jamesbr02,1642355,1610612747.0,SG
 David Jones García,https://www.basketball-reference.com/players/j/jonesda06.html,2027,SAS,jonesda06,1642357,1610612759.0,SF
+Tyus Jones,https://www.basketball-reference.com/players/j/jonesty01.html,2027,DEN,jonesty01,1626145,1610612743.0,PG
 Pelle Larsson,https://www.basketball-reference.com/players/l/larsspe01.html,2027,MIA,larsspe01,1641796,1610612748.0,SG
 Khaman Maluach,https://www.basketball-reference.com/players/m/maluakh01.html,2027,PHO,maluakh01,1642863,1610612756.0,C
 Chris Mañon,https://www.basketball-reference.com/players/m/manonch01.html,2027,LAL,manonch01,1643024,1610612747.0,SG
@@ -274,6 +294,7 @@ Jase Richardson,https://www.basketball-reference.com/players/r/richaja02.html,20
 Kobe Sanders,https://www.basketball-reference.com/players/s/sandeko01.html,2027,LAC,sandeko01,1642920,1610612746.0,SG
 Brice Sensabaugh,https://www.basketball-reference.com/players/s/sensabr01.html,2027,UTA,sensabr01,1641729,1610612762.0,SF
 Jamal Shead,https://www.basketball-reference.com/players/s/sheadja01.html,2027,TOR,sheadja01,1642347,1610612761.0,PG
+Jabari Walker,https://www.basketball-reference.com/players/w/walkeja01.html,2027,PHI,walkeja01,1631133,1610612755.0,SF
 Robert Williams,https://www.basketball-reference.com/players/w/williro04.html,2027,POR,williro04,1629057,1610612757.0,C
 Jaylen Clark,https://www.basketball-reference.com/players/c/clarkja02.html,2027,MIN,clarkja02,1641740,1610612750.0,SG
 Noa Essengue,https://www.basketball-reference.com/players/e/essenno01.html,2027,CHI,essenno01,1642855,1610612741.0,PF
@@ -284,7 +305,6 @@ Trey Lyles,https://www.basketball-reference.com/players/l/lylestr01.html,2027,MI
 Kyle Anderson,https://www.basketball-reference.com/players/a/anderky01.html,2027,TOR,anderky01,203937,1610612761.0,SF
 Brooks Barnhizer,https://www.basketball-reference.com/players/b/barnhbr01.html,2027,OKC,barnhbr01,1642964,1610612760.0,SG
 Joan Beringer,https://www.basketball-reference.com/players/b/berinjo01.html,2027,MIN,berinjo01,1642866,1610612750.0,PF
-Adem Bona,https://www.basketball-reference.com/players/b/bonaad01.html,2027,PHI,bonaad01,1641737,1610612755.0,C
 Jaden Bradley,https://www.basketball-reference.com/players/b/bradlja02.html,2027,TOR,bradlja02,1643558,1610612761.0,PG
 Maliq Brown,https://www.basketball-reference.com/players/b/brownma05.html,2027,SAS,brownma05,1643576,1610612759.0,PF
 Carter Bryant,https://www.basketball-reference.com/players/b/bryanca01.html,2027,SAS,bryanca01,1642868,1610612759.0,PF
@@ -301,6 +321,7 @@ Collin Gillespie,https://www.basketball-reference.com/players/g/gilleco01.html,2
 Hugo González,https://www.basketball-reference.com/players/g/gonzahu01.html,2027,BOS,gonzahu01,1642864,1610612738.0,SG
 Buddy Hield,https://www.basketball-reference.com/players/h/hieldbu01.html,2027,CHI,hieldbu01,1627741,1610612741.0,SG
 Ron Holland,https://www.basketball-reference.com/players/h/hollaro01.html,2027,DET,hollaro01,1641842,1610612765.0,SF
+Bryce Hopkins,https://www.basketball-reference.com/players/h/hopkibr01.html,2027,DEN,hopkibr01,1643624,1610612743.0,SF
 Al Horford,https://www.basketball-reference.com/players/h/horfoal01.html,2027,GSW,horfoal01,201143,1610612744.0,C
 Chaney Johnson,https://www.basketball-reference.com/players/j/johnsch06.html,2027,BRK,johnsch06,1643052,1610612751.0,SF
 Jayson Kent,https://www.basketball-reference.com/players/k/kentja01.html,2027,POR,kentja01,1643257,1610612757.0,SF
@@ -311,12 +332,13 @@ De'Anthony Melton,https://www.basketball-reference.com/players/m/meltode01.html,
 Jonathan Mogbo,https://www.basketball-reference.com/players/m/mogbojo01.html,2027,SAC,mogbojo01,1642367,1610612758.0,PF
 Larry Nance Jr.,https://www.basketball-reference.com/players/n/nancela02.html,2027,IND,nancela02,1626204,1610612754.0,PF
 Josh Okogie,https://www.basketball-reference.com/players/o/okogijo01.html,2027,UTA,okogijo01,1629006,1610612762.0,SG
+Craig Porter Jr.,https://www.basketball-reference.com/players/p/portecr01.html,2027,CLE,portecr01,1641854,1610612739.0,PG
+Tyrese Proctor,https://www.basketball-reference.com/players/p/proctty01.html,2027,CLE,proctty01,1642878,1610612739.0,PG
 Tarris Reed Jr.,https://www.basketball-reference.com/players/r/reedjta01.html,2027,SAS,reedjta01,1643542,1610612759.0,C
 Jericho Sims,https://www.basketball-reference.com/players/s/simsje01.html,2027,MIL,simsje01,1630579,1610612749.0,C
 Bennett Stirtz,https://www.basketball-reference.com/players/s/stirtbe01.html,2027,OKC,stirtbe01,1642892,1610612760.0,PG
 Jae'Sean Tate,https://www.basketball-reference.com/players/t/tateja01.html,2027,HOU,tateja01,1630256,1610612745.0,SF
 Bruce Thornton,https://www.basketball-reference.com/players/t/thornbr01.html,2027,HOU,thornbr01,1643570,1610612745.0,PG
 Nikola Vučević,https://www.basketball-reference.com/players/v/vucevni01.html,2027,ORL,vucevni01,202696,1610612753.0,C
-Jabari Walker,https://www.basketball-reference.com/players/w/walkeja01.html,2027,PHI,walkeja01,1631133,1610612755.0,SF
 Jordan Walsh,https://www.basketball-reference.com/players/w/walshjo01.html,2027,BOS,walshjo01,1641775,1610612738.0,PF
 Cody Williams,https://www.basketball-reference.com/players/w/willico04.html,2027,MIN,willico04,1642262,1610612750.0,SG

@@ -64,7 +64,16 @@ def lineuppull(team_id, season, opp=False, ps=False):
         'Cache-Control': 'max-age=0',
     }
 
-    wowy_response = requests.get(wowy_url, params=wowy_params, headers=headers)
+    # pbpstats sometimes accepts the connection and never answers; without a timeout the daily run hung here.
+    for attempt in range(3):
+        try:
+            wowy_response = requests.get(wowy_url, params=wowy_params, headers=headers, timeout=60)
+            wowy_response.raise_for_status()
+            break
+        except requests.RequestException:
+            if attempt == 2:
+                raise  # pull_onoff falls back to the local file
+            time.sleep(5 * (attempt + 1))
     wowy = wowy_response.json()
     combos = wowy["multi_row_table_data"]
     frame_length = len(combos)
