@@ -525,11 +525,32 @@ for year in range(start_year, end_year):
     merged_data['FGA']=merged_data['FG2A']+merged_data['FG3A']
     merged_data['FGM']=merged_data['FG2M']+merged_data['FG3M']
     merged_data['FG_missed']=merged_data['FGA']-merged_data['FGM']
-    print(len(merged_data))
-    merged_data.dropna(subset='GameId',inplace=True)
-    print(len(merged_data))
-    print(merged_data)
+    # Retain NBA tracking rows when PBP Stats has not published this game's logs.
+    # The local schedule supplies only the GameId; PBP-derived fields stay null.
+    schedule = dateframe.loc[dateframe['year'] == year, ['GAME_DATE', 'TEAM_ID', 'GAME_ID']].copy()
+    schedule['date'] = schedule['GAME_DATE'].astype(str)
+    schedule = schedule.rename(columns={'GAME_ID': 'scheduled_GameId'})[
+        ['date', 'TEAM_ID', 'scheduled_GameId']
+    ].drop_duplicates()
+    if schedule.duplicated(['date', 'TEAM_ID']).any():
+        raise ValueError(f"Ambiguous schedule game for {year} team/date")
+    merged_data = merged_data.merge(schedule, on=['date', 'TEAM_ID'], how='left', validate='one_to_one')
+    missing_pbp = merged_data['GameId'].isna()
+    if missing_pbp.any():
+        print(f"{year}: retaining {missing_pbp.sum()} team games without PBP Stats logs")
+    merged_data['GameId'] = merged_data['GameId'].fillna(merged_data['scheduled_GameId'])
+    if merged_data['GameId'].isna().any():
+        raise ValueError(f"{year}: team game missing both PBP Stats and scheduled GameId")
+    merged_data.drop(columns=['scheduled_GameId'], inplace=True)
     merged_data['GameId']=merged_data['GameId'].astype(int)
+    # The PBP log also supplies Opponent. Recover it from the paired NBA row.
+    teams_per_game = merged_data.groupby('GameId')['TEAM_ABBREVIATION'].nunique()
+    if (teams_per_game != 2).any():
+        raise ValueError(f"{year}: expected two teams per game before opponent merge")
+    abbr = merged_data.groupby('GameId')['TEAM_ABBREVIATION']
+    first, last = abbr.transform('first'), abbr.transform('last')
+    scheduled_opponent = pd.Series(np.where(merged_data['TEAM_ABBREVIATION'].eq(first), last, first), index=merged_data.index)
+    merged_data['Opponent'] = merged_data['Opponent'].fillna(scheduled_opponent)
     merged_data['date']=merged_data['date'].astype(int)
     merged_data.sort_values(by=['date','GameId'],inplace=True)
 

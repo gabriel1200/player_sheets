@@ -461,7 +461,7 @@ for year in range(start_year,end_year+1):
             if len(temp_index)>0:
                 temp_index = temp_index[['nba_id','Pos']]
                 temp_index.rename(columns={'nba_id':'PLAYER_ID'},inplace=True)
-                yearframe = yearframe.merge(temp_index, on='PLAYER_ID')
+                yearframe = yearframe.merge(temp_index, on='PLAYER_ID', how='left')
 
                 print(yearframe[yearframe.Pos.isna()])
 

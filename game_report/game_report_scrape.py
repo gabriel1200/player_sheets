@@ -360,7 +360,8 @@ def get_dates(start_year, end_year, ps=False):
         for team in teams.get_teams():
             team_id = team['id']
             base = 'https://raw.githubusercontent.com/gabriel1200/shot_data/refs/heads/master/team/'
-            path = f"{base}{year}{trail}/{team_id}.csv"
+            local_path = f'../../shot_data/team/{year}{trail}/{team_id}.csv'
+            path = local_path if os.path.exists(local_path) else f"{base}{year}{trail}/{team_id}.csv"
             print(path)
 
             try:
@@ -427,7 +428,10 @@ index_master['nba_id']=index_master['nba_id'].astype(int)
 
 
 
-game_dates= pd.read_csv('https://raw.githubusercontent.com/gabriel1200/shot_data/refs/heads/master/game_dates.csv')
+game_dates_path = '../../shot_data/game_dates.csv'
+if not os.path.exists(game_dates_path):
+    game_dates_path = 'https://raw.githubusercontent.com/gabriel1200/shot_data/refs/heads/master/game_dates.csv'
+game_dates = pd.read_csv(game_dates_path)
 team_id_map = game_dates[['team', 'TEAM_ID']].drop_duplicates().set_index('team')['TEAM_ID'].to_dict()
 game_dates['year'] = game_dates['season'].apply(lambda x: int(x.split('-')[0]) + 1)
 # 2. Map the 'opp_team' column using this dictionary to create the new column

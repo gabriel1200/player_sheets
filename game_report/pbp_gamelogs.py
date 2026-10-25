@@ -419,7 +419,7 @@ if __name__ == "__main__":
         logging.error(f"Failed to load master index: {e}")
         exit()
 
-    local_ref_file = "game_dates.csv"
+    local_ref_file = "../../shot_data/game_dates.csv"
     if os.path.exists(local_ref_file):
         reference_path = local_ref_file
         logging.info(f"Using local reference file: {local_ref_file}")
