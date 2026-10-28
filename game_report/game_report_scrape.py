@@ -17,6 +17,7 @@ import os
 import time
 from datetime import datetime
 from requests.exceptions import RequestException # Import for better error handling
+from game_checks import incomplete_dates
 def format_date_to_url(date):
     # Convert date from YYYYMMDD to datetime object
     date_obj = datetime.strptime(str(date), '%Y%m%d')
@@ -80,6 +81,11 @@ def pull_data(url, max_retries=3, delay_seconds=5):
     return None # Should not be reached, but good practice
 
 
+# Re-fetch dates up to this many days before the newest game date when they came back incomplete
+# (scraped before stats.nba.com finished processing tracking; game_checks.incomplete_dates).
+RECHECK_DAYS = 21
+
+
 def pull_game_level(dateframe, start_year,end_year,ps=False):
     stype = 'Regular%20Season'
     trail=''
@@ -108,6 +114,18 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
             df.drop_duplicates(subset=['date','PLAYER_ID','TEAM_ID'],inplace=True)
             if test != False:
                 df=df[df.date<game_date]
+
+            stale = incomplete_dates(df, countframe)
+            if stale:
+                latest = datetime.strptime(str(int(countframe['GAME_DATE'].max())), '%Y%m%d')
+                recent = [d for d in stale
+                          if (latest - datetime.strptime(str(d), '%Y%m%d')).days <= RECHECK_DAYS]
+                older = [d for d in stale if d not in recent]
+                if older:
+                    print(f'Incomplete dates older than {RECHECK_DAYS} days, left as-is: {older}')
+                if recent:
+                    print(f'Re-fetching incomplete dates: {recent}')
+                    df = df[~df['date'].isin(recent)]
             
             year_frame.append(df)
 
