@@ -512,7 +512,9 @@ def fetch_nba_data(start_year, end_year, season_type='rs', save_to_csv=True):
                     # replace the saved file after the full set validates.
                     complete_pbp_totals(
                         year, season_type == 'ps',
-                        Path('/tmp/pbpstats-complete') / str(year), True,
+                        # One cache folder per day: it saves repeat requests within a day's runs, but a
+                        # new day re-fetches (PBP Stats keeps adding games and players to the season).
+                        Path('/tmp/pbpstats-complete') / datetime.now().strftime('%Y%m%d') / str(year), True,
                         source_path=raw_file, destination_path=Path(filename),
                     )
                 finally:

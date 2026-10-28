@@ -22,6 +22,13 @@ import requests
 API = "https://api.pbpstats.com"
 HERE = Path(__file__).resolve().parent
 
+# PBP Stats occasionally has no row at all for a player the NBA lists (2026-27:
+# Steven Adams, 8 minutes in one game, absent from every team and league request
+# days later). A few such low-minute players are left out with a warning instead
+# of blocking the whole season file; more, or anyone with real minutes, still fails.
+ABSENT_MAX_PLAYERS = 3
+ABSENT_MAX_MINUTES = 50   # season total (the _avg file's MIN is a season total)
+
 
 def get_json(session: requests.Session, path: str, params: dict) -> dict:
     for attempt in range(3):
@@ -115,11 +122,18 @@ def complete(
                 by_player[player].append(row)
         print(f"team {team}: {len(rows)} players", flush=True)
 
+    avg_by_id = avg.set_index(avg["PLAYER_ID"].astype(str))
     absent = sorted(player for player, rows in by_player.items() if not rows)
     if absent:
-        raise ValueError(f"PBP Stats team requests did not return player IDs {absent}")
+        minutes = avg_by_id.loc[absent, "MIN"].astype(float)
+        if len(absent) > ABSENT_MAX_PLAYERS or (minutes >= ABSENT_MAX_MINUTES).any():
+            raise ValueError(f"PBP Stats team requests did not return player IDs {absent}")
+        print("WARNING: PBP Stats has no row for " + ", ".join(
+            f"{player} {avg_by_id.loc[player, 'PLAYER_NAME']} ({minutes[player]:.0f} min)" for player in absent)
+            + "; left out of the file", flush=True)
+        missing -= set(absent)
+        target -= set(absent)
 
-    avg_by_id = avg.set_index(avg["PLAYER_ID"].astype(str))
     additions = []
     combined = []
     for player in sorted(missing):
