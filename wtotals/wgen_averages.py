@@ -19,6 +19,10 @@
 #     (Rebounding tracking data) instead of url23 - it wasn't erroring or coming back
 #     empty, it was just silently mislabeling rebounding columns as 15ft+ defense stats
 #
+# SPLIT PLAYERS (2026-10-29): the league dashboards list a player whose display name changed mid-season once per
+# name (Nia Coffey -> Nia Brodie, 2026), and the merges on PLAYER_ID multiplied her rows. combine_split_players()
+# replaces such a player's rows with the league's own combined season line before the merges.
+#
 # DIAGNOSTICS (new): every pull_data() call is now labeled (e.g. 'drives', 'hustle',
 # 'defend_3pt') and pull_data() no longer crashes the whole run on a bad request - it
 # catches the error, records it, and returns an empty frame so the rest of the pulls
@@ -143,6 +147,55 @@ def pull_data(url, label='unlabeled'):
     return df
 
 
+def player_season_line(player_id, season, stype, measure, label):
+    """The league's own combined season line for one player (playerdashboardbygeneralsplits, OverallPlayerDashboard, Totals), or None."""
+    url = (f'https://stats.wnba.com/stats/playerdashboardbygeneralsplits?DateFrom=&DateTo=&GameSegment=&LastNGames=0&LeagueID=10&Location='
+           f'&MeasureType={measure}&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0&PlayerID={player_id}'
+           f'&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&VsConference=&VsDivision=')
+    record = {'label': label, 'url': url, 'status': 'OK', 'rows': 0, 'cols': 0, 'mostly_null_cols': [], 'error': ''}
+    try:
+        resp = browser_requests.get(url, headers=headers, impersonate='chrome', timeout=25)
+        resp.raise_for_status()
+        overall = {s['name']: s for s in resp.json()['resultSets']}['OverallPlayerDashboard']
+        line = dict(zip(overall['headers'], overall['rowSet'][0])) if overall['rowSet'] else None
+        record['rows'], record['cols'] = (1, len(overall['headers'])) if line else (0, 0)
+        if line is None: record['status'] = 'EMPTY'
+    except Exception as e:
+        record['status'], record['error'], line = 'ERROR', str(e), None
+    ENDPOINT_DIAGNOSTICS.append(record)
+    print(f"  [{label}] {record['status']}" + (f": {record['error']}" if record['error'] else ''))
+    time.sleep(.2)
+    return line
+
+
+def combine_split_players(frame, season, stype, measure, label):
+    """One row per PLAYER_ID. The league dashboards list a player whose display name changed mid-season once per name (2026: Nia Coffey ->
+    Nia Brodie, 1628269, 40 games under one name and 4 under the other), and merging two such frames on PLAYER_ID multiplied her rows (four,
+    the 40-game line paired with the 4-game line's ratings). Each such player's rows are replaced by the league's own combined season line
+    (player_season_line, same measure): identity columns from her row with the most games, *_RANK columns empty (a league rank can't be read
+    off one player's dashboard). If that request fails, the rows are kept as they are and the run says so."""
+    if frame.empty or not frame['PLAYER_ID'].duplicated().any():
+        return frame
+    split = frame['PLAYER_ID'].duplicated(keep=False)
+    keep = [frame[~split]]
+    for pid, rows in frame[split].groupby('PLAYER_ID', sort=False):
+        line = player_season_line(pid, season, stype, measure, f'{label}_combined_{pid}')
+        if line is None:
+            print(f"  [{label}] WARNING: {rows['PLAYER_NAME'].iloc[0]} ({pid}) stays split over {len(rows)} rows")
+            keep.append(rows)
+            continue
+        row = rows.sort_values('GP', ascending=False).iloc[[0]].copy()
+        by_name = {k.lower(): v for k, v in line.items()}   # the dashboard spells sp_work_* in capitals
+        for col in row.columns:
+            if col.endswith('_RANK'):
+                row[col] = None
+            elif col.lower() in by_name:
+                row[col] = by_name[col.lower()]
+        print(f"  [{label}] {row['PLAYER_NAME'].iloc[0]} ({pid}): {len(rows)} rows ({', '.join(str(g) for g in rows['GP'])} games) -> one season line ({line['GP']} games)")
+        keep.append(row)
+    return pd.concat(keep).sort_index()
+
+
 def print_diagnostics_report(year=None, trail='', save_csv=True):
     """
     Prints a summary of every pull_data() call made so far (across the whole run,
@@ -205,9 +258,11 @@ def pull_wnba_avg(dates, start_year,end_year,ps=False):
 
             url = f'https://stats.nba.com/stats/leaguedashplayerstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=10&Location=&MeasureType=Base&Month=0&OpponentTeamID=0&Outcome=&PORound=&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
             df = pull_data(url, label='base_stats')
+            df = combine_split_players(df, season, stype, 'Base', 'base_stats')
 
             url2 = f'https://stats.nba.com/stats/leaguedashplayerstats?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&LeagueID=10&Location=&MeasureType=Advanced&Month=0&OpponentTeamID=0&Outcome=&PORound=&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight='
             df2 = pull_data(url2, label='advanced_stats')
+            df2 = combine_split_players(df2, season, stype, 'Advanced', 'advanced_stats')
 
             # --- Dropped endpoints: confirmed EMPTY (0 rows) for WNBA via this API path ---
             # passing, drives, possessions, rebounding (leaguedashptstats PtMeasureType=
@@ -301,6 +356,8 @@ def pull_wnba_avg(dates, start_year,end_year,ps=False):
                 df = df.merge(frame, on='PLAYER_ID',how='left').reset_index(drop=True)
 
             df['year'] = year
+            if df['PLAYER_ID'].duplicated().any():
+                print(f"  WARNING: players on more than one row after the merges: {sorted(df.loc[df['PLAYER_ID'].duplicated(), 'PLAYER_ID'].unique().tolist())}")
 
             extra_columns = [
             '_PLAYER_NAME', 
