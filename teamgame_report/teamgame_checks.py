@@ -54,3 +54,42 @@ def date_report(saved, expected):
              'blank_tracking_rows': int(blank.get(d, 0))}
             for d in incomplete_dates(saved, expected)]
     return pd.DataFrame(rows, columns=['date', 'scheduled_teams', 'saved_teams', 'blank_tracking_rows'])
+
+
+# stats.nba.com also reprocesses tracking after a date is scraped, with no
+# blanks to give it away: in Oct 2026 the drives saved for Oct 20-27 were about
+# 40% of what it reported a few days later (Oct 21: 576 vs 1,401). A date counts
+# as revised when a team's drives there differ from stats.nba.com by more than
+# this many. Twin of game_checks.revised_dates.
+REVISION_TOL = 2
+
+
+def revised_dates(saved, dates, team_drives, tol=REVISION_TOL):
+    """Saved dates whose team drives no longer match stats.nba.com.
+
+    saved: the year file (date, TEAM_ID, DRIVES). dates: saved dates to check
+    (YYYYMMDD ints). team_drives(first, last): {TEAM_ID: drives} over
+    first..last from the Team drives endpoint, or None if the pull failed. One
+    pull covers all the dates; single dates are pulled only for teams whose
+    total over the range is off.
+    """
+    dates = sorted(int(d) for d in dates)
+    if not dates or 'DRIVES' not in saved.columns:
+        return []
+    ours = saved[saved['date'].isin(dates)].groupby(['date', 'TEAM_ID'])['DRIVES'].sum()
+
+    def off(theirs, mine):
+        return {t for t, n in theirs.items() if abs(n - mine.get(t, 0)) > tol}
+
+    window = team_drives(dates[0], dates[-1])
+    if not window:
+        return []
+    teams = off(window, ours.groupby(level='TEAM_ID').sum())
+    revised = []
+    for d in dates:
+        day = ours.xs(d, level='date')
+        if teams & set(day.index):
+            theirs = team_drives(d, d)
+            if theirs and off(theirs, day):
+                revised.append(d)
+    return revised

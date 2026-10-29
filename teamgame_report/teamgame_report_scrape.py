@@ -18,7 +18,7 @@ import os
 import time
 from datetime import datetime
 from fourfactors import four_factors_data
-from teamgame_checks import incomplete_dates
+from teamgame_checks import incomplete_dates, revised_dates
 import numpy as np
 def format_date_to_url(date):
     # Convert date from YYYYMMDD to datetime object
@@ -74,6 +74,21 @@ def pull_data(url, max_retries=3, sleep_seconds=1):
             time.sleep(sleep_seconds * attempt)  # light backoff
 
 
+def team_drives(first, last, season, stype):
+    """{TEAM_ID: drives} from stats.nba.com over first..last (YYYYMMDD ints); None if the pull failed."""
+    url = (f'https://stats.nba.com/stats/leaguedashptstats?College=&Conference=&Country='
+           f'&DateFrom={format_date_to_url(first)}&DateTo={format_date_to_url(last)}&Division=&DraftPick=&DraftYear='
+           f'&GameScope=&Height=&ISTRound=&LastNGames=0&LeagueID=00&Location=&Month=0&OpponentTeamID=0&Outcome='
+           f'&PORound=&PerMode=Totals&PlayerExperience=&PlayerOrTeam=Team&PlayerPosition=&PtMeasureType=Drives'
+           f'&Season={season}&SeasonSegment=&SeasonType={stype}&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight=')
+    try:
+        got = pull_data(url)
+    except Exception as e:  # a failed check must not stop the scrape
+        print(f'drives check failed: {e}')
+        return None
+    return None if got is None else dict(zip(got['TEAM_ID'], got['DRIVES']))
+
+
 # Saved dates are never refetched, so recent incomplete dates (see
 # teamgame_checks.py) are dropped and pulled again on the next run. Older gaps
 # are usually permanent on the NBA side; repair_teamgames.py handles those.
@@ -111,9 +126,9 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
             if test != False:
                 df=df[df.date<game_date]
 
+            latest = datetime.strptime(str(int(countframe['GAME_DATE'].max())), '%Y%m%d')
             stale = incomplete_dates(df, countframe)
             if stale:
-                latest = datetime.strptime(str(int(countframe['GAME_DATE'].max())), '%Y%m%d')
                 recent = [d for d in stale
                           if (latest - datetime.strptime(str(d), '%Y%m%d')).days <= RECHECK_DAYS]
                 older = [d for d in stale if d not in recent]
@@ -122,6 +137,14 @@ def pull_game_level_team(dateframe, start_year,end_year,ps=False):
                 if recent:
                     print(f'Re-fetching incomplete dates: {recent}')
                     df = df[~df['date'].isin(recent)]
+            # Complete dates can still be revised later (see teamgame_checks.revised_dates).
+            window = [d for d in df['date'].unique()
+                      if (latest - datetime.strptime(str(d), '%Y%m%d')).days <= RECHECK_DAYS]
+            season = str(year - 1) + '-' + str(year)[-2:]
+            revised = revised_dates(df, window, lambda a, b: team_drives(a, b, season, stype))
+            if revised:
+                print(f'Re-fetching dates whose drives stats.nba.com has since revised: {revised}')
+                df = df[~df['date'].isin(revised)]
 
             year_frame.append(df)
 
