@@ -235,9 +235,9 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
                               'CORNER_3_FGM', 'CORNER_3_FGA', 'CORNER_3_FG_PCT'  ]  # Above the Break 3
     
                 df13.columns=zone_columns
-                url14=f"https://stats.nba.com/stats/leaguedashptdefend?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DefenseCategory=Less%20Than%206Ft"
-                df14=pull_data(url14)
-                df14.rename(columns={'CLOSE_DEF_PERSON_ID':'PLAYER_ID'},inplace=True)
+                # url14/df14 (leaguedashptdefend, Less Than 6Ft) was removed 2026-10-30: url21 below asks the same endpoint and
+                # category (2025-26 values identical), and url14 had lost its Season/PerMode/... parameters, so in 2026-27 it
+                # only added empty FGM_LT_06 / FGA_LT_06 / LT_06_PCT / NS_LT_06_PCT / PLUSMINUS / FREQ columns.
     
                 url15=f"https://stats.nba.com/stats/leaguedashplayershotlocations?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DistanceRange=5ft%20Range&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&Location=&MeasureType=Base&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
                 df15=pull_data(url15)
@@ -328,7 +328,7 @@ def pull_game_level(dateframe, start_year,end_year,ps=False):
                 
                 df26 = pull_data(url26)
           
-                frames = [df2, df3, df4, df5, df6, df7, df8, df9, df10,df11,df12,df13,df14,df15,df16,df18,df19,df20,df21,df22,df23,df24,df25,df26]
+                frames = [df2, df3, df4, df5, df6, df7, df8, df9, df10,df11,df12,df13,df15,df16,df18,df19,df20,df21,df22,df23,df24,df25,df26]
                 for frame in frames:
                     
                     joined_columns = set(frame.columns) - set(df.columns)
