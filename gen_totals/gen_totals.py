@@ -601,6 +601,10 @@ for year in range(start_year,end_year+1):
         modern_years.append(yearframe)
 modern = pd.concat(modern_years)
 modern.to_csv('../year_totals/modern'+trail+'.csv',index=False)
+# The site reads modern.parquet / modern_ps.parquet too; write them from the CSV just saved (as
+# year_totals/parquet_convert.py does) so mixed-type columns get the same types as a CSV read.
+pd.read_csv('../year_totals/modern'+trail+'.csv', low_memory=False).to_parquet(
+    '../year_totals/modern'+trail+'.parquet', engine='pyarrow', compression='snappy', index=False)
 
 
 modern['adjusted_trueshooting_pct'].value_counts()
