@@ -36,6 +36,9 @@ cd all_games/
 python master_record.py
 cd ../..
 
+# Time of possession's default on this season's game logs, before gen_totals sums them (see top_default.py)
+python top_default.py players
+
 
 cd team_totals
 python team_average_scrape.py
@@ -54,6 +57,8 @@ python teamgame_report_scrape.py
 python ~/basketball/nb2py.py teamseries.ipynb
 python teamseries.py
 cd ..
+
+python top_default.py teams
 
 # Refresh this season's SRS/HCA sheet (web_app/data/srs_generated.csv) now
 # that this season's teamgame_report parquet is current. Reads that parquet

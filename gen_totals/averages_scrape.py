@@ -127,6 +127,7 @@ def pull_avg(dates, start_year,end_year,ps=False):
 
 
             df12 = pull_data(url12) 
+            df12 = df12.drop(columns=['CATCH_SHOOT_PTS', 'CATCH_SHOOT_FG_PCT'], errors='ignore')  # the catch-and-shoot request (url16) owns these: Efficiency's count extra shots, so they don't match its makes and attempts (2026-11-05)
             url13=f"https://stats.nba.com/stats/leaguedashplayershotlocations?College=&Conference=&Country=&DateFrom={date}&DateTo={date}&DistanceRange=By%20Zone&Division=&DraftPick=&DraftYear=&GameScope=&GameSegment=&Height=&ISTRound=&LastNGames=0&Location=&MeasureType=Base&Month=0&OpponentTeamID=0&Outcome=&PORound=0&PaceAdjust=N&PerMode=Totals&Period=0&PlayerExperience=&PlayerPosition=&PlusMinus=N&Rank=N&Season={season}&SeasonSegment=&SeasonType={stype}&ShotClockRange=&StarterBench=&TeamID=0&VsConference=&VsDivision=&Weight="
 
             df13=pull_data(url13)

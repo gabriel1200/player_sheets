@@ -14,6 +14,9 @@ import glob
 import os
 import numpy as np
 
+import sys
+sys.path.insert(0, '..')
+import top_default  # time of possession's default, from 2026-27 on
 ps=PLAYOFFS
 
 avg = pd.read_csv('../team_totals/team_averages.csv')
@@ -51,6 +54,7 @@ def collect_yeardata(ps=False):
         file= str(year)+trail+'_avg.csv'
         
         df = pd.read_csv(file)
+        df = top_default.season_override(df, year, ps)
         df['PLAYER_ID']=df['PLAYER_ID'].astype(str)
 
         if year >2000:

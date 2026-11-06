@@ -287,6 +287,7 @@ def pull_game_avg( start_year,end_year,ps=False,unit='Player'):
 
 
             df12 = pull_data(url12) 
+            df12 = df12.drop(columns=['CATCH_SHOOT_PTS', 'CATCH_SHOOT_FG_PCT'], errors='ignore')  # the catch-and-shoot request (url16) owns these: Efficiency's count extra shots, so they don't match its makes and attempts (2026-11-05)
 
 
             #print(df12)
