@@ -463,7 +463,9 @@ for year in range(start_year,end_year+1):
             temp_index=pd.read_csv('modern_index.csv')
             temp_index=temp_index[temp_index.year==year]
             if len(temp_index)>0:
-                temp_index = temp_index[['nba_id','Pos']]
+                # One row per player: the index lists a traded player once per team plus a total row,
+                # and a repeated id here repeats his row in the season file (2026-11-13).
+                temp_index = temp_index[['nba_id','Pos']].drop_duplicates('nba_id')
                 temp_index.rename(columns={'nba_id':'PLAYER_ID'},inplace=True)
                 yearframe = yearframe.merge(temp_index, on='PLAYER_ID', how='left')
 

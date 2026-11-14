@@ -237,7 +237,9 @@ if __name__ == "__main__":
     totals_data_with_pos['bref_id']= totals_data_with_pos['url'].str.split('/').str[-1]
     totals_data_with_pos['bref_id']= totals_data_with_pos['bref_id'].str.split('.').str[0]
     print(totals_data_with_pos.head())
-    totals_data_with_pos=totals_data_with_pos[['Pos','bref_id']]
+    # One position per player: a traded player has a row per team plus a combined row (listed first), and
+    # index_master does too, so merging them as they are repeats him teams x teams times (2026-11-13).
+    totals_data_with_pos=totals_data_with_pos[['Pos','bref_id']].drop_duplicates('bref_id')
     index_master= pd.read_csv('https://raw.githubusercontent.com/gabriel1200/site_Data/refs/heads/master/index_master.csv')
     index_master=index_master[index_master.year==SEASON_YEAR]
 
