@@ -80,6 +80,62 @@ def lineuppull(team_id, season, opp=False, ps=False):
     df = pd.DataFrame(combos, index=[0]*frame_length)
     return df
 
+# Skip teams whose saved WOWY already covers every game (2026-11-18: the pulls were 60 requests a day, about 20 of them
+# needed). A WOWY file's rows are five-man lineups, so their SecondsPlayed add up to the team's minutes in the games
+# pbpstats has processed. When that equals the minutes in the team's pbpstats game logs (../game_report/team/<year>/,
+# fetched earlier in the run by pbp_gamelogs.py) and those logs hold every game shot_data/game_dates.csv lists, nothing
+# new would come back. A file a game behind is short by that game's minutes (48 or more). Checked that day on all 60
+# files: complete ones within 0.4 min, stale ones short by exactly their missing games. The Opponent files were a day
+# behind even when fetched fresh at 10:20 CST (pbpstats updates them later than the Team ones), and this refetches them
+# until they catch up. Every file is refetched on Mondays and with LINEUPS_FULL=1, for pbpstats' corrections to past games.
+FULL_REFRESH = os.environ.get("LINEUPS_FULL") == "1" or _today.weekday() == 0
+GAP_TOLERANCE_S = 300
+
+
+def _game_seconds(minutes):  # "48:00" -> 2880
+    m, s = str(minutes).split(":")
+    return int(m) * 60 + int(s)
+
+
+_game_dates = None
+
+
+def _schedule():
+    global _game_dates
+    if _game_dates is None:
+        _game_dates = pd.read_csv("../../shot_data/game_dates.csv")
+    return _game_dates
+
+
+def wowy_gap_seconds(wowy_seconds, team_id, year, ps=False):
+    """Game-log seconds minus WOWY seconds for the team, or None when its game logs are behind the schedule."""
+    logs = pd.read_csv(f"../game_report/team/{year}/{int(team_id)}.csv")
+    logs = logs[logs.SeasonType == ("Playoffs" if ps else "Regular Season")]
+    ref = _schedule()
+    ref = ref[(ref.season == f"{year - 1}-{str(year)[-2:]}") & (ref.playoffs.astype(str) == str(bool(ps)))
+              & (ref.TEAM_ID == int(team_id))]
+    if set(ref.GAME_ID.astype(int)) - set(logs.GameId.astype(int)):
+        return None
+    return logs.Minutes.map(_game_seconds).sum() - wowy_seconds
+
+
+def wowy_up_to_date(filepath, team_id, year, ps=False):
+    """(True, why) when the saved file covers every game in the team's game logs and schedule; (False, why) otherwise."""
+    if FULL_REFRESH:
+        return False, "full refresh"
+    if not os.path.exists(filepath):
+        return False, "no saved file"
+    try:
+        gap = wowy_gap_seconds(pd.read_csv(filepath, usecols=["SecondsPlayed"]).SecondsPlayed.sum(), team_id, year, ps)
+    except Exception as e:
+        return False, f"check failed ({e})"
+    if gap is None:
+        return False, "game logs behind the schedule"
+    if abs(gap) > GAP_TOLERANCE_S:
+        return False, f"{gap / 60:+.0f} min behind the game logs"
+    return True, "up to date"
+
+
 def get_filename(team_id, year, opp=False, ps=False):
     """Generate filename based on parameters"""
     filename = f"{team_id}"
@@ -128,6 +184,7 @@ def pull_onoff(years, opp=False, ps=False, force_refresh=False):
         fail_list = []
         success_count = 0
         temp_files = []  # Track temporary files for this pull
+        skipped = 0  # teams whose saved file is already complete (wowy_up_to_date)
 
         season_index.dropna(subset='team_id', inplace=True)
 
@@ -140,9 +197,21 @@ def pull_onoff(years, opp=False, ps=False, force_refresh=False):
             # ---------------------------------------------------------
             # MODIFIED LOGIC: Always try scrape first, fallback to file
             # ---------------------------------------------------------
+            up_to_date, why = wowy_up_to_date(filepath, team_id, year, ps)
+            if up_to_date:
+                frames.append(pd.read_csv(filepath))
+                success_count += 1
+                skipped += 1
+                continue
             try:
-                print(f"Attempting scrape for Team {team_id} ({season})...")
+                print(f"Attempting scrape for Team {team_id} ({season}): {why}...")
                 df = lineuppull(team_id, season, opp=opp, ps=ps)
+                try:
+                    gap = wowy_gap_seconds(df.SecondsPlayed.sum(), team_id, year, ps)
+                    if gap is not None and abs(gap) > GAP_TOLERANCE_S:
+                        print(f"-> pbpstats' WOWY is still {gap / 60:+.0f} min behind the game logs; refetched next run")
+                except Exception:
+                    pass
                 
                 # Process the scraped data
                 df = df.reset_index(drop=True)
@@ -195,7 +264,7 @@ def pull_onoff(years, opp=False, ps=False, force_refresh=False):
         if frames:
             year_frame = pd.concat(frames)
             all_frames.append(year_frame)
-            print(f'Year {year} Completed with {success_count} teams (fresh + cached)')
+            print(f'Year {year} Completed with {success_count} teams (fresh + cached; {skipped} already up to date, not fetched)')
         else:
             print(f"All operations failed for year {year}.")
             # Clean up temp files if everything failed totally (unlikely with this logic but good safety)

@@ -2,6 +2,7 @@
 # Generated from pbp_gamelogs.ipynb by nb2py.py; edit the notebook.
 
 
+import glob
 import os, datetime as _dt
 _today = _dt.date.today()
 SEASON_YEAR = int(os.environ.get("NBA_SEASON_YEAR") or _today.year + (_today.month >= 10))  # end year: 2027 = 2026-27 (see ~/basketball/season.sh)
@@ -132,6 +133,56 @@ def get_team_abbreviations():
         '1610612766': 'CHO', '1610612748': 'MIA', '1610612753': 'ORL', '1610612750': 'MIN', 
         '1610612763': 'MEM', '1610612740': 'NOP'
     }
+
+def derive_opponent_logs(year_dir: str, team_dict: Dict[str, str], reference_path: str, season: str
+                         ) -> Tuple[Dict[str, pd.DataFrame], List[str]]:
+    """Opponent logs built from the other teams' own logs, with no requests (2026-11-18).
+
+    A team's opponent row for a game is the other team's own row for that game. Checked on every row of 2025-26 and
+    2026-27 (3,050) against pbpstats' Opponent request: every column equal except Minutes, which pbpstats rounds per
+    side (the two differ by 1 s on 12-17% of rows, never more; this carries the other team's own Minutes). Relabeled:
+    team_id is this team, Opponent the other team as this team's own row names it, team this team (team_dict).
+
+    Returns ({team_id: opponent logs}, [team_ids to fetch instead]): a team goes to the second list when its own file
+    lacks a game the reference lists for it, or another team's row for one of its games isn't saved.
+    """
+    key = ["GameId", "SeasonType"]
+    own = {}
+    for f in glob.glob(os.path.join(year_dir, "16106127??.csv")):
+        try:
+            own[os.path.basename(f)[:10]] = pd.read_csv(f, low_memory=False)
+        except Exception as e:
+            logging.warning(f"Could not read {f} to build opponent logs: {e}")
+    if not own:
+        return {}, []
+    try:
+        ref = pd.read_csv(reference_path)
+        ref = ref[ref["season"] == season]
+        sched = ref.groupby(ref["TEAM_ID"].astype(str))["GAME_ID"].apply(lambda s: set(s.astype(int))).to_dict()
+    except Exception as e:
+        logging.warning(f"Could not read {reference_path} for the schedule check: {e}")
+        sched = {}
+    rows = pd.concat([d.assign(_src=t) for t, d in own.items()], ignore_index=True)
+    derived, missing = {}, []
+    for tid, mine in own.items():
+        games = mine[key + ["Opponent"]].drop_duplicates(key)
+        if sched.get(tid, set()) - set(games["GameId"].astype(int)):
+            missing.append(tid)  # its own logs are behind (a failed Team fetch): fetch its Opponent logs as before
+            continue
+        theirs = rows[rows["_src"] != tid].merge(games[key], on=key)
+        if len(theirs.drop_duplicates(key)) < len(games):
+            missing.append(tid)
+            continue
+        vs = theirs.drop(columns=["_src", "Opponent"]).merge(games, on=key, how="left")
+        vs = vs.drop(columns=[c for c in vs.columns if vs[c].isna().all()])  # columns only other teams' files carry
+        vs["team_id"] = tid
+        if tid in team_dict:
+            vs["team"] = team_dict[tid]
+        if "Date" in vs.columns:
+            vs = vs.sort_values(["Date", "GameId"], kind="stable")
+        derived[tid] = vs.reset_index(drop=True)
+    return derived, missing
+
 
 def fetch_all_teams_game_logs(
     team_ids: List[str],
@@ -466,12 +517,21 @@ if __name__ == "__main__":
     else:
         logging.info("No teams need a Team log update.")
 
-    if teams_needing_opp:
-        # --- OPPONENT LOGS ---
-        logging.info("Fetching Opponent logs for updated teams...")
-        team_dict = get_team_abbreviations()
+    # --- OPPONENT LOGS ---
+    # Built from the team files just written (derive_opponent_logs; the check is in its docstring). pbpstats' Opponent
+    # request is now only the fallback, for a team whose own logs or an opponent's are missing a game.
+    team_dict = get_team_abbreviations()
+    season_str = f"{start_year - 1}-{str(start_year)[-2:]}"
+    derived_opp, opp_missing = derive_opponent_logs(year_dir, team_dict, reference_path, season_str)
+    for team_id_str, team_df in derived_opp.items():
+        file_path = f"{year_dir}/{team_id_str}vs.csv"
+        team_df = keep_other_season_types(file_path, team_df)
+        team_df.to_csv(file_path, index=False)
+    logging.info(f"Opponent logs built from the other teams' own logs: {len(derived_opp)} teams")
 
-        opp_teams_str = [str(t) for t in teams_needing_opp]
+    if opp_missing:
+        logging.info(f"Fetching Opponent logs for teams with a missing game: {opp_missing}")
+        opp_teams_str = [str(t) for t in opp_missing]
         opp_game_logs, opp_failed = fetch_all_teams_game_logs(
             opp_teams_str, start_year, end_year, entity_type="Opponent"
         )
@@ -494,8 +554,6 @@ if __name__ == "__main__":
                         team_df = keep_other_season_types(file_path, team_df)
                         team_df.to_csv(file_path, index=False)
                         logging.info(f"Updated VS file: {file_path}")
-    else:
-        logging.info("No teams need an Opponent log update.")
 
     logging.info("Re-aggregating all files...")
 
