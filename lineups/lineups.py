@@ -254,11 +254,9 @@ def pull_onoff(years, opp=False, ps=False, force_refresh=False):
         if temp_files:
             for temp_path, final_path in temp_files:
                 if os.path.exists(temp_path):
-                    # Delete old file if it exists (since we have a fresh scrape in temp)
-                    if os.path.exists(final_path):
-                        os.remove(final_path)
-                    # Move temp to final
-                    os.rename(temp_path, final_path)
+                    # One atomic replace: since it runs in the background (background.sh), a quick_commit could
+                    # otherwise land between deleting the old file and moving the new one in.
+                    os.replace(temp_path, final_path)
                     print(f"Committed: {final_path}")
 
         if frames:

@@ -67,9 +67,9 @@ python top_default.py teams
 # shot_data/daily_scrape.sh already refreshes earlier in all_scrapes.sh.
 python ../web_app/srs_by_season.py --current
 
-cd lineups
-python lineups.py
-cd ..
+# pbpstats WOWY on/off: in the background since 2026-11-18 (it held the whole run 1.5 h when pbpstats was down); it
+# pushes player_sheets itself once all_scrapes is done. See lineups/background.sh.
+(setsid nohup bash lineups/background.sh > "$HOME/basketball/lineups_$(date +%Y%m%d_%H%M).log" 2>&1 < /dev/null &)
 
 
 cp team_totals/team_averages.csv ../web_app/data/team_averages.csv

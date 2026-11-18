@@ -56,3 +56,5 @@ coverage.xml
 *.swp
 *.swo
 *darko_historical.csv
+# lineups.py writes each fresh file as .temp first (lineups/background.sh)
+lineups/data/**/*.temp
