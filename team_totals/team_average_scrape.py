@@ -620,7 +620,7 @@ def scrape_teams_vs(ps=False):
             teamdf = df[df['TeamId'] == team_id]
 
             try:
-                olddf = pd.read_csv(str(team_id) + carry + '.csv')
+                olddf = pd.read_csv(str(team_id) + 'vs' + carry + '.csv')  # the opponent file's own history (read the team file until 2026-11-18)
                 new_years = teamdf['year'].unique().tolist()
                 olddf = olddf[~olddf.year.isin(new_years)]
                 teamdf = pd.concat([olddf, teamdf])
